@@ -1,0 +1,17 @@
+*__/
+*___*
+*.pyc
+*.o
+.DS_Store
+*.dSYM
+.vscode/*
+*.egg-info/
+*.vhdd
+.vscode/
+.config.json
+
+netsim/toplevel
+netsim/run
+netsim/compile
+netsim/runproc
+netsim/runclock
