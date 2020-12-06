@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Table</title>
+	<link rel="stylesheet" href="css/main.css" />
+	<link rel="stylesheet" href="css/table.css" />
+
+	<!-- development version, includes helpful console warnings -->
+	<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+	<!-- production version, optimized for size and speed -->
+	<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2"></script> -->
+</head>
+
+<body>
+	<div id="app">
+		<div v-if="!connected && !cantConnect" class="loading">Loading...</div>
+		<div v-if="!connected && cantConnect" class="error">Error, can't connect to the table "{{ tableId }}"</div>
+		<div v-if="errorMessage" class="error">{{ errorMessage }}</div>
+		<div v-if="connected" class="mainTable">
+			<div class="top_bar">
+				<span class="label">Connecté en tant que : </span>
+				<span class="top_username">{{ identity.name }}</span>
+				<button v-on:click="open_sheet" v-if="!identity.gm" class="top_edit_sheet">Modifier ma fiche</button>
+			</div>
+			<jet-competence v-if="!reroll_comp.dice" v-bind:socket="socket" v-bind:identity="identity"></jet-competence>
+
+			<reroll-competence v-if="reroll_comp.dice" v-bind:socket="socket" v-bind:identity="identity"
+				v-bind:reroll_comp="reroll_comp"></reroll-competence>
+		</div>
+		<chat-compo v-if="connected" v-bind:socket="socket" v-bind:identity="identity" v-bind:reroll_comp="reroll_comp">
+		</chat-compo>
+	</div>
+
+	<script src="app/util.js"></script>
+	<script src="app/comp/chat.js"></script>
+	<script src="app/table_app.js"></script>
+</body>
+
+</html>

@@ -1,6 +1,9 @@
 from fastapi import HTTPException
 import aioboto3
 
+from decimal import Decimal
+import json
+
 from util import config
 
 # res = await aioboto3.resource('dynamodb').__aenter__() ?
@@ -26,10 +29,12 @@ async def set_item(id, **args):
     # async with aioboto3.resource('dynamodb', **dynamo_args) as dynamodb:
     dynamodb = await get_dynamo_db()
     table = await dynamodb.Table('ocs')
-    response = await table.put_item(Item={
+    data = {
         'id': id,
         **args,
-    })
+    }
+    data = json.loads(json.dumps(data), parse_float=Decimal)
+    response = await table.put_item(Item=data)
     return response
 
 

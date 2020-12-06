@@ -1,0 +1,17 @@
+#app {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+}
+
+.error {
+	background: #d89494;
+    color: #191919;
+    font-weight: bold;
+    padding: 20px;
+    max-width: 500px;
+    border: 10px solid #ef4343;
+    margin: auto;
+}

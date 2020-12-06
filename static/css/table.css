@@ -1,0 +1,285 @@
+code {
+	color: black;
+    background: rgb(4 255 0 / 19%);
+    border-radius: 6px;
+}
+
+/*
+	Chat
+*/
+.chat {
+	width: 400px;
+	height: 100%;
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	border-left: 2px solid gray;
+	background: rgb(230, 230, 230);
+	z-index: 20;
+}
+
+.chat_message_list {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	padding: 10px;
+	height: calc(100% - 47px);
+	width: calc(100% - 20px);
+	overflow: scroll;
+}
+
+.chat_help {
+	background: #b7ccf3;
+    padding: 5px;
+    border: 2px solid #0b0b96;
+    border-radius: 5px;
+}
+
+.chat_message {
+	margin: 5px 0px;
+}
+.chat_message_user {
+	font-weight: bold;
+}
+.chat_message_text {
+	padding: 0px;
+	margin: 0px;
+}
+.chat_message_error {
+	background: #ff8f8f;
+    padding: 5px;
+    border: 2px solid red;
+}
+.chat_message_self {
+	border-right: 2px solid rgb(54, 130, 202);
+}
+
+/* rolls */
+.chat_roll_line * {
+	vertical-align: middle;
+}
+.chat_roll_expr {
+	display: inline-block;
+	font-family: monospace;
+	margin-right: 0.5em;
+}
+.chat_roll_total {
+	margin-right: 0.5em;
+}
+.chat_dice {
+	display: inline-block;
+    padding: 1px;
+    /* border: 1px solid red; */
+    border-radius: 5px;
+	background: #e0b8e0;
+	box-shadow: 0 0px 3px 0px black;
+	margin-right: 0.4em;
+}
+.chat_dice.dice_20 {
+	background-color: #d9e4ff;
+	background-image: url(/web/images/hexa.png);
+    background-size: cover;
+    height: 1.6em;
+    width: 1.6em;
+    text-align: center;
+    line-height: 1.6em;
+    border-radius: 2em;
+}
+.chat_dice.dice_20 .chat_dice_p2 {
+	display: none;
+}
+.chat_dice.dice_20.rolled_1 {
+	background-color: #35ea33;
+    font-weight: bold;
+    color: #000000;
+}
+.chat_dice.dice_20.rolled_20 {
+	background-color: #000000;
+	background-image: url(/web/images/hexa_red.png);
+    font-weight: bold;
+	color: #ec4646;
+}
+
+/* Jets de competence */
+.chat_competence {
+	text-align: center;
+	background: #d0d0d0;
+    padding: 5px;
+}
+.chat_competence_title {
+	font-family: fantasy;
+	border-bottom: 1px solid black;
+	padding: 3px
+}
+.chat_competence_jet {
+	margin: 6px 0px;
+}
+.comp_qual_dice {
+	display: inline-block;
+    padding: 1px;
+	box-shadow: 0 0px 3px 0px black;
+	background-color: #d9e4ff;
+	background-image: url(/web/images/hexa.png);
+    background-size: cover;
+    height: 1.6em;
+    width: 1.6em;
+    text-align: center;
+    line-height: 1.6em;
+	border-radius: 2em;
+	margin: 0px 0.5em;
+}
+
+.comp_reussite .chat_competence_title {
+	background: #a9d2b2;
+}
+.comp_critique .chat_competence_title {
+	background: #00b728;
+    font-weight: bold;
+    color: black;
+}
+.comp_echec .chat_competence_title {
+	background: #e0b8b8;
+}
+.comp_maladresse .chat_competence_title {
+	background: #1f1f1f;
+    font-weight: bold;
+    color: #ff0404;
+}
+.comp_dice_can_reroll {
+	cursor: pointer;
+}
+.comp_qual_dice.rolled_1 {
+	background-color: #35ea33;
+    font-weight: bold;
+    color: #000000;
+}
+.comp_qual_dice.rolled_20 {
+	background-color: #000000;
+	background-image: url(/web/images/hexa_red.png);
+    font-weight: bold;
+	color: #ec4646;
+}
+.comp_dice_kept {
+	background-color: #712323;
+    color: #d2d2d2;
+}
+.comp_qual_dice.comp_dice_kept.rolled_1 {
+	background-color: #712323;
+	color: #35ea33;
+}
+.comp_qual_dice.comp_dice_kept.rolled_20 {
+	background-color: #712323;
+    color: #d2d2d2;
+	background-image: url(/web/images/hexa_red.png);
+}
+
+
+/* input */
+
+.chat_form {
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	width: calc(100% - 4px);
+	height: 25;
+	border-top: 2px solid gray;
+}
+.chat_form > input {
+	height: 25px;
+	padding: 0px 2px;
+    width: 100%;
+    border: none;
+}
+
+/*
+	Main area
+*/
+
+.label {
+	font-weight: bold;
+}
+
+
+.mainTable {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	height: 100%;
+	width: calc(100% - 400px - 2px);
+	overflow: scroll;
+}
+.top_bar {
+	background-color: rgb(255, 243, 202);
+	padding: 5px;
+	box-shadow: 0px 0px 5px black;
+	z-index: 10;
+	margin-bottom: 2em;
+}
+.top_edit_sheet {
+	display: inline-block;
+	float: right;
+	margin-right: 1em;
+}
+
+/* jet de dés */
+.inrc_view {
+	padding: 10px;
+    background: #eaeaea;
+	margin-bottom: 1em;
+	text-align: center;
+}
+.inrc_view input {
+	height: 2em;
+    width: 4em;
+    text-align: center;
+}
+.inrc_view td, .inrc_view th {
+	text-align: center;
+	width: 7em;
+}
+.inrc_view > table {
+	display: inline-block;
+}
+.inrc_view > div {
+}
+
+
+.reroll_comp_view input {
+	background: #c5c5c5;
+    color: #b93131;
+    border-radius: 10px;
+}
+.list_reroll {
+	text-align: center;
+}
+.dice_reroll_ask {
+	display: inline-block;
+    padding: 1px;
+    box-shadow: 0 0px 3px 0px rgb(43, 12, 12);
+    background-color: #d9e4ff;
+    background-image: url(/web/images/hexa.png);
+    background-size: cover;
+    height: 2.5em;
+    width: 2.5em;
+    text-align: center;
+    line-height: 2.5em;
+    border-radius: 3em;
+    margin: 0px 0.5em;
+    cursor: pointer;
+    margin: 1em;
+	opacity: 0.7;
+}
+
+
+.dice_reroll_ask:hover {
+    box-shadow: 0 0px 6px 0px black;
+    background-color: #ffffff;
+	opacity: 1;
+}
+
+
+.dice_reroll_ask.dice_for_reroll {
+    box-shadow: 0 0px 6px 0px rgb(99, 97, 12);
+	background-color: #8dc573;
+	opacity: 1;
+}

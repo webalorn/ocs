@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
 
 from db import get_item, set_item
+from chat import *
 from util import new_id
 
 app = FastAPI()
@@ -78,12 +79,10 @@ class WebsocketGroup:
         self.active_connections.remove(websocket)
 
     async def broadcast(self, data: str):
-        print(self.active_connections)
         for connection in self.active_connections:
             await connection.send_json(data)
 
     async def broadcast_other(self, websocket, data: str):
-        print(self.active_connections)
         for connection in self.active_connections:
             if connection is not websocket:
                 await connection.send_json(data)
@@ -92,7 +91,7 @@ class WebsocketGroup:
 table_groups = {}
 
 
-@app.websocket("/ws/table/{table_id}")
+@app.websocket("/ws/table/{table_id}")  # Chat
 async def websocket_endpoint(websocket: WebSocket, table_id: str):
     table = await get_item(table_id)
     if table_id not in table_groups:
@@ -103,8 +102,21 @@ async def websocket_endpoint(websocket: WebSocket, table_id: str):
     await group.connect(websocket)
     try:
         while True:
-            data = await websocket.receive_json()
-            await group.broadcast(data)
+            message = await websocket.receive_json()
+            try:
+                send_message = process_message(message)
+                send_message['from'] = message['from']
+                send_message['from_name'] = message['from_name']
+                await group.broadcast(send_message)
+            except MessageError as e:
+                await websocket.send_json({
+                    'type': 'error',
+                    'message': e.text,
+                })
+            except Exception as e:
+                await websocket.send_json({
+                    'type': 'error',
+                    'message': str(e),
+                })
     except WebSocketDisconnect:
         group.disconnect(websocket)
-        await group.broadcast({'message': "One client left the chat"})

@@ -1,0 +1,1014 @@
+<div class="sheet" v-if="loaded">
+	<div class="s_header">
+		<div class="avatar" v-on:click="updateAvatar" v-bind:style="avatarStyle"></div>
+		<div class="infos">
+			<label for="owner">Joueur :</label>
+			<input placeholder="Nom du joueur" type="text" name="owner" v-model.trim="sheet.owner" />
+			<br />
+			<label for="nom">Personage :</label>
+			<input placeholder="Nom du personage" type="text" name="nom" v-model.trim="sheet.head.nom" />
+			<br />
+			<label>PAV :</label>
+			{{sheet.xp.total}} ({{ deriv.xp.degree }})
+			<br />
+			<label>PV :</label>
+			<int-input v-model.number="sheet.cur_stats.ev" style="width: 4em; text-align: right;" />
+			</int-input>
+			/ {{ deriv.stats.ev }}
+			<span v-if="deriv.ev_etats == 1" class="ev_niv_1">Touché (1)</span>
+			<span v-if="deriv.ev_etats == 2" class="ev_niv_2">Touché (2)</span>
+			<span v-if="deriv.ev_etats == 3" class="ev_niv_3">Touché (3)</span>
+			<span v-if="deriv.ev_etats == 4" class="ev_niv_4">Touché (4)</span>
+			<span v-if="deriv.ev_etats == 5" class="ev_niv_5">Mourant</span>
+		</div>
+
+		<div class="qualites_bar">
+			<div class="qualite" v-for="(val, name) in sheet.qualites">
+				<div class="qualite_symb" v-bind:class="'qual_' + name">{{ name.toUpperCase() }}</div>
+				<div class="qualite_val">
+					<int-input v-model.number="sheet.qualites[name]" />
+					</int-input>
+				</div>
+			</div>
+		</div>
+
+
+		<data-saver v-bind:manager="saveManager" v-bind:data="sheet"></data-saver>
+	</div>
+	<div class="s_body">
+		<div class="s_sidebar">
+			<div class="s_sidebar_character" v-on:click="active_view='character';"></div>
+			<div class="s_sidebar_stats" v-on:click="active_view='stats';"></div>
+			<div class="s_sidebar_fight" v-on:click="active_view='fight';"></div>
+			<div class="s_sidebar_stuff" v-on:click="active_view='stuff';"></div>
+			<div class="s_sidebar_magic" v-on:click="active_view='magic';"></div>
+			<div class="s_sidebar_gods" v-on:click="active_view='gods';"></div>
+			<div class="s_sidebar_notes" v-on:click="active_view='notes';"></div>
+		</div>
+
+		<div class="s_main_area" v-if="active_view == 'character'">
+			<div class="col_33">
+				<div>
+					<div class="champ_in">
+						<label>Nom</label>
+						<div class='field'><input type="text" v-model.trim="sheet.head.nom" /></div>
+					</div>
+					<div class="champ_in">
+						<label>Sexe</label>
+						<div class='field'><input type="text" v-model.trim="sheet.head.sexe" /></div>
+					</div>
+					<div class="champ_in">
+						<label>Peuple</label>
+						<div class='field'><input type="text" v-model.trim="sheet.head.peuple" /></div>
+					</div>
+					<div class="champ_in">
+						<label>Date de naissance</label>
+						<div class='field'><input type="text" v-model.trim="sheet.head.date_naissance" /></div>
+					</div>
+					<div class="champ_in">
+						<label>Âge</label>
+						<div class='field'><input type="text" v-model.trim="sheet.head.age" /></div>
+					</div>
+					<div class="champ_in">
+						<label>Couleur de cheveux</label>
+						<div class='field'><input type="text" v-model.trim="sheet.head.cheveux" /></div>
+					</div>
+					<div class="champ_in">
+						<label>Couleur des yeux</label>
+						<div class='field'><input type="text" v-model.trim="sheet.head.yeux" /></div>
+					</div>
+					<div class="champ_in">
+						<label>Taille / Masse</label>
+						<div class='field'><input type="text" v-model.trim="sheet.head.taille_masse" /></div>
+					</div>
+					<div class="champ_in">
+						<label>Profession</label>
+						<div class='field'><input type="text" v-model.trim="sheet.head.profession" /></div>
+					</div>
+					<div class="champ_in">
+						<label>Culture</label>
+						<div class='field'><input type="text" v-model.trim="sheet.head.culture" /></div>
+					</div>
+					<div class="champ_in">
+						<label>Niveau social</label>
+						<div class='field'><input type="text" v-model.trim="sheet.head.niveau_social" /></div>
+					</div>
+					<div class="champ_in">
+						<label>Lieu de naissance</label>
+						<div class='field'><input type="text" v-model.trim="sheet.head.lieu_naissance" /></div>
+					</div>
+					<div class="champ_in">
+						<label>Famille</label>
+					</div>
+					<div class="champ_in">
+						<div class='field'><input type="text" v-model.trim="sheet.head.famille" /></div>
+					</div>
+					<div class="champ_in">
+						<label>Traits caractéristiques</label>
+					</div>
+					<div class="champ_in">
+						<div class='field'><input type="text" v-model.trim="sheet.head.traits" /></div>
+					</div>
+
+					<div class="champ_in">
+						<label>Description physique complète</label>
+					</div>
+					<textarea class="s_textarea" v-model="sheet.head.description_phy"></textarea>
+				</div>
+			</div>
+
+			<div class="col_33">
+				<div>
+					<div class="champ_in"><label>Avantages</label></div>
+					<textarea class="s_textarea" v-model="sheet.avantages"></textarea>
+					<div class="champ_in"><label>Désavantages</label></div>
+					<textarea class="s_textarea" v-model="sheet.desavantages"></textarea>
+					<div class="champ_in"><label>Capacités spéciales (CS) générales</label></div>
+					<textarea class="s_textarea" v-model="sheet.cs.generales"></textarea>
+				</div>
+			</div>
+
+			<div class="col_33">
+				<div>
+					<table class="table_stats">
+						<tr>
+							<td></td>
+							<td>Valeur</td>
+							<td>Avant / Desav</td>
+							<td>Achat</td>
+							<td>Total</td>
+						</tr>
+						<tr>
+							<td><label>Énergie Vitale</label></td>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.stats.ev[0]"></int-input>
+							</td>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.stats.ev[1]"></int-input>
+							</td>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.stats.ev[2]"></int-input>
+							</td>
+							<td class="ts_cell">{{ deriv.stats.ev }}</td>
+						</tr>
+						<tr>
+							<td><label>Énergie Astrale</label></td>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.stats.ea[0]"></int-input>
+							</td>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.stats.ea[1]"></int-input>
+							</td>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.stats.ea[2]"></int-input>
+							</td>
+							<td class="ts_cell">{{ deriv.stats.ea }}</td>
+						</tr>
+						<tr>
+							<td><label>Énergie Karmique</label></td>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.stats.ek[0]"></int-input>
+							</td>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.stats.ek[1]"></int-input>
+							</td>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.stats.ek[2]"></int-input>
+							</td>
+							<td class="ts_cell">{{ deriv.stats.ek }}</td>
+						</tr>
+						<tr>
+							<td><label>Ténacité Mentale</label></td>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.stats.tm[0]"></int-input>
+							</td>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.stats.tm[1]"></int-input>
+							</td>
+							<td class="ts_cell ts_cell_cross">
+								</int-input>
+							</td>
+							<td class="ts_cell">{{ deriv.stats.tm }}</td>
+						</tr>
+						<tr>
+							<td><label>Ténacité Physique</label></td>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.stats.tp[0]"></int-input>
+							</td>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.stats.tp[1]"></int-input>
+							</td>
+							<td class="ts_cell ts_cell_cross">
+								</int-input>
+							</td>
+							<td class="ts_cell">{{ deriv.stats.tp }}</td>
+						</tr>
+						<tr>
+							<td><label>Esquive</label></td>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.stats.esq[0]"></int-input>
+							</td>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.stats.esq[1]"></int-input>
+							</td>
+							<td class="ts_cell ts_cell_cross">
+								</int-input>
+							</td>
+							<td class="ts_cell">{{ deriv.stats.esq }}</td>
+						</tr>
+						<tr>
+							<td><label>Initiative</label></td>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.stats.ini[0]"></int-input>
+							</td>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.stats.ini[1]"></int-input>
+							</td>
+							<td class="ts_cell ts_cell_cross">
+								</int-input>
+							</td>
+							<td class="ts_cell">{{ deriv.stats.ini }}</td>
+						</tr>
+						<tr>
+							<td><label>Vitesse</label></td>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.stats.vi[0]"></int-input>
+							</td>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.stats.vi[1]"></int-input>
+							</td>
+							<td class="ts_cell ts_cell_cross">
+								</int-input>
+							</td>
+							<td class="ts_cell">{{ deriv.stats.vi }}</td>
+						</tr>
+					</table>
+					<div class="champ_in">
+						<label>Points de destin</label>
+					</div>
+					<table class="table_stats">
+						<tr>
+							<td class="ts_cell_head">Valeur base</td>
+							<td class="ts_cell_head">Bonus / Malus</td>
+							<td class="ts_cell_head">Max</td>
+							<td class="ts_cell_head">Actuels</td>
+						</tr>
+						<tr>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.des.valeur"></int-input>
+							</td>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.des.modif"></int-input>
+							</td>
+							<td class="ts_cell">{{ deriv.des.max }}</td>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.des.actuels"></int-input>
+							</td>
+						</tr>
+					</table>
+
+					<div class="champ_in">
+						<label>Degré d'expérience</label>
+						<div class='field'>{{ deriv.xp.degree }}</div>
+					</div>
+					<div class="champ_in">
+						<label>Points d'aventure</label>
+					</div>
+					<table class="table_stats table_xp">
+						<tr>
+							<td class="ts_cell_head">Totaux</td>
+							<td class="ts_cell_head">Non dépensés</td>
+							<td class="ts_cell_head">Dépensés</td>
+						</tr>
+						<tr>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.xp.total"></int-input>
+							</td>
+							<td class="ts_cell">{{ deriv.xp.restant }}</td>
+							<td class="ts_cell">
+								<int-input v-model.number="sheet.xp.spent"></int-input>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+
+
+
+
+		<div class="s_main_area" v-if="active_view == 'stats'">
+			<div class="col_33">
+				<div>
+					<table class="table_talents s_table">
+						<tr>
+							<th colspan="6">Talents physiques (CO/AG/FO)</th>
+						</tr>
+						<sheet-talent v-bind:name="'Acuité sensorielle'" v-bind:dices="'IN/IU/IU'" v-bind:enc="'EVTL'"
+							v-bind:am="'D'" v-bind:stats="sheet.talents.phy.acuite">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Alcools & drogues'" v-bind:dices="'IN/CN/FO'" v-bind:enc="'NON'"
+							v-bind:am="'A'" v-bind:stats="sheet.talents.phy.alcool">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Batellerie'" v-bind:dices="'CO/CH/DE'" v-bind:enc="'OUI'"
+							v-bind:am="'A'" v-bind:stats="sheet.talents.phy.batellerie">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Chant'" v-bind:dices="'IN/CH/CN'" v-bind:enc="'EVTL'"
+							v-bind:am="'A'" v-bind:stats="sheet.talents.phy.chant">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Danse'" v-bind:dices="'IN/CH/AG'" v-bind:enc="'OUI'" v-bind:am="'A'"
+							v-bind:stats="sheet.talents.phy.danse">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Équitation'" v-bind:dices="'CH/AG/FO'" v-bind:enc="'OUI'"
+							v-bind:am="'B'" v-bind:stats="sheet.talents.phy.equitation">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Escalade'" v-bind:dices="'CO/AG/FO'" v-bind:enc="'OUI'"
+							v-bind:am="'B'" v-bind:stats="sheet.talents.phy.escalade">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Furtivité'" v-bind:dices="'CO/IU/AG'" v-bind:enc="'OUI'"
+							v-bind:am="'C'" v-bind:stats="sheet.talents.phy.furtivite">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Maîtrise corporelle'" v-bind:dices="'AG/AG/CN'" v-bind:enc="'OUI'"
+							v-bind:am="'D'" v-bind:stats="sheet.talents.phy.maitrise_corps">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Maîtrise de soi'" v-bind:dices="'CO/CO/CN'" v-bind:enc="'NON'"
+							v-bind:am="'D'" v-bind:stats="sheet.talents.phy.maitrise_soi">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Natation'" v-bind:dices="'AG/CN/FO'" v-bind:enc="'OUI'"
+							v-bind:am="'B'" v-bind:stats="sheet.talents.phy.natation">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Tour de force'" v-bind:dices="'CN/FO/FO'" v-bind:enc="'OUI'"
+							v-bind:am="'b'" v-bind:stats="sheet.talents.phy.tour_force">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Vol'" v-bind:dices="'CO/IU/AG'" v-bind:enc="'OUI'" v-bind:am="'B'"
+							v-bind:stats="sheet.talents.phy.vol">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Vol à la tire'" v-bind:dices="'CO/DE/AG'" v-bind:enc="'OUI'"
+							v-bind:am="'B'" v-bind:stats="sheet.talents.phy.vol_tire">
+						</sheet-talent>
+
+						<tr>
+							<th colspan="6">Talents sociaux</th>
+						</tr>
+						<sheet-talent v-bind:name="'Connaissance de la rue'" v-bind:dices="'IN/IU/CH'"
+							v-bind:enc="'EVTL'" v-bind:am="'C'" v-bind:stats="sheet.talents.soc.rue">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Convertir & convaincre'" v-bind:dices="'CO/IN/CH'"
+							v-bind:enc="'NON'" v-bind:am="'B'" v-bind:stats="sheet.talents.soc.convertir">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Déguisement'" v-bind:dices="'IU/CH/AG'" v-bind:enc="'OUI'"
+							v-bind:am="'B'" v-bind:stats="sheet.talents.soc.deguisement">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Étiquette'" v-bind:dices="'IN/IU/CH'" v-bind:enc="'EVTL'"
+							v-bind:am="'B'" v-bind:stats="sheet.talents.soc.etiquette">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Intimidation'" v-bind:dices="'CO/IU/CH'" v-bind:enc="'NON'"
+							v-bind:am="'B'" v-bind:stats="sheet.talents.soc.intimidation">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Nature humaine'" v-bind:dices="'IN/IU/CH'" v-bind:enc="'NON'"
+							v-bind:am="'C'" v-bind:stats="sheet.talents.soc.nature_humaine">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Persutation'" v-bind:dices="'CO/IU/CH'" v-bind:enc="'NON'"
+							v-bind:am="'C'" v-bind:stats="sheet.talents.soc.persutaation">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Séduction'" v-bind:dices="'CO/CH/CH'" v-bind:enc="'EVTL'"
+							v-bind:am="'B'" v-bind:stats="sheet.talents.soc.seduction">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Volonté'" v-bind:dices="'CO/IU/CH'" v-bind:enc="'NON'"
+							v-bind:am="'D'" v-bind:stats="sheet.talents.soc.volonte">
+						</sheet-talent>
+
+						<tr>
+							<th colspan="6">Talents de nature</th>
+						</tr>
+						<sheet-talent v-bind:name="'Botanique'" v-bind:dices="'IN/DE/CN'" v-bind:enc="'EVTL'"
+							v-bind:am="'C'" v-bind:stats="sheet.talents.nat.botanique">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Orientation'" v-bind:dices="'IN/IU/IU'" v-bind:enc="'NON'"
+							v-bind:am="'B'" v-bind:stats="sheet.talents.nat.orientation">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Pêche'" v-bind:dices="'DE/AG/CN'" v-bind:enc="'EVTL'"
+							v-bind:am="'A'" v-bind:stats="sheet.talents.nat.peche">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Pistage'" v-bind:dices="'CO/IU/AG'" v-bind:enc="'OUI'"
+							v-bind:am="'C'" v-bind:stats="sheet.talents.nat.pistage">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Pratique des noeuds'" v-bind:dices="'IN/DE/FO'" v-bind:enc="'EVTL'"
+							v-bind:am="'A'" v-bind:stats="sheet.talents.nat.noeuds">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Survie'" v-bind:dices="'CO/AG/CN'" v-bind:enc="'OUI'"
+							v-bind:am="'C'" v-bind:stats="sheet.talents.nat.survie">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Zoologie'" v-bind:dices="'CO/CO/CH'" v-bind:enc="'OUI'"
+							v-bind:am="'C'" v-bind:stats="sheet.talents.nat.zoologie">
+						</sheet-talent>
+					</table>
+				</div>
+			</div>
+
+			<div class="col_33">
+				<div>
+					<table class="table_talents s_table">
+
+						<tr>
+							<th colspan="6">Connaissances</th>
+						</tr>
+						<sheet-talent v-bind:name="'Art de la guerre'" v-bind:dices="'CO/IN/IU'" v-bind:enc="'NON'"
+							v-bind:am="'B'" v-bind:stats="sheet.talents.connaissance.art_guerre">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Astronomie'" v-bind:dices="'IN/IN/IU'" v-bind:enc="'NON'"
+							v-bind:am="'A'" v-bind:stats="sheet.talents.connaissance.astonomie">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Calcul'" v-bind:dices="'IN/IN/IU'" v-bind:enc="'NON'"
+							v-bind:am="'A'" v-bind:stats="sheet.talents.connaissance.calcul">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Contes & légendes'" v-bind:dices="'IN/IN/IU'" v-bind:enc="'NON'"
+							v-bind:am="'B'" v-bind:stats="sheet.talents.connaissance.contes_legendes">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Dieux & cultes'" v-bind:dices="'IN/IN/IU'" v-bind:enc="'NON'"
+							v-bind:am="'B'" v-bind:stats="sheet.talents.connaissance.dieux_cultes">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Droit'" v-bind:dices="'IN/IN/IU'" v-bind:enc="'NON'" v-bind:am="'A'"
+							v-bind:stats="sheet.talents.connaissance.droit">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Géographie'" v-bind:dices="'IN/IN/IU'" v-bind:enc="'NON'"
+							v-bind:am="'B'" v-bind:stats="sheet.talents.connaissance.geographie">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Histoire'" v-bind:dices="'IN/IN/IU'" v-bind:enc="'NON'"
+							v-bind:am="'B'" v-bind:stats="sheet.talents.connaissance.histoire">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Jeux'" v-bind:dices="'IN/IN/IU'" v-bind:enc="'NON'" v-bind:am="'A'"
+							v-bind:stats="sheet.talents.connaissance.jeux">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Magicologie'" v-bind:dices="'IN/IN/IU'" v-bind:enc="'NON'"
+							v-bind:am="'C'" v-bind:stats="sheet.talents.connaissance.magicologie">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Mécanique'" v-bind:dices="'IN/IN/DE'" v-bind:enc="'NON'"
+							v-bind:am="'B'" v-bind:stats="sheet.talents.connaissance.mecanique">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Sphérologie'" v-bind:dices="'IN/IN/IU'" v-bind:enc="'NON'"
+							v-bind:am="'B'" v-bind:stats="sheet.talents.connaissance.spherologie">
+						</sheet-talent>
+
+
+						<tr>
+							<th colspan="6">Savoir-faire</th>
+						</tr>
+						<sheet-talent v-bind:name="'Alchimie'" v-bind:dices="'CO/IN/DE'" v-bind:enc="'OUI'"
+							v-bind:am="'C'" v-bind:stats="sheet.talents.savoir.alchimie">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Bateaux & navires'" v-bind:dices="'DE/AG/FO'" v-bind:enc="'OUI'"
+							v-bind:am="'C'" v-bind:stats="sheet.talents.savoir.navires">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Commerce'" v-bind:dices="'IN/IU/CH'" v-bind:enc="'NON'"
+							v-bind:am="'B'" v-bind:stats="sheet.talents.savoir.commerce">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Conduite'" v-bind:dices="'CH/DE/CN'" v-bind:enc="'OUI'"
+							v-bind:am="'A'" v-bind:stats="sheet.talents.savoir.conduite">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Crochetage'" v-bind:dices="'IU/DE/DE'" v-bind:enc="'OUI'"
+							v-bind:am="'C'" v-bind:stats="sheet.talents.savoir.crochetage">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Cuisine'" v-bind:dices="'IU/DE/DE'" v-bind:enc="'OUI'"
+							v-bind:am="'A'" v-bind:stats="sheet.talents.savoir.cuisine">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Musique'" v-bind:dices="'CH/DE/CN'" v-bind:enc="'OUI'"
+							v-bind:am="'A'" v-bind:stats="sheet.talents.savoir.musique">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Peinture & dessin'" v-bind:dices="'IN/DE/DE'" v-bind:enc="'OUI'"
+							v-bind:am="'A'" v-bind:stats="sheet.talents.savoir.peinture_dessin">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Soin de l\'esprit'" v-bind:dices="'IU/CH/CN'" v-bind:enc="'NON'"
+							v-bind:am="'B'" v-bind:stats="sheet.talents.savoir.soin_esprit">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Soin des blessures'" v-bind:dices="'IU/DE/DE'" v-bind:enc="'OUI'"
+							v-bind:am="'D'" v-bind:stats="sheet.talents.savoir.soin_blessures">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Soin des maladies'" v-bind:dices="'CO/IU/CN'" v-bind:enc="'OUI'"
+							v-bind:am="'B'" v-bind:stats="sheet.talents.savoir.soin_maladies">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Soin des poisons'" v-bind:dices="'CO/IN/IU'" v-bind:enc="'OUI'"
+							v-bind:am="'B'" v-bind:stats="sheet.talents.savoir.soin_poisons">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Travail de la pierre'" v-bind:dices="'DE/DE/FO'" v-bind:enc="'OUI'"
+							v-bind:am="'A'" v-bind:stats="sheet.talents.savoir.pierre">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Travail du bois'" v-bind:dices="'DE/AG/FO'" v-bind:enc="'OUI'"
+							v-bind:am="'B'" v-bind:stats="sheet.talents.savoir.bois">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Travail du cuir'" v-bind:dices="'DE/AG/CN'" v-bind:enc="'OUI'"
+							v-bind:am="'B'" v-bind:stats="sheet.talents.savoir.cuir">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Travail du métal'" v-bind:dices="'DE/CN/FO'" v-bind:enc="'OUI'"
+							v-bind:am="'C'" v-bind:stats="sheet.talents.savoir.métal">
+						</sheet-talent>
+						<sheet-talent v-bind:name="'Travail du tissu'" v-bind:dices="'IN/DE/DE'" v-bind:enc="'OUI'"
+							v-bind:am="'A'" v-bind:stats="sheet.talents.savoir.tissu">
+						</sheet-talent>
+					</table>
+				</div>
+			</div>
+
+			<div class="col_33">
+				<div>
+					<div class="champ_in">
+						<label>Langues</label>
+					</div>
+					<textarea class="s_textarea" v-model="sheet.langues"></textarea>
+					<div class="champ_in">
+						<label>Écritures</label>
+					</div>
+					<textarea class="s_textarea" v-model="sheet.ecritures"></textarea>
+					<div class="champ_in">
+						<label>Modifications temporaires des qualités</label>
+					</div>
+					<textarea class="s_textarea" v-model="sheet.modifs_qualites"></textarea>
+					<sheet-etats-display v-bind:etats="sheet.etats"></sheet-etats-display>
+				</div>
+			</div>
+		</div>
+
+
+
+		<div class="s_main_area" v-if="active_view == 'fight'">
+			<div class="col_666">
+				<div>
+
+					<div class="quick_fight_stats">
+						<label>VI : </label>{{ deriv.stats.vi }}
+						<label>PV : </label>
+						<int-input v-model.number="sheet.cur_stats.ev" style="width: 4em; text-align: right;" />
+						</int-input> / {{ deriv.stats.ev }}
+						<label>ESQ : </label>{{ deriv.stats.esq }}
+						<label>INI : </label>{{ deriv.stats.ini }}
+						<label>TM : </label>{{ deriv.stats.tm }}
+						<label>TP : </label>{{ deriv.stats.tp }}
+					</div>
+					<div class="ev_seuils">
+						<label>1/4 perdus : </label> {{ Math.floor(deriv.stats.ev * 3 / 4) }}
+						<label>1/2 perdus : </label> {{ Math.floor(deriv.stats.ev * 1 / 2) }}
+						<label>3/4 perdus : </label> {{ Math.floor(deriv.stats.ev * 1 / 4) }}
+						<label>Sous 5 PV </label> +1 douleur
+					</div>
+					<hr>
+
+					<div class="champ_in">
+						<label>Armes de mêlée</label>
+					</div>
+					<sheet-table v-bind:schema="['str', 'str', 'str', 'str', 'str', 'str', 'int', 'int', 'int']"
+						v-bind:data="sheet.armes.melee"
+						v-bind:titles="['Arme', 'Technique', 'Bonus PI', 'PI', 'AT/PRD Mod', 'Allonge', 'AT', 'PRD', 'Masse']"
+						class="weapon_table"></sheet-table>
+
+					<div class="champ_in">
+						<label>Armes de combat à distance</label>
+					</div>
+					<sheet-table v-bind:schema="['str', 'str', 'str', 'str', 'str', 'str', 'int', 'int']"
+						v-bind:data="sheet.armes.distance"
+						v-bind:titles="['Arme', 'Technique', 'Durée de charg.', 'PI', 'Munitions', 'Portée', 'CD', 'Masse']"
+						class="weapon_table dist_weapon"></sheet-table>
+
+					<div class="champ_in">
+						<label>Armures</label>
+					</div>
+					<sheet-table v-bind:schema="['str', 'int', 'int', 'str', 'str', 'int']"
+						v-bind:data="sheet.armes.armures"
+						v-bind:titles="['Armure', 'PR', 'ENC', 'Malus supp.', 'Voyage, combat', 'Masse']"
+						class="table_armures"></sheet-table>
+
+					<div class="champ_in">
+						<label>Boucliers / Armes de parade</label>
+					</div>
+					<sheet-table v-bind:schema="['str', 'int', 'str', 'int']" v-bind:data="sheet.armes.parade"
+						v-bind:titles="['Bouclier / Arme', 'Pts de struc.', 'AT/PRD mod.', 'Masse']"
+						class="table_boucliers">
+					</sheet-table>
+					<br />
+					<div class="champ_in">
+						<label>Masse des armes & armures :</label>
+						{{ deriv.masse.weapons }}
+					</div>
+				</div>
+			</div>
+
+			<div class="col_33">
+				<div>
+					<table class="table_techniques s_table">
+						<tr>
+							<th>Techniques de combat</th>
+							<th>Q princ</th>
+							<th>Am.</th>
+							<th>VTC</th>
+							<th>AT/CD</th>
+							<th>PRD</th>
+						</tr>
+						<sheet-technique v-bind:name="'Arbalètes'" v-bind:q="'DE'" v-bind:am="'A'"
+							v-bind:stats="sheet.techniques.arbaletes">
+						</sheet-technique>
+						<sheet-technique v-bind:name="'Arcs'" v-bind:q="'DE'" v-bind:am="'C'"
+							v-bind:stats="sheet.techniques.arcs">
+						</sheet-technique>
+						<sheet-technique v-bind:name="'Armes à chaîne'" v-bind:q="'FO'" v-bind:am="'C'"
+							v-bind:stats="sheet.techniques.chaines">
+						</sheet-technique>
+						<sheet-technique v-bind:name="'Armes d\'hast'" v-bind:q="'AG/FO'" v-bind:am="'C'"
+							v-bind:stats="sheet.techniques.hast">
+						</sheet-technique>
+						<sheet-technique v-bind:name="'Armes de duel'" v-bind:q="'AG'" v-bind:am="'C'"
+							v-bind:stats="sheet.techniques.duel">
+						</sheet-technique>
+						<sheet-technique v-bind:name="'Armes de jet'" v-bind:q="'DE'" v-bind:am="'C'"
+							v-bind:stats="sheet.techniques.jet">
+						</sheet-technique>
+						<sheet-technique v-bind:name="'Bagarre'" v-bind:q="'AG/FO'" v-bind:am="'B'"
+							v-bind:stats="sheet.techniques.bagarre">
+						</sheet-technique>
+						<sheet-technique v-bind:name="'Boucliers'" v-bind:q="'FO'" v-bind:am="'C'"
+							v-bind:stats="sheet.techniques.boucliers">
+						</sheet-technique>
+						<sheet-technique v-bind:name="'Dagues'" v-bind:q="'AG'" v-bind:am="'B'"
+							v-bind:stats="sheet.techniques.dagues">
+						</sheet-technique>
+						<sheet-technique v-bind:name="'Épées'" v-bind:q="'AG/FO'" v-bind:am="'C'"
+							v-bind:stats="sheet.techniques.epees">
+						</sheet-technique>
+						<sheet-technique v-bind:name="'Épées à 2 mains'" v-bind:q="'FO'" v-bind:am="'C'"
+							v-bind:stats="sheet.techniques.epees2mains">
+						</sheet-technique>
+						<sheet-technique v-bind:name="'Haches & masses'" v-bind:q="'FO'" v-bind:am="'C'"
+							v-bind:stats="sheet.techniques.haches_masses">
+						</sheet-technique>
+						<sheet-technique v-bind:name="'Haches & masses à 2 mains'" v-bind:q="'FO'" v-bind:am="'C'"
+							v-bind:stats="sheet.techniques.haches_masses_2m">
+						</sheet-technique>
+						<sheet-technique v-bind:name="'Lances'" v-bind:q="'FO'" v-bind:am="'B'"
+							v-bind:stats="sheet.techniques.lances">
+						</sheet-technique>
+					</table>
+
+					<div class="champ_in">
+						<label>Capacités spéciales de combat</label>
+					</div>
+					<textarea class="s_textarea" v-model="sheet.cs.combat"></textarea>
+
+					<table class="s_table table_etats">
+						<tr>
+							<th>Etat</th>
+							<th>Niveau</th>
+							<th>Etat</th>
+							<th>Niveau</th>
+						</tr>
+						<tr>
+							<td>Confusion</td>
+							<td>
+								<intnum-input v-model.number="sheet.etats.confusion" v-bind:min="0" v-bind:max="4">
+								</intnum-input>
+							</td>
+							<td>Douleur</td>
+							<td>
+								<intnum-input v-model.number="sheet.etats.douleur" v-bind:min="0" v-bind:max="4">
+								</intnum-input>
+							</td>
+						</tr>
+						<tr>
+							<td>Encombrement</td>
+							<td>
+								<intnum-input v-model.number="sheet.etats.encombrement" v-bind:min="0" v-bind:max="4">
+								</intnum-input>
+							</td>
+							<td>Étourdissement</td>
+							<td>
+								<intnum-input v-model.number="sheet.etats.etourdissement" v-bind:min="0" v-bind:max="4">
+								</intnum-input>
+							</td>
+						</tr>
+						<tr>
+							<td>Extase</td>
+							<td>
+								<intnum-input v-model.number="sheet.etats.extase" v-bind:min="0" v-bind:max="4">
+								</intnum-input>
+							</td>
+							<td>Paralysie</td>
+							<td>
+								<intnum-input v-model.number="sheet.etats.paralysie" v-bind:min="0" v-bind:max="4">
+								</intnum-input>
+							</td>
+						</tr>
+						<tr>
+							<td>Terreur</td>
+							<td>
+								<intnum-input v-model.number="sheet.etats.terreur" v-bind:min="0" v-bind:max="4">
+								</intnum-input>
+							</td>
+							<td>Ébriété</td>
+							<td>
+								<intnum-input v-model.number="sheet.etats.ebriete" v-bind:min="0" v-bind:max="4">
+								</intnum-input>
+							</td>
+						</tr>
+					</table>
+					<div class="champ_in">
+						<label>Status</label>
+					</div>
+					<textarea class="s_textarea" v-model="sheet.status"></textarea>
+
+
+					<sheet-etats-display v-bind:etats="sheet.etats"></sheet-etats-display>
+				</div>
+			</div>
+		</div>
+
+
+
+		<div class="s_main_area" v-if="active_view == 'stuff'">
+			<div class="col_5">
+				<div>
+					<div class="champ_in">
+						<label>Équipement</label>
+					</div>
+
+					<sheet-table v-bind:schema="['str', 'int', 'str']" v-bind:data="sheet.stuff"
+						v-bind:titles="['Article', 'Masse', 'Où est-il rangé ?']" class="stuff_table"></sheet-table>
+
+					<br>
+					<div class="champ_in">
+						<label>Masse dans l'inventaire (hors armes) :</label>
+						{{ deriv.masse.stuff }}
+					</div>
+					<div class="champ_in">
+						<label>Masse totale transportée:</label>
+						{{ deriv.masse.total }} / {{ deriv.masse.max }}
+					</div>
+				</div>
+			</div>
+			<div class="col_5">
+				<div>
+					<div class="champ_in">
+						<label>Argent</label>
+					</div>
+					<table class="s_table table_argent">
+						<tr>
+							<td>
+								<int-input v-model.number="sheet.argent[0]"></int-input>
+							</td>
+							<td>
+								<int-input v-model.number="sheet.argent[1]"></int-input>
+							</td>
+							<td>
+								<int-input v-model.number="sheet.argent[2]"></int-input>
+							</td>
+							<td>
+								<int-input v-model.number="sheet.argent[3]"></int-input>
+							</td>
+						</tr>
+						<tr>
+							<th>Croisés</th>
+							<th>Deniers</th>
+							<th>Thalers</th>
+							<th>Ducats</th>
+						</tr>
+					</table>
+
+					<div class="champ_in">
+						<label>Autres possessions (hors inventaire)</label>
+					</div>
+					<textarea class="s_textarea" v-model="sheet.cs.combat"></textarea>
+
+
+					<h2>Animal <div class="avatarAnimal" v-on:click="updateAvatarAnimal"
+							v-bind:style="avatarAnimalStyle">
+						</div>
+					</h2>
+					<div class="champ_in">
+						<label>Nom</label>
+						<input type="text" v-model="sheet.animal.nom" class="field" />
+					</div>
+					<div class="champ_in">
+						<label>Type</label>
+						<input type="text" v-model="sheet.animal.type" style="width: 12em;" />
+
+						<label>PV</label>
+						<int-input v-model="sheet.animal.pv" style="width: 3em;"></int-input>
+
+						<label>PA</label>
+						<int-input v-model="sheet.animal.pa" style="width: 3em;"></int-input>
+					</div>
+					<div class="champ_in">
+						<label>CO</label>
+						<int-input v-model="sheet.animal.qualites.co" style="width: 3em;"></int-input>
+						<label>IN</label>
+						<int-input v-model="sheet.animal.qualites.in" style="width: 3em;"></int-input>
+						<label>IU</label>
+						<int-input v-model="sheet.animal.qualites.iu" style="width: 3em;"></int-input>
+						<label>CH</label>
+						<int-input v-model="sheet.animal.qualites.ch" style="width: 3em;"></int-input>
+					</div>
+					<div class="champ_in">
+						<label>DE</label>
+						<int-input v-model="sheet.animal.qualites.de" style="width: 3em;"></int-input>
+						<label>AG</label>
+						<int-input v-model="sheet.animal.qualites.ag" style="width: 3em;"></int-input>
+						<label>CN</label>
+						<int-input v-model="sheet.animal.qualites.cn" style="width: 3em;"></int-input>
+						<label>FO</label>
+						<int-input v-model="sheet.animal.qualites.fo" style="width: 3em;"></int-input>
+					</div>
+					<div class="champ_in">
+						<label>TM</label>
+						<int-input v-model="sheet.animal.tm" style="width: 3em;"></int-input>
+						<label>TP</label>
+						<int-input v-model="sheet.animal.tp" style="width: 3em;"></int-input>
+						<label>PR</label>
+						<int-input v-model="sheet.animal.pr" style="width: 3em;"></int-input>
+						<label>INI</label>
+						<int-input v-model="sheet.animal.ini" style="width: 3em;"></int-input>
+						<label>VI</label>
+						<int-input v-model="sheet.animal.vi" style="width: 3em;"></int-input>
+					</div>
+
+					<div class="champ_in">
+						<label>Attaque</label>
+						<input type="text" v-model="sheet.animal.attaque" class="field"></int-input>
+					</div>
+
+					<div class="champ_in">
+						<label>AT/CD</label>
+						<input type="text" v-model="sheet.animal.atcd" style="width: 4em;"></int-input>
+
+						<label>Défense</label>
+						<input type="text" v-model="sheet.animal.defense" style="width: 4em;"></int-input>
+
+						<label>PI</label>
+						<input type="text" v-model="sheet.animal.pi" style="width: 4em;"></int-input>
+
+						<label>AL/PO</label>
+						<input type="text" v-model="sheet.animal.alpo" style="width: 4em;"></int-input>
+					</div>
+					<div class="champ_in">
+						<label>Actions</label>
+						<input type="text" v-model="sheet.animal.actions" class="field"></int-input>
+					</div>
+
+					<div class="champ_in">
+						<label>Capacités spéciales</label>
+						<input type="text" v-model="sheet.animal.cs" class="field"></int-input>
+					</div>
+
+					<div class="champ_in">
+						<label>Notes</label>
+						<input type="text" v-model="sheet.animal.notes" class="field"></int-input>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+
+		<div class="s_main_area" v-if="active_view == 'magic'">
+			<div class="col_666">
+				<div>
+					<sheet-table
+						v-bind:schema="['str', 'str', 'int', 'str', 'str', 'str', 'str', 'str', 'str', 'str', 'str']"
+						v-bind:data="sheet.sorts"
+						v-bind:titles="['Sort/Rituel', 'Épreuve', 'VC', 'Coût', 'Durée', 'Portée', 'Durée d\'incantation', 'Domaine', 'am', 'Effets', 'p.']"
+						class="magic_table"></sheet-table>
+				</div>
+			</div>
+			<div class="col_33">
+				<div>
+					<div class="champ_in">
+						<label>PA</label>
+						<int-input v-model.number="sheet.cur_stats.ea"
+							style="width: 4em; text-align: right; margin-right: 0.2em;" />
+						</int-input>
+						/ {{ deriv.stats.ea }}
+					</div>
+					<div class="champ_in">
+						<label>PA permanents non rachetés</label>
+						<int-input v-model.number="sheet.magic.perma_pa" class="field" />
+					</div>
+
+					<div class="champ_in">
+						<label>Tradition</label>
+						<input type="text" v-model="sheet.magic.tradition" class="field" />
+					</div>
+					<div class="champ_in">
+						<label>Qualité principale</label>
+						<input type="text" v-model="sheet.magic.qualite_principale" class="field" />
+					</div>
+					<div class="champ_in">
+						<label>Domaine</label>
+						<input type="text" v-model="sheet.magic.domaine" class="field" />
+					</div>
+
+					<div class="champ_in">
+						<label>Capacités spéciales magiques</label>
+					</div>
+					<textarea class="s_textarea" v-model="sheet.magic.cs"></textarea>
+
+					<div class="champ_in">
+						<label>Tours de magie</label>
+					</div>
+					<textarea class="s_textarea" v-model="sheet.magic.tours"></textarea>
+				</div>
+			</div>
+		</div>
+
+
+
+		<div class="s_main_area" v-if="active_view == 'gods'">
+
+			<div class="col_666">
+				<div>
+					<sheet-table
+						v-bind:schema="['str', 'str', 'int', 'str', 'str', 'str', 'str', 'str', 'str', 'str', 'str']"
+						v-bind:data="sheet.liturgies"
+						v-bind:titles="['Liturgie/Cérémonie', 'Épreuve', 'VC', 'Coût', 'Durée', 'Portée', 'Durée d\'oraison', 'Aspect', 'am', 'Effets', 'p.']"
+						class="magic_table"></sheet-table>
+				</div>
+			</div>
+			<div class="col_33">
+				<div>
+					<div class="champ_in">
+						<label>PK</label>
+						<int-input v-model.number="sheet.cur_stats.ek"
+							style="width: 4em; text-align: right; margin-right: 0.2em;" />
+						</int-input>
+						/ {{ deriv.stats.ek }}
+					</div>
+					<div class="champ_in">
+						<label>PK permanents non rachetés</label>
+						<int-input v-model.number="sheet.divin.perma_pk" class="field" />
+					</div>
+
+					<div class="champ_in">
+						<label>Tradition</label>
+						<input type="text" v-model="sheet.divin.tradition" class="field" />
+					</div>
+					<div class="champ_in">
+						<label>Qualité principale</label>
+						<input type="text" v-model="sheet.divin.qualite_principale" class="field" />
+					</div>
+					<div class="champ_in">
+						<label>Aspect</label>
+						<input type="text" v-model="sheet.divin.aspect" class="field" />
+					</div>
+
+					<div class="champ_in">
+						<label>Capacités spéciales cléricales</label>
+					</div>
+					<textarea class="s_textarea" v-model="sheet.divin.cs"></textarea>
+
+					<div class="champ_in">
+						<label>Bénédictions</label>
+					</div>
+					<textarea class="s_textarea" v-model="sheet.divin.benedictions"></textarea>
+				</div>
+			</div>
+		</div>
+
+		<div class="s_main_area" v-if="active_view == 'notes'">
+			<div class="col_5">
+
+				<div>
+
+					<div class="champ_in">
+						<label>Description physique détaillée</label>
+					</div>
+					<textarea class="s_textarea" v-model="sheet.head.description_phy"></textarea>
+
+					<div class="champ_in">
+						<label>Relations, alliés & enemis</label>
+					</div>
+					<textarea class="s_textarea" v-model="sheet.notes.relations"></textarea>
+
+					<div class="champ_in">
+						<label>Idéaux & Objectifs</label>
+					</div>
+					<textarea class="s_textarea" v-model="sheet.notes.ideaux_objectifs"></textarea>
+
+					<div class="champ_in">
+						<label>Autres qualités, défauts ou traits spéciaux</label>
+					</div>
+					<textarea class="s_textarea" v-model="sheet.notes.qualites_defauts_rp"></textarea>
+				</div>
+			</div>
+
+			<div class="col_5">
+				<div>
+					<div class="champ_in">
+						<label>Notes de partie</label>
+					</div>
+					<textarea class="s_textarea" v-model="sheet.divin.benedictions"
+						style="min-height: 20em;"></textarea>
+
+
+					<div class="champ_in">
+						<label>Background</label>
+					</div>
+					<textarea class="s_textarea" v-model="sheet.notes.background" style="min-height: 20em;"></textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
