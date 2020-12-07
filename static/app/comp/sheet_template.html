@@ -1007,6 +1007,11 @@
 						<label>Background</label>
 					</div>
 					<textarea class="s_textarea" v-model="sheet.notes.background" style="min-height: 20em;"></textarea>
+					<div class="special_actions">
+						<button v-on:click="export_sheet">Exporter la fiche</button>
+						<br>
+						<button v-on:click="import_sheet">Importer une sauvegarde</button>
+					</div>
 				</div>
 			</div>
 		</div>

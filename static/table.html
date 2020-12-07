@@ -31,8 +31,8 @@
 			<reroll-competence v-if="reroll_comp.dice" v-bind:socket="socket" v-bind:identity="identity"
 				v-bind:reroll_comp="reroll_comp"></reroll-competence>
 
-			<sheet-short-view v-for="sheet in players" v-bind:sheet="sheet.content" v-bind:key="sheet.id"
-				v-bind:table="tableId" v-bind:identity="identity" v-bind:id="sheet.id">
+			<sheet-short-view v-for="id in characters" v-bind:key="id" v-bind:table="tableId" v-bind:identity="identity"
+				v-bind:id="id" v-bind:socket="socket">
 			</sheet-short-view>
 
 			<div v-if="identity.gm" class="add_player">

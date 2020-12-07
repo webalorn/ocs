@@ -8,7 +8,7 @@ var app = new Vue({
 		errorMessage: null,
 		urlParams: (new URL(window.location.href)).searchParams,
 		identity: {},
-		players: [],
+		characters: [],
 		reroll_comp: {
 			'dice': null
 		},
@@ -18,16 +18,6 @@ var app = new Vue({
 		open_sheet: function () {
 			let url = "/web/sheet.html?id=" + this.identity.id;
 			window.open(url, '_blank');
-		},
-		loadPlayers(idList) {
-			for (let i in idList) {
-				let url = "/api/sheet/" + idList[i];
-				fetch(url)
-					.then(answer => answer.json())
-					.then(data => {
-						this.players.push(data);
-					});
-			}
 		},
 		addPlayer: function () {
 			if (this.newPlayerId) {
@@ -90,7 +80,7 @@ var app = new Vue({
 							.then(data => { this.identity.name = data.content.owner })
 					}
 					this.connected = true;
-					this.loadPlayers(data['characters']);
+					this.characters = data['characters'];
 				})
 			}
 		}).catch((error) => {

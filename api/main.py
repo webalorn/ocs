@@ -1,4 +1,5 @@
 from typing import Optional, List
+from collections import defaultdict
 
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
@@ -36,6 +37,12 @@ async def get_sheet(sheet_id: str):
 async def put_sheet(sheet: Sheet, sheet_id: str):
     sheet.id = sheet_id
     await set_item(**sheet.dict())
+    await table_groups['notif_' + sheet_id].broadcast({
+        'type': 'notification',
+        'on': 'sheet',
+        'sheet_id': sheet_id,
+        'new_data': sheet.dict(),
+    })
     return 'OK'
 
 
@@ -113,18 +120,18 @@ class WebsocketGroup:
                 await connection.send_json(data)
 
 
-table_groups = {}
+table_groups = defaultdict(lambda: WebsocketGroup())
 
 
 @app.websocket("/ws/table/{table_id}")  # Chat
 async def websocket_endpoint(websocket: WebSocket, table_id: str):
     table = await get_item(table_id)
-    if table_id not in table_groups:
-        table_groups[table_id] = WebsocketGroup()
     group = table_groups[table_id]
 
     await websocket.accept()
     await group.connect(websocket)
+    for user_id in table['characters']:
+        await table_groups['notif_' + user_id].connect(websocket)
     try:
         while True:
             message = await websocket.receive_json()
@@ -144,4 +151,8 @@ async def websocket_endpoint(websocket: WebSocket, table_id: str):
                     'message': str(e),
                 })
     except WebSocketDisconnect:
+        pass
+    finally:
         group.disconnect(websocket)
+        for user_id in table['characters']:
+            table_groups['notif_' + user_id].disconnect(websocket)

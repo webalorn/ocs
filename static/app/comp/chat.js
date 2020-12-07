@@ -11,8 +11,10 @@ Vue.component('chat-compo', {
 		}
 	},
 	mounted: function () {
-		this.socket.register((event) => {
-			let data = JSON.parse(event.data);
+		this.socket.register((event, data) => {
+			if (data.type == 'notification') {
+				return;
+			}
 			let elMsgList = this.$el.querySelector('.chat_message_list');
 			if (elMsgList.clientHeight + elMsgList.scrollTop + 20 >= elMsgList.scrollHeight) {
 				this.scrollMsg = true;
@@ -49,11 +51,8 @@ Vue.component('chat-compo', {
 		},
 		historyPrev: function () {
 			if (this.inputMessage == this.getCurHistory() && this.historyPos > 0) {
-				console.log("Prev");
 				this.historyPos--;
 				this.inputMessage = this.history[this.historyPos];
-
-				console.log(this.inputMessage);
 			}
 		},
 		historyNext: function () {

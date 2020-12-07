@@ -522,3 +522,13 @@
 .magic_table td:nth-child(11), .magic_table th:nth-child(11) {
 	width: 2em;
 }
+
+
+.special_actions {
+	margin: 1em;
+    text-align: right;
+}
+.special_actions button {
+	display: inline-block;
+	margin-top: 0.5em;
+}

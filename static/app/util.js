@@ -32,7 +32,9 @@ function newReSocket(url, connnectCallback) {
 					this.initSocket();
 				}
 			}
-			this.socket.onmessage = event => this.callOnMessage.forEach(f => f(event));
+			this.socket.onmessage = event => this.callOnMessage.forEach(
+				f => f(event, event.data ? JSON.parse(event.data) : {})
+			);
 		},
 		send: function (data) {
 			this.socket.send(data);

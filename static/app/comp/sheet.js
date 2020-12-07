@@ -284,7 +284,8 @@ function compute_derived(sheet) {
 const saveIntervalMax = 60 * 1000;
 const saveInactiveDelay = 3 * 1000;
 
-function newSaveManager(data, prepareData, interval = 200) {
+function newSaveManager(dataInit, prepareData, interval = 200) {
+	let data = dataInit;
 	let lastSavedData = cloneData(data);
 	let lastModif = Date.now();
 	let lastTrySave = Date.now();
@@ -294,7 +295,8 @@ function newSaveManager(data, prepareData, interval = 200) {
 		unsaved: false,
 		saving: false,
 		saveError: false,
-		changed: function () {
+		changed: function (dataNew) {
+			data = dataNew;
 			// if (!this.unsaved && !areEqual(data, lastSavedData)) {
 			//	 this.unsaved = true;
 			// }
@@ -329,7 +331,6 @@ function newSaveManager(data, prepareData, interval = 200) {
 					}
 				}).catch((error) => {
 					console.error("Error during saving", error);
-					console.log(this);
 					this.saving = false;
 					this.saveError = true;
 				});
@@ -356,7 +357,7 @@ Vue.component('data-saver', {
 	watch: {
 		data: {
 			handler(val) {
-				this.manager.changed();
+				this.manager.changed(this.data);
 			},
 			deep: true
 		},
@@ -364,9 +365,6 @@ Vue.component('data-saver', {
 	methods: {
 		save: function () {
 			this.manager.pushSave();
-		},
-		test: function () {
-			console.log("pressed")
 		},
 	},
 	template: `
@@ -585,7 +583,8 @@ function create_sheet_component(sheet_template) {
 			return {
 				loaded: false,
 				sheet: newDefaultSheet(),
-				active_view: "character",
+				// active_view: "character",
+				active_view: "notes",
 				saveManager: null,
 			}
 		},
@@ -638,6 +637,48 @@ function create_sheet_component(sheet_template) {
 					this.sheet.animal.image = nouv;
 				}
 			},
+			export_sheet: function () {
+				let content = JSON.stringify(this.sheet);
+				let file = new Blob([content], { type: 'json' });
+				let url = URL.createObjectURL(file);
+				let a = document.createElement("a");
+				a.style.display = 'none';
+				a.href = url;
+				a.download = this.id + '.json';
+				document.body.appendChild(a);
+				a.click();
+				setTimeout(function () {
+					document.body.removeChild(a);
+					window.URL.revokeObjectURL(url);
+				}, 0);
+			},
+			import_sheet: function () {
+				let doit = confirm("Voulez vous vraiment importer une ancienne fiche ? Cela effacera toutes les données de celle-ci");
+				if (doit) {
+					let fileInput = document.createElement("input");
+					fileInput.type = 'file';
+					fileInput.style.display = 'none';
+					document.body.appendChild(fileInput);
+
+					fileInput.onchange = e => {
+						let file = e.target.files[0];
+						if (!file) {
+							return;
+						}
+						let reader = new FileReader();
+						reader.onload = function (e) {
+							fileInput.func(e.target.result);
+							document.body.removeChild(fileInput);
+						}
+						reader.readAsText(file);
+					};
+					fileInput.func = txt => {
+						let json = JSON.parse(txt);
+						this.sheet = json;
+					};
+					fileInput.click();
+				}
+			}
 		},
 		template: sheet_template,
 	});
@@ -654,11 +695,25 @@ if (event_sheet_loaded !== null) {
 	Sheet short view
 */
 Vue.component('sheet-short-view', {
-	props: ['sheet', 'identity', 'table', 'id'],
+	props: ['identity', 'table', 'id', 'socket'],
 	data: function () {
 		return {
 			detailOpen: false,
+			sheet: null,
 		}
+	},
+	mounted: function () {
+		let url = "/api/sheet/" + this.id;
+		fetch(url)
+			.then(answer => answer.json())
+			.then(data => {
+				this.sheet = data.content;
+			});
+		this.socket.register((event, data) => {
+			if (data.type == 'notification' && data.on == 'sheet' && data.sheet_id == this.id) {
+				this.sheet = data.new_data.content;
+			}
+		});
 	},
 	computed: {
 		avatarStyle: function () {
@@ -699,6 +754,7 @@ Vue.component('sheet-short-view', {
 	},
 	template: `
 	<div class="sheet_short_view">
+	<template v-if="sheet">
 		<div class="ssv_head">
 			<div class="ssv_avatar" v-bind:style="avatarStyle" v-on:click="toggleDetails"></div>
 			<div class="header_infos">
@@ -724,6 +780,11 @@ Vue.component('sheet-short-view', {
 			<div class="header_infos">
 				<label>PV :</label>
 				<span>{{sheet.cur_stats.ev}} / {{ deriv.stats.ev }}</span>
+				<span v-if="deriv.ev_etats == 1" class="ev_niv_1">Touché (1)</span>
+				<span v-if="deriv.ev_etats == 2" class="ev_niv_2">Touché (2)</span>
+				<span v-if="deriv.ev_etats == 3" class="ev_niv_3">Touché (3)</span>
+				<span v-if="deriv.ev_etats == 4" class="ev_niv_4">Touché (4)</span>
+				<span v-if="deriv.ev_etats == 5" class="ev_niv_5">Mourant</span>
 				<br>
 				<template v-if="deriv.stats.ea != 0">
 					<label>PA :</label>
@@ -793,5 +854,6 @@ Vue.component('sheet-short-view', {
 				</div>
 			</div>
 		</template>
+	</template>
 	</div>`,
 });

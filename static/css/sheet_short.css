@@ -54,16 +54,28 @@
 	margin-top: 0.5em;
 }
 
-.winBack {
-	z-index: 50;
-	position: fixed;
-	width: 100%;
-	height: 100%;
-	top: 0px;
-	left: 0px;
-	background: rgba(0, 0, 0, 0.5);
-	cursor: pointer;
+.ev_niv_1 .ev_niv_2 .ev_niv_3 .ev_niv_4 .ev_niv_5 {
+	font-style: italic;
 }
+.ev_niv_1 {
+	color: rgb(6, 17, 82);
+}
+.ev_niv_2 {
+	color: rgb(83, 45, 2);
+}
+.ev_niv_3 {
+	color: rgb(66, 0, 0);
+}
+.ev_niv_4 {
+	color: rgb(216, 0, 0);
+	background: rgb(87, 1, 1);
+}
+.ev_niv_5 {
+	color: rgb(230, 0, 0);
+	background: black;
+}
+
+
 .ssv_details {
 	z-index: 100;
 	position: fixed;
