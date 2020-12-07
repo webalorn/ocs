@@ -87,7 +87,7 @@ var app = new Vue({
 			this.cantConnect = true;
 		});
 
-		let urlSocket = "ws://" + window.location.host + "/ws/table/" + this.tableId;
+		let urlSocket = "/ws/table/" + this.tableId;
 		this.socket = newReSocket(urlSocket, socketOk => {
 			if (!socketOk) {
 				this.connected = false;

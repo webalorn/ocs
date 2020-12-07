@@ -1,6 +1,8 @@
 let global_elements = {};
 
-function newReSocket(url, connnectCallback) {
+function newReSocket(url_path, connnectCallback) {
+	let socketProtol = location.protocol == 'http:' ? 'ws://' : 'wss://'
+	let url = socketProtol + window.location.host + url_path;
 	let s = {
 		callOnMessage: [],
 		lastOpen: 0,
