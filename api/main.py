@@ -4,12 +4,12 @@ from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
 
-from db import get_item, set_item
-from chat import *
-from util import new_id
+from api.db import get_item, set_item
+from api.chat import *
+from api.util import new_id
 
 app = FastAPI()
-app.mount("/web", StaticFiles(directory="../static"), name="static")
+app.mount("/web", StaticFiles(directory="static"), name="static")
 
 
 class Sheet(BaseModel):

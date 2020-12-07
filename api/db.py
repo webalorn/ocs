@@ -4,7 +4,7 @@ import aioboto3
 from decimal import Decimal
 import json
 
-from util import config
+from api.util import config
 
 # res = await aioboto3.resource('dynamodb').__aenter__() ?
 

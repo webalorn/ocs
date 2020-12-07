@@ -8,7 +8,8 @@
 *.egg-info/
 *.vhdd
 .vscode/
-.config.json
+.env
+env/
 
 netsim/toplevel
 netsim/run
