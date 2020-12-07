@@ -26,6 +26,7 @@ code {
 	height: calc(100% - 47px);
 	width: calc(100% - 20px);
 	overflow: scroll;
+	overflow-x: hidden;
 }
 
 .chat_help {
@@ -207,6 +208,7 @@ code {
 	height: 100%;
 	width: calc(100% - 400px - 2px);
 	overflow: scroll;
+	overflow-x: hidden;
 }
 .top_bar {
 	background-color: rgb(255, 243, 202);

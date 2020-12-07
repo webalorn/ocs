@@ -578,70 +578,220 @@ Vue.component('sheet-table', {
 /*
 	Sheet main view
 */
-fetch('/web/app/comp/sheet_template.html')
-	.then(response => response.text())
-	.then(sheet_template => {
-		Vue.component('sheet-compo', {
-			props: ['socket', 'id'],
-			data: function () {
-				return {
-					loaded: false,
-					sheet: newDefaultSheet(),
-					active_view: "character",
-					saveManager: null,
-				}
-			},
-			mounted: function () {
-				fetch('/api/sheet/' + this.id, { cache: 'no-cache' })
-					.then(response => {
-						if (response.ok) {
-							response.json().then((data) => {
-								this.sheet = mergeDatas(this.sheet, data["content"]);
-								this.saveManager = newSaveManager(this.sheet, sheet => {
-									let url = "/api/sheet/" + this.id;
-									let data = {
-										"id": this.id,
-										"content": sheet
-									};
-									return [url, data];
-								});
-								this.loaded = true;
+function create_sheet_component(sheet_template) {
+	Vue.component('sheet-compo', {
+		props: ['socket', 'id'],
+		data: function () {
+			return {
+				loaded: false,
+				sheet: newDefaultSheet(),
+				active_view: "character",
+				saveManager: null,
+			}
+		},
+		mounted: function () {
+			fetch('/api/sheet/' + this.id, { cache: 'no-cache' })
+				.then(response => {
+					if (response.ok) {
+						response.json().then((data) => {
+							this.sheet = mergeDatas(this.sheet, data["content"]);
+							this.saveManager = newSaveManager(this.sheet, sheet => {
+								let url = "/api/sheet/" + this.id;
+								let data = {
+									"id": this.id,
+									"content": sheet
+								};
+								return [url, data];
 							});
-						}
-					});
+							this.loaded = true;
+						});
+					}
+				});
+		},
+		computed: {
+			avatarStyle: function () {
+				if (this.sheet.image) {
+					return "background: url('" + this.sheet.image + "'); background-size: cover;"
+				}
+				return "";
 			},
-			computed: {
-				avatarStyle: function () {
-					if (this.sheet.image) {
-						return "background: url('" + this.sheet.image + "'); background-size: cover;"
-					}
-					return "";
-				},
-				avatarAnimalStyle: function () {
-					if (this.sheet.animal.image) {
-						return "background: url('" + this.sheet.animal.image + "'); background-size: cover;"
-					}
-					return "";
-				},
-				deriv: function () {
-					return compute_derived(this.sheet);
+			avatarAnimalStyle: function () {
+				if (this.sheet.animal.image) {
+					return "background: url('" + this.sheet.animal.image + "'); background-size: cover;"
+				}
+				return "";
+			},
+			deriv: function () {
+				return compute_derived(this.sheet);
+			}
+		},
+		methods: {
+			updateAvatar: function () {
+				let nouv = prompt("Nouvelle url de l'image du personage :", this.sheet.image);
+				if (nouv !== null) {
+					this.sheet.image = nouv;
 				}
 			},
-			methods: {
-				updateAvatar: function () {
-					let nouv = prompt("Nouvelle url de l'image du personage :", this.sheet.image);
-					if (nouv !== null) {
-						this.sheet.image = nouv;
-					}
-				},
-				updateAvatarAnimal: function () {
-					let nouv = prompt("Nouvelle url de l'image de l'animal :", this.sheet.animal.image);
-					if (nouv !== null) {
-						this.sheet.animal.image = nouv;
-					}
-				},
+			updateAvatarAnimal: function () {
+				let nouv = prompt("Nouvelle url de l'image de l'animal :", this.sheet.animal.image);
+				if (nouv !== null) {
+					this.sheet.animal.image = nouv;
+				}
 			},
-			template: sheet_template,
-		});
-		window.dispatchEvent(event_sheet_loaded);
+		},
+		template: sheet_template,
 	});
+	window.dispatchEvent(event_sheet_loaded);
+}
+if (event_sheet_loaded !== null) {
+	fetch('/web/app/comp/sheet_template.html')
+		.then(response => response.text())
+		.then(sheet_template => create_sheet_component(sheet_template));
+}
+
+
+/*
+	Sheet short view
+*/
+Vue.component('sheet-short-view', {
+	props: ['sheet', 'identity', 'table', 'id'],
+	data: function () {
+		return {
+			detailOpen: false,
+		}
+	},
+	computed: {
+		avatarStyle: function () {
+			if (this.sheet.image) {
+				return "background-image: url('" + this.sheet.image + "'); background-size: cover;"
+			}
+			return "";
+		},
+		avatarAnimalStyle: function () {
+			if (this.sheet.animal.image) {
+				return "background-image: url('" + this.sheet.animal.image + "'); background-size: cover;"
+			}
+			return "";
+		},
+		deriv: function () {
+			return compute_derived(this.sheet);
+		}
+	},
+	methods: {
+		edit: function () {
+			let url = "/web/sheet.html?id=" + this.id;
+			window.open(url, '_blank');
+		},
+		deleteFromTable: function () {
+			if (confirm("Supprimer de la campagne ?")) {
+				let url = "/api/table/" + this.table + "/player/" + this.id;
+				fetch(url, {
+					method: 'DELETE',
+					cache: 'no-cache',
+				}).then(ans => {
+					if (ans.ok) { location.reload(); }
+				});
+			}
+		},
+		toggleDetails: function () {
+			this.detailOpen = !this.detailOpen;
+		},
+	},
+	template: `
+	<div class="sheet_short_view">
+		<div class="ssv_head">
+			<div class="ssv_avatar" v-bind:style="avatarStyle" v-on:click="toggleDetails"></div>
+			<div class="header_infos">
+				<label>Nom :</label>
+				<span>{{sheet.head.nom}}</span>
+				<br>
+				<label>Joueur :</label>
+				<span>{{sheet.owner}}</span>
+				<br>
+				<label>Âge :</label>
+				<span>{{sheet.head.age}}</span>
+			</div>
+			<div class="header_infos">
+				<label>Peuple :</label>
+				<span>{{sheet.head.peuple}}</span>
+				<br>
+				<label>Culture :</label>
+				<span>{{sheet.head.culture}}</span>
+				<br>
+				<label>Profession :</label>
+				<span>{{sheet.head.profession}}</span>
+			</div>
+			<div class="header_infos">
+				<label>PV :</label>
+				<span>{{sheet.cur_stats.ev}} / {{ deriv.stats.ev }}</span>
+				<br>
+				<template v-if="deriv.stats.ea != 0">
+					<label>PA :</label>
+					<span>{{sheet.cur_stats.ea}} / {{ deriv.stats.ea }}</span>
+					<br>
+				</template>
+				<template v-if="deriv.stats.ek != 0">
+					<label>PK :</label>
+					<span>{{sheet.cur_stats.ek}} / {{ deriv.stats.ek }}</span>
+					<br>
+				</template>
+				<label>PAV :</label>
+				<span>{{sheet.xp.total}} ({{ deriv.xp.degree }})</span>
+			</div>
+
+			<div class="header_infos" v-if="identity.gm">
+				<button v-on:click="edit">Modifier</button>
+				<br>
+				<br>
+				<button v-on:click="deleteFromTable">Retirer</button>
+				<br>
+			</div>
+		</div>
+		<div class='ssv_body'>
+			<div class="champ_in">
+				<label>Status & États</label>
+			</div>
+			<div class="ssv_status">{{ sheet.status }}</div>
+			<sheet-etats-display v-bind:etats="sheet.etats"></sheet-etats-display>
+		</div>
+		<template v-if="detailOpen">
+			<div class="winBack" v-on:click="toggleDetails"></div>
+			<div class="ssv_details scrollable">
+				<div class="champ_in">
+					<label>Nom</label>
+					<span>{{sheet.head.nom}}</span>
+				</div>
+				<div class="champ_in">
+					<label>Âge</label>
+					<span>{{ sheet.head.age}}</span>
+				</div>
+				<div class="champ_in">
+					<label>Couleur de cheveux</label>
+					<span>{{ sheet.head.cheveux}}</span>
+				</div>
+				<div class="champ_in">
+					<label>Couleur des yeux</label>
+					<span>{{ sheet.head.yeux}}</span>
+				</div>
+				<div class="champ_in">
+					<label>Taille / Masse</label>
+					<span>{{ sheet.head.taille_masse}}</span>
+				</div>
+
+				<div class="champ_in">
+					<label>Traits caractéristiques</label>
+				</div>
+				<p>{{ sheet.head.traits }}</p>
+
+				<div class="champ_in">
+					<label>Description physique complète</label>
+				</div>
+				<p>{{ sheet.head.description_phy }}</p>
+
+				<div class="ssv_details_close">
+					<button v-on:click="toggleDetails">Fermer</button>
+				</div>
+			</div>
+		</template>
+	</div>`,
+});

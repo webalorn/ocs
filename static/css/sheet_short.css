@@ -1,0 +1,91 @@
+.sheet_short_view {
+	margin: 10px;
+    padding: 10px;
+    background: #dcdccd;
+    border: 2px solid #616161;
+	border-radius: 10px;
+}
+.sheet_short_view label {
+	font-weight: bold;
+}
+.ssv_head {
+	margin-bottom: 0.5em;
+}
+.ssv_head > div {
+	display: inline-block;
+	vertical-align: middle;
+	margin-right: 20px;
+}
+.ssv_avatar {
+	width : 90px;
+	height: 90px;
+	background-color: gray;
+	cursor: pointer;
+}
+.ssv_avatar:hover {
+	background-color: rgb(1, 172, 202);
+	background-image: url("/web/images/eye.png")!important;
+	background-size: cover;
+}
+
+
+
+.champ_in {
+	height: 1.3em;
+	display: flex;
+	border-bottom: 1px solid rgb(123, 82, 54);
+}
+.champ_in > label {
+	margin-right: 0.5em;
+	display: inline-flex;
+	overflow: hidden;
+}
+.champ_in > .field {
+	height: 100%;
+	display: inline-flex;
+	flex-grow: 100;
+}
+.champ_in > .field input {
+	width: calc(100% - 6px);
+}
+.ssv_status, .s_etats_display {
+	font-size: small;
+	margin: 0px;
+	margin-top: 0.5em;
+}
+
+.winBack {
+	z-index: 50;
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	top: 0px;
+	left: 0px;
+	background: rgba(0, 0, 0, 0.5);
+	cursor: pointer;
+}
+.ssv_details {
+	z-index: 100;
+	position: fixed;
+	top: 0px;
+	left: calc(50% - 225px - 2px - 2em);
+	margin: auto;
+	height: 100%;
+	width: 450px;
+	background: #fbf3d8;
+	border: 2px solid black;
+	border-width: 0px 2px;
+	padding: 2em;
+}
+
+.ssv_details_close {
+	margin: 2em 0px;
+	text-align: center;
+}
+.add_player {
+	padding: 2em;
+}
+
+.add_player input {
+	margin-bottom: 0.7em;
+}

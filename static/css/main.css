@@ -15,3 +15,20 @@
     border: 10px solid #ef4343;
     margin: auto;
 }
+
+.scrollable::-webkit-scrollbar {
+	display: none;
+}
+.scrollable {
+	overflow: scroll;
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+body::-webkit-scrollbar {
+	display: none;
+}
+body {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}

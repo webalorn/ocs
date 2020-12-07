@@ -1,5 +1,5 @@
 <div class="sheet" v-if="loaded">
-	<div class="s_header">
+	<div class="s_header scrollable">
 		<div class="avatar" v-on:click="updateAvatar" v-bind:style="avatarStyle"></div>
 		<div class="infos">
 			<label for="owner">Joueur :</label>
@@ -36,7 +36,7 @@
 		<data-saver v-bind:manager="saveManager" v-bind:data="sheet"></data-saver>
 	</div>
 	<div class="s_body">
-		<div class="s_sidebar">
+		<div class="s_sidebar scrollable">
 			<div class="s_sidebar_character" v-on:click="active_view='character';"></div>
 			<div class="s_sidebar_stats" v-on:click="active_view='stats';"></div>
 			<div class="s_sidebar_fight" v-on:click="active_view='fight';"></div>
@@ -46,7 +46,7 @@
 			<div class="s_sidebar_notes" v-on:click="active_view='notes';"></div>
 		</div>
 
-		<div class="s_main_area" v-if="active_view == 'character'">
+		<div class="s_main_area scrollable" v-if="active_view == 'character'">
 			<div class="col_33">
 				<div>
 					<div class="champ_in">
@@ -297,7 +297,7 @@
 
 
 
-		<div class="s_main_area" v-if="active_view == 'stats'">
+		<div class="s_main_area scrollable" v-if="active_view == 'stats'">
 			<div class="col_33">
 				<div>
 					<table class="table_talents s_table">
@@ -530,7 +530,7 @@
 
 
 
-		<div class="s_main_area" v-if="active_view == 'fight'">
+		<div class="s_main_area scrollable" v-if="active_view == 'fight'">
 			<div class="col_666">
 				<div>
 
@@ -720,7 +720,7 @@
 
 
 
-		<div class="s_main_area" v-if="active_view == 'stuff'">
+		<div class="s_main_area scrollable" v-if="active_view == 'stuff'">
 			<div class="col_5">
 				<div>
 					<div class="champ_in">
@@ -864,7 +864,7 @@
 
 
 
-		<div class="s_main_area" v-if="active_view == 'magic'">
+		<div class="s_main_area scrollable" v-if="active_view == 'magic'">
 			<div class="col_666">
 				<div>
 					<sheet-table
@@ -916,7 +916,7 @@
 
 
 
-		<div class="s_main_area" v-if="active_view == 'gods'">
+		<div class="s_main_area scrollable" v-if="active_view == 'gods'">
 
 			<div class="col_666">
 				<div>
@@ -967,7 +967,7 @@
 			</div>
 		</div>
 
-		<div class="s_main_area" v-if="active_view == 'notes'">
+		<div class="s_main_area scrollable" v-if="active_view == 'notes'">
 			<div class="col_5">
 
 				<div>
@@ -997,7 +997,7 @@
 			<div class="col_5">
 				<div>
 					<div class="champ_in">
-						<label>Notes de partie</label>
+						<label>Notes de partie & secrets</label>
 					</div>
 					<textarea class="s_textarea" v-model="sheet.divin.benedictions"
 						style="min-height: 20em;"></textarea>

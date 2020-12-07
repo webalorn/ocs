@@ -8,15 +8,52 @@ var app = new Vue({
 		errorMessage: null,
 		urlParams: (new URL(window.location.href)).searchParams,
 		identity: {},
+		players: [],
 		reroll_comp: {
 			'dice': null
 		},
+		newPlayerId: "",
 	},
 	methods: {
 		open_sheet: function () {
 			let url = "/web/sheet.html?id=" + this.identity.id;
 			window.open(url, '_blank');
 		},
+		loadPlayers(idList) {
+			for (let i in idList) {
+				let url = "/api/sheet/" + idList[i];
+				fetch(url)
+					.then(answer => answer.json())
+					.then(data => {
+						this.players.push(data);
+					});
+			}
+		},
+		addPlayer: function () {
+			if (this.newPlayerId) {
+				for (let i in this.players) {
+					if (this.players[i].id == this.newPlayerId) {
+						alert("Déjà à cette table !");
+						return;
+					}
+				}
+				let urlFiche = "/api/sheet/" + this.newPlayerId;
+				fetch(urlFiche)
+					.then(answer => {
+						if (!answer.ok) {
+							alert("Ce joueur n'existe pas !");
+						} else {
+							let urlPost = "/api/table/" + this.tableId + "/player/" + this.newPlayerId;
+							fetch(urlPost, {
+								method: 'POST',
+								cache: 'no-cache',
+							}).then(ans => {
+								if (ans.ok) { location.reload(); }
+							});
+						}
+					})
+			}
+		}
 	},
 	mounted: function () {
 		this.tableId = this.urlParams.get("table");
@@ -53,6 +90,7 @@ var app = new Vue({
 							.then(data => { this.identity.name = data.content.owner })
 					}
 					this.connected = true;
+					this.loadPlayers(data['characters']);
 				})
 			}
 		}).catch((error) => {

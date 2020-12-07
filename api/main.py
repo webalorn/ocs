@@ -46,6 +46,31 @@ async def create_sheet():
     return sheet
 
 
+@app.post("/api/table/{table_id}/player/{player_id}")
+async def get_table(table_id: str, player_id: str):
+    table = await get_item(table_id)
+    if player_id in table['characters']:
+        raise HTTPException(status_code=400,
+                            detail=f"Player {played_id} already in this table")
+    else:
+        table['characters'].append(player_id)
+        await set_item(**table)
+        return 'OK'
+
+
+@app.delete("/api/table/{table_id}/player/{player_id}")
+async def get_table(table_id: str, player_id: str):
+    table = await get_item(table_id)
+    if player_id in table['characters']:
+        table['characters'].remove(player_id)
+        await set_item(**table)
+        return 'OK'
+    else:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Player {played_id} doesn't belong to this table")
+
+
 @app.get("/api/table/{table_id}", response_model=Table)
 async def get_table(table_id: str):
     return await get_item(table_id)

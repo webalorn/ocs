@@ -41,7 +41,6 @@
 	height: 90px;
 	padding: 10px;
 	background: #ada7a7;
-	overflow: scroll;
 }
 .s_header > div {
 	display: inline-block;
@@ -174,7 +173,6 @@
 	left: 0px;
 	width: 90px;
 	background: red;
-	overflow: scroll;
 	background-color: grey;
 	border-right: 2px solid black;
 }
@@ -207,7 +205,6 @@
 	right: 0px;
 	width: calc(100% - 90px - 2px);
 	background: rgb(245, 245, 245);
-	overflow: scroll;
 	font-size: 0em;
 }
 
@@ -232,6 +229,13 @@
 	margin-right: 5px;
 	height: 100%;
 	overflow: scroll;
+}
+.col_33 > div::-webkit-scrollbar, .col_5 > div::-webkit-scrollbar, .col_666 > div::-webkit-scrollbar {
+	display: none;
+}
+.col_33 > div, .col_5 > div, .col_666 > div {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
 }
 .champ_in {
 	height: 1.3em;

@@ -5,6 +5,8 @@
 	<title>Table</title>
 	<link rel="stylesheet" href="css/main.css" />
 	<link rel="stylesheet" href="css/table.css" />
+	<link rel="stylesheet" href="css/sheet_short.css" />
+	<link rel="icon" type="image/png" href="/web/images/icon.png" />
 
 	<!-- development version, includes helpful console warnings -->
 	<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
@@ -28,13 +30,28 @@
 
 			<reroll-competence v-if="reroll_comp.dice" v-bind:socket="socket" v-bind:identity="identity"
 				v-bind:reroll_comp="reroll_comp"></reroll-competence>
+
+			<sheet-short-view v-for="sheet in players" v-bind:sheet="sheet.content" v-bind:key="sheet.id"
+				v-bind:table="tableId" v-bind:identity="identity" v-bind:id="sheet.id">
+			</sheet-short-view>
+
+			<div v-if="identity.gm" class="add_player">
+				<input v-model.trim="newPlayerId" placeholder="Id de la fiche"> <br />
+				<button v-on:click="addPlayer" v-bind:disabled="!newPlayerId">Ajouter un joueur</button>
+			</div>
+
 		</div>
 		<chat-compo v-if="connected" v-bind:socket="socket" v-bind:identity="identity" v-bind:reroll_comp="reroll_comp">
 		</chat-compo>
 	</div>
 
+	<script>
+		const event_sheet_loaded = null;
+	</script>
+
 	<script src="app/util.js"></script>
 	<script src="app/comp/chat.js"></script>
+	<script src="app/comp/sheet.js"></script>
 	<script src="app/table_app.js"></script>
 </body>
 
