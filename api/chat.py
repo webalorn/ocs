@@ -26,9 +26,18 @@ def process_message(message_obj):
     parts = message.split()
     cmd = parts[0][1:]
     args = parts[1:]
-    if not cmd in all_commands:
-        raise MessageError(f"La commande {cmd} n'existe pas")
-    return all_commands[cmd](args)
+    if cmd in all_commands:
+        return all_commands[cmd](args)
+    elif cmd[:-1] in all_commands:
+        if cmd[-1] == 'h':
+            r = all_commands[cmd[:-1]](args)
+            r['target'] = 'self'
+            return r
+        if cmd[-1] == 'j':
+            r = all_commands[cmd[:-1]](args)
+            r['target'] = 'game_master'
+            return r
+    raise MessageError(f"La commande {cmd} n'existe pas")
 
 
 def cmd_roll(args):

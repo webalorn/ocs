@@ -139,7 +139,15 @@ async def websocket_endpoint(websocket: WebSocket, table_id: str):
                 send_message = process_message(message)
                 send_message['from'] = message['from']
                 send_message['from_name'] = message['from_name']
-                await group.broadcast(send_message)
+                if 'target' not in send_message:
+                    if 'target' in message:
+                        send_message['target'] = message['target']
+                    else:
+                        send_message['target'] = 'all'
+                if send_message.get('target', None) == 'self':
+                    await websocket.send_json(send_message)
+                else:
+                    await group.broadcast(send_message)
             except MessageError as e:
                 await websocket.send_json({
                     'type': 'error',

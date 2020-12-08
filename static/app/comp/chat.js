@@ -19,6 +19,10 @@ Vue.component('chat-compo', {
 			if (elMsgList.clientHeight + elMsgList.scrollTop + 20 >= elMsgList.scrollHeight) {
 				this.scrollMsg = true;
 			}
+			data.target_ok = true;
+			if (data.target == 'game_master' && !this.identity.gm) {
+				data.target_ok = false;
+			}
 			this.messages.push(data);
 		});
 	},
@@ -79,46 +83,51 @@ Vue.component('chat-compo', {
 				Envoyez des messages en appuyant sur <code>entrée</code>.<br>
 				Vous pouvez envoyer des commandes pour:<br>
 				Lancer des dés avec <code>/roll [liste de dés]</code> ou <code>/r</code> (par exemple, <code>/roll d20+3d6  6d3-4</code>).<br>
-				Faire un jet de compétence avec <code>/c qual1 qual1 qual3 VC [bonus]</code> (par exemple <code>/c 9 10 15 12</code>, ou <code>/c 9 10 15 12 -1</code>).
+				Faire un jet de compétence avec <code>/c qual1 qual2 qual3 VC [bonus]</code> (par exemple <code>/c 9 10 15 12</code>, ou <code>/c 9 10 15 12 -1</code>).<br>
+				Vous pouvez utiliser le modificateur <code>h</code> pour cacher un jet (<code>/rh d20</code>), le modificateur <code>j</code> pour envoyer uniquement au MJ (<code>/rj d20</code>).
 			</div>
 			<div class="chat_message" v-for='m in messages' v-bind:class="{chat_message_self : m.from == identity.id}">
 				<div class="chat_message_name" v-if="m.type != 'error'">
 					<span class="chat_message_user">{{ m.from_name }}</span>
+					<span v-if="m.target=='game_master'" class="msg_only_gm">(Jet derrière l'écran)</span>
+					<span v-if="m.target=='self'" class="msg_only_self">(Jet secret)</span>
 				</div>
-				<p class="chat_message_text" v-if="m.type == 'message'">{{ m.message }}</p>
-				<p class="chat_message_error" v-else-if="m.type == 'error'">{{ m.message }}</p>
-				<template v-else-if="m.type == 'roll'">
-					<div v-for="roll in m.rolls" class="chat_roll_line">
-						<span class="chat_roll_total">{{ roll[0] }}</span>
-						<span class="chat_roll_expr"> (={{ roll[2] }})</span>
-						<div v-for="d in roll[1]" class="chat_dice" v-bind:class="['dice_' + d[1], 'rolled_' + d[0]]"><span class="chat_dice_p1">{{ d[0] }}</span><span class="chat_dice_p2">/{{ d[1] }}</span></div>
+				<template v-if="m.target_ok">
+					<p class="chat_message_text" v-if="m.type == 'message'">{{ m.message }}</p>
+					<p class="chat_message_error" v-else-if="m.type == 'error'">{{ m.message }}</p>
+					<template v-else-if="m.type == 'roll'">
+						<div v-for="roll in m.rolls" class="chat_roll_line">
+							<span class="chat_roll_total">{{ roll[0] }}</span>
+							<span class="chat_roll_expr"> (={{ roll[2] }})</span>
+							<div v-for="d in roll[1]" class="chat_dice" v-bind:class="['dice_' + d[1], 'rolled_' + d[0]]"><span class="chat_dice_p1">{{ d[0] }}</span><span class="chat_dice_p2">/{{ d[1] }}</span></div>
+						</div>
+					</template>
+					<div v-else-if="m.type == 'competence'" class="chat_competence"
+						v-bind:class="{comp_reussite : m.nr > 0, comp_echec: m.nr == 0, comp_critique: m.critique, comp_maladresse: m.maladresse}">
+						<div class="chat_competence_title">
+							<span v-if="m.maladresse">Échec critique</span>
+							<span v-else-if="m.critique">Réussite critique</span>
+							<span v-else-if="m.nr == 0">Échec</span>
+							<span v-else-if="m.nr > 0">Réussite</span>
+							<span v-if="m.nr > 0" class="comp_nr"> (PC={{m.pc}}, NR={{m.nr}})</span>
+							<span v-if="m.nr <= 0" class="comp_nr"> ({{m.pc}})</span>
+						</div>
+						<div class="chat_competence_jet">
+							<span v-if="m.q1.roll && m.q2.roll && m.q3.roll">Jet sur</span>
+							<span v-else>Reroll sur</span>
+							{{m.q1.qual}}/{{m.q2.qual}}/{{m.q3.qual}},
+							<span v-if="m.bonus > 0">+{{m.bonus}}</span>
+							<span v-if="m.bonus < 0">{{m.bonus}}</span>
+							<span v-if="m.bonus == 0">+0</span>
+						</div>
+						<div>
+							<div v-for="q in [m.q1, m.q2, m.q3]" class="comp_qual_dice" v-bind:class="['rolled_' + q.dice, {comp_dice_can_reroll : m.from == identity.id}, {comp_dice_kept : !q.roll}]" v-on:click="reroll_comp_trigger(m)"><span class="chat_dice_p1">{{ q.dice }}</span></div>
+						</div>
 					</div>
+					<p v-else>
+					{{ m }}
+					</p>
 				</template>
-				<div v-else-if="m.type == 'competence'" class="chat_competence"
-					v-bind:class="{comp_reussite : m.nr > 0, comp_echec: m.nr == 0, comp_critique: m.critique, comp_maladresse: m.maladresse}">
-					<div class="chat_competence_title">
-						<span v-if="m.maladresse">Échec critique</span>
-						<span v-else-if="m.critique">Réussite critique</span>
-						<span v-else-if="m.nr == 0">Échec</span>
-						<span v-else-if="m.nr > 0">Réussite</span>
-						<span v-if="m.nr > 0" class="comp_nr"> (PC={{m.pc}}, NR={{m.nr}})</span>
-						<span v-if="m.nr <= 0" class="comp_nr"> ({{m.pc}})</span>
-					</div>
-					<div class="chat_competence_jet">
-						<span v-if="m.q1.roll && m.q2.roll && m.q3.roll">Jet sur</span>
-						<span v-else>Reroll sur</span>
-						 {{m.q1.qual}}/{{m.q2.qual}}/{{m.q3.qual}},
-						<span v-if="m.bonus > 0">+{{m.bonus}}</span>
-						<span v-if="m.bonus < 0">{{m.bonus}}</span>
-						<span v-if="m.bonus == 0">+0</span>
-					</div>
-					<div>
-						<div v-for="q in [m.q1, m.q2, m.q3]" class="comp_qual_dice" v-bind:class="['rolled_' + q.dice, {comp_dice_can_reroll : m.from == identity.id}, {comp_dice_kept : !q.roll}]" v-on:click="reroll_comp_trigger(m)"><span class="chat_dice_p1">{{ q.dice }}</span></div>
-					</div>
-				</div>
-				<p v-else>
-				{{ m }}
-				</p>
 			</div>
 		</div>
 		<form class='chat_form' v-on:submit.prevent="sendMessage">
@@ -139,7 +148,7 @@ Vue.component('jet-competence', {
 		}
 	},
 	methods: {
-		send: function () {
+		send: function (target) {
 			let messageDict = {
 				'type': 'competence',
 				'from': this.identity.id,
@@ -150,6 +159,9 @@ Vue.component('jet-competence', {
 				'vc': this.vc,
 				'bonus': this.bonus,
 			};
+			if (target) {
+				messageDict.target = target;
+			}
 			this.socket.send(JSON.stringify(messageDict));
 		},
 	},
@@ -174,6 +186,10 @@ Vue.component('jet-competence', {
 		<div class="inrc_actions">
 			<button class="inrc_send" v-on:click="send">Effectuer le jet</button>
 		</div>
+		<div class="inrc_actions inrc_actions_2">
+			<button class="inrc_send" v-on:click="send('self')">Jet caché</button>
+			<button class="inrc_send" v-on:click="send('game_master')">Jet derrière l'écran</button>
+		</div>
 	</div>`
 });
 
@@ -192,6 +208,8 @@ Vue.component('reroll-competence', {
 			reroll3: false,
 			vc: this.reroll_comp.dice.vc,
 			bonus: this.reroll_comp.dice.bonus,
+			target: (typeof this.reroll_comp.dice.target == "string" ?
+				this.reroll_comp.dice.target : "all"),
 		}
 	},
 	methods: {
@@ -205,6 +223,7 @@ Vue.component('reroll-competence', {
 				'q3': { 'roll': this.reroll3, 'qual': this.qual3, 'dice': this.dice3 },
 				'vc': this.vc,
 				'bonus': this.bonus,
+				'target': this.target,
 			};
 			this.socket.send(JSON.stringify(messageDict));
 			this.close();

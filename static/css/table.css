@@ -54,6 +54,14 @@ code {
 .chat_message_self {
 	border-right: 2px solid rgb(54, 130, 202);
 }
+.msg_only_self {
+	font-style: italic;
+    color: #676767;
+}
+.msg_only_gm {
+	font-style: italic;
+    color: #7909f3;
+}
 
 /* rolls */
 .chat_roll_line * {
@@ -222,6 +230,9 @@ code {
 	float: right;
 	margin-right: 1em;
 }
+.top_name {
+	font-style: italic;
+}
 
 /* jet de dés */
 .inrc_view {
@@ -243,6 +254,9 @@ code {
 	display: inline-block;
 }
 .inrc_view > div {
+}
+.inrc_actions_2 {
+	margin-top: 1em;
 }
 
 

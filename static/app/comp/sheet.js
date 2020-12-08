@@ -583,8 +583,7 @@ function create_sheet_component(sheet_template) {
 			return {
 				loaded: false,
 				sheet: newDefaultSheet(),
-				// active_view: "character",
-				active_view: "notes",
+				active_view: "character",
 				saveManager: null,
 			}
 		},

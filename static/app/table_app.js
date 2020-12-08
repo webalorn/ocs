@@ -67,7 +67,8 @@ var app = new Vue({
 						}
 						this.identity = {
 							'id': this.urlParams.get("id"),
-							'name': 'Guest',
+							'name': '',
+							'player_name': '',
 							'gm': false,
 						};
 						if (!data['characters'].includes(this.identity.id)) {
@@ -77,7 +78,10 @@ var app = new Vue({
 						let tableUrl = "/api/sheet/" + this.identity.id;
 						fetch(tableUrl)
 							.then(answer => answer.json())
-							.then(data => { this.identity.name = data.content.owner })
+							.then(data => {
+								this.identity.name = data.content.head.nom;
+								this.identity.player_name = data.content.owner;
+							});
 					}
 					this.connected = true;
 					this.characters = data['characters'];
