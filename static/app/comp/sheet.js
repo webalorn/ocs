@@ -694,7 +694,7 @@ if (event_sheet_loaded !== null) {
 	Sheet short view
 */
 Vue.component('sheet-short-view', {
-	props: ['identity', 'table', 'id', 'socket'],
+	props: ['identity', 'table', 'id', 'socket', 'isgm'],
 	data: function () {
 		return {
 			detailOpen: false,
@@ -729,7 +729,13 @@ Vue.component('sheet-short-view', {
 		},
 		deriv: function () {
 			return compute_derived(this.sheet);
-		}
+		},
+		invite_url: function () {
+			if (this.isgm) {
+				return window.location.protocol + '//' + window.location.host + '/web/table.html?table=' + this.table + '&id=' + this.id;
+			}
+			return null;
+		},
 	},
 	methods: {
 		edit: function () {
@@ -847,6 +853,11 @@ Vue.component('sheet-short-view', {
 					<label>Description physique complète</label>
 				</div>
 				<p>{{ sheet.head.description_phy }}</p>
+
+				<div class="ssv_invit" v-if="isgm">
+					<span>Lien d'invitation :</span><br />
+					<a v-bind:href="invite_url" target="_blank">{{ invite_url }}</a>
+				</div>
 
 				<div class="ssv_details_close">
 					<button v-on:click="toggleDetails">Fermer</button>

@@ -22,10 +22,11 @@
 		<div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 		<div v-if="connected" class="mainTable">
 			<div class="top_bar">
-				<span class="label">Connecté en tant que : </span>
+				<span class="label">Connecté : </span>
 				<span class="top_username">{{ identity.player_name }}</span>
 				<span class="top_name">({{ identity.name }})</span>
 				<button v-on:click="open_sheet" v-if="!identity.gm" class="top_edit_sheet">Modifier ma fiche</button>
+				<span class="top_table_name">{{ tableName }}</span>
 			</div>
 			<jet-competence v-if="!reroll_comp.dice" v-bind:socket="socket" v-bind:identity="identity"></jet-competence>
 
@@ -33,12 +34,20 @@
 				v-bind:reroll_comp="reroll_comp"></reroll-competence>
 
 			<sheet-short-view v-for="id in characters" v-bind:key="id" v-bind:table="tableId" v-bind:identity="identity"
-				v-bind:id="id" v-bind:socket="socket">
+				v-bind:id="id" v-bind:socket="socket" v-bind:isgm="identity.gm">
 			</sheet-short-view>
 
 			<div v-if="identity.gm" class="add_player">
+				<label>Ajouter des joueurs</label>
 				<input v-model.trim="newPlayerId" placeholder="Id de la fiche"> <br />
 				<button v-on:click="addPlayer" v-bind:disabled="!newPlayerId">Ajouter un joueur</button>
+			</div>
+
+			<div v-if="identity.gm" class="change_table_name">
+				<label>Changer le nom de la table</label>
+				<input v-model.trim="newTableName" placeholder="Id de la fiche"> <br />
+				<button v-on:click="updateTableName"
+					v-bind:disabled="!newTableName || newTableName == tableName">Modifier</button>
 			</div>
 
 		</div>
@@ -52,6 +61,7 @@
 
 	<script src="app/util.js"></script>
 	<script src="app/comp/chat.js"></script>
+	<script src="app/comp/jets.js"></script>
 	<script src="app/comp/sheet.js"></script>
 	<script src="app/table_app.js"></script>
 </body>

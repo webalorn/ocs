@@ -12,13 +12,19 @@ class RollError(Exception):
     pass
 
 
+SIMPLE_MESSAGES = ['message', 'routine']
+
+
 def process_message(message_obj):
     if message_obj['type'] == 'competence':
         return jet_competence(message_obj['q1'], message_obj['q2'],
                               message_obj['q3'], message_obj['vc'],
                               message_obj['bonus'])
-    if message_obj['type'] != 'message':
+    if message_obj['type'] not in SIMPLE_MESSAGES:
         raise MessageError("Pas de message ?")
+    if message_obj['type'] != 'message':
+        return message_obj
+
     message = message_obj['message'].strip()
     if not message.startswith('/'):
         return message_obj

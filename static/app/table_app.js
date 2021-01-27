@@ -13,6 +13,8 @@ var app = new Vue({
 			'dice': null
 		},
 		newPlayerId: "",
+		tableName: "",
+		newTableName: "",
 	},
 	methods: {
 		open_sheet: function () {
@@ -43,6 +45,26 @@ var app = new Vue({
 						}
 					})
 			}
+		},
+		setTitle: function (title) {
+			this.tableName = title;
+			this.newTableName = title;
+			document.title = this.tableName + ' | Game table';
+		},
+		updateTableName: function () {
+			let urlPost = "/api/table/" + this.tableId + "/update";
+			let data = {
+				'name': this.newTableName,
+			};
+			fetch(urlPost, {
+				method: 'PUT',
+				cache: 'no-cache',
+				body: JSON.stringify(data),
+			}).then(ans => {
+				if (ans.ok) {
+					this.setTitle(this.newTableName);
+				}
+			});
 		}
 	},
 	mounted: function () {
@@ -54,6 +76,7 @@ var app = new Vue({
 				this.cantConnect = true;
 			} else {
 				answer.json().then(data => {
+					this.setTitle(data['name']);
 					if (this.urlParams.get("gm")) {
 						this.identity = {
 							'id': '0',

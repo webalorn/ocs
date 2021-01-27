@@ -4,6 +4,7 @@ from collections import defaultdict
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
+from starlette.responses import RedirectResponse
 
 from api.db import get_item, set_item
 from api.chat import *
@@ -21,11 +22,26 @@ class Sheet(BaseModel):
 class Table(BaseModel):
     id: str
     characters: List[str]
+    name: str = "Unnamed"
+
+
+class NewTable(BaseModel):
+    name: str = "Unnamed"
+
+
+# @app.get("/")
+# async def read_root():
+#     return "You may be lost..."
 
 
 @app.get("/")
-async def read_root():
-    return "You may be lost..."
+async def redirect():
+    return RedirectResponse(url='/web/index.html')
+
+
+@app.get("/web")
+async def redirect():
+    return RedirectResponse(url='/web/index.html')
 
 
 @app.get("/api/sheet/{sheet_id}", response_model=Sheet)
@@ -53,12 +69,20 @@ async def create_sheet():
     return sheet
 
 
+@app.put("/api/table/{table_id}/update")
+async def get_table(tableUpdate: NewTable, table_id: str):
+    table = await get_item(table_id)
+    table['name'] = tableUpdate.name
+    await set_item(**table)
+    return 'OK'
+
+
 @app.post("/api/table/{table_id}/player/{player_id}")
 async def get_table(table_id: str, player_id: str):
     table = await get_item(table_id)
     if player_id in table['characters']:
         raise HTTPException(status_code=400,
-                            detail=f"Player {played_id} already in this table")
+                            detail=f"Player {player_id} already in this table")
     else:
         table['characters'].append(player_id)
         await set_item(**table)
@@ -75,7 +99,7 @@ async def get_table(table_id: str, player_id: str):
     else:
         raise HTTPException(
             status_code=404,
-            detail=f"Player {played_id} doesn't belong to this table")
+            detail=f"Player {player_id} doesn't belong to this table")
 
 
 @app.get("/api/table/{table_id}", response_model=Table)
@@ -91,8 +115,8 @@ async def put_table(table: Table, table_id: str):
 
 
 @app.post("/api/table", response_model=Table)
-async def create_table():
-    table = Table(id=new_id(), characters=[])
+async def create_table(new_table: NewTable):
+    table = Table(id=new_id(), characters=[], name=new_table.name)
     await set_item(**table.dict())
     return table
 

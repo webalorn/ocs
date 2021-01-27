@@ -39,8 +39,11 @@ function newReSocket(url_path, connnectCallback) {
 			);
 		},
 		send: function (data) {
-			this.socket.send(data);
-		}
+			return this.socket.send(data);
+		},
+		send_json: function (data) {
+			return this.send(JSON.stringify(data));
+		},
 	};
 	s.initSocket();
 	return s;
@@ -154,6 +157,21 @@ function areEqual(cur, add) {
 	} else {
 		return cur === add;
 	}
+}
+
+function storage_get(key) {
+	let storedValue = localStorage.getItem(key);
+	if (storedValue === null) {
+		return [];
+	} else {
+		return JSON.parse(storedValue);
+	}
+}
+
+function storage_add(key, value) {
+	let allValues = storage_get(key);
+	allValues.push(value);
+	localStorage.setItem(key, JSON.stringify(allValues));
 }
 
 /*

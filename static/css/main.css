@@ -43,3 +43,31 @@ body {
 	background: rgba(0, 0, 0, 0.5);
 	cursor: pointer;
 }
+
+
+button {
+	display:inline-block;
+	padding:0.3em 1em;
+	border:0.1em solid #141414;
+	border-radius:0.12em;
+	box-sizing: border-box;
+	text-decoration:none;
+	color:#141414;
+	text-align:center;
+	transition: all 0.1s;
+	cursor: pointer;
+	background: white;
+	outline: none;
+}
+button:hover {
+	color:#ffffff;
+	background-color:#353535;
+}
+
+
+button:disabled {
+	font-style: italic;
+    background: rgb(163, 163, 163);
+    color: black;
+    cursor: not-allowed;
+}

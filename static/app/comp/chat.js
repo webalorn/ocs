@@ -8,6 +8,7 @@ Vue.component('chat-compo', {
 			scrollMsg: false,
 			messages: [],
 			toSend: [],
+			rollDetails: { shown: false },
 		}
 	},
 	mounted: function () {
@@ -47,7 +48,7 @@ Vue.component('chat-compo', {
 					'from': this.identity.id,
 					'from_name': this.identity.name,
 				};
-				this.socket.send(JSON.stringify(messageDict));
+				this.socket.send_json(messageDict);
 			}
 		},
 		getCurHistory: function () {
@@ -74,7 +75,39 @@ Vue.component('chat-compo', {
 			if (message.from == this.identity.id) {
 				this.reroll_comp.dice = message;
 			}
-		}
+		},
+		roll_details_with_bonus(m, bonus) {
+			let pc = m.vc - Math.max(m.q1.dice - m.q1.qual - bonus, 0)
+				- Math.max(m.q2.dice - m.q2.qual - bonus, 0)
+				- Math.max(m.q3.dice - m.q3.qual - bonus, 0);
+			let nr = Math.min(6, Math.max(1, 1 + Math.floor((pc - 1) / 3)));
+			if (pc < 0) {
+				nr = 0;
+			}
+			return { bonus: bonus, pc: pc, nr: nr };
+		},
+		roll_details: function (m) {
+			if (!this.identity.gm) {
+				return;
+			}
+			let withBonus = [], withMalus = [];
+			let withZero = this.roll_details_with_bonus(m, 0);
+			for (let i = 1; i <= 20; i++) {
+				withBonus.push(this.roll_details_with_bonus(m, i));
+				withMalus.push(this.roll_details_with_bonus(m, -i));
+			}
+			this.rollDetails = {
+				m: m,
+				withBonus: withBonus,
+				withMalus: withMalus,
+				withZero: withZero,
+				shown: true,
+			};
+			console.log(JSON.stringify(this.rollDetails));
+		},
+		toggleDetails: function (m) {
+			this.rollDetails = !this.rollDetails;
+		},
 	},
 	template: `
 	<div class="chat">
@@ -103,8 +136,8 @@ Vue.component('chat-compo', {
 						</div>
 					</template>
 					<div v-else-if="m.type == 'competence'" class="chat_competence"
-						v-bind:class="{comp_reussite : m.nr > 0, comp_echec: m.nr == 0, comp_critique: m.critique, comp_maladresse: m.maladresse}">
-						<div class="chat_competence_title">
+						v-bind:class="{comp_reussite : m.nr > 0, comp_echec: m.nr == 0, comp_critique: m.critique, comp_maladresse: m.maladresse, competence_as_gm : identity.gm}">
+						<div class="chat_competence_title" v-on:click="roll_details(m)">
 							<span v-if="m.maladresse">Échec critique</span>
 							<span v-else-if="m.critique">Réussite critique</span>
 							<span v-else-if="m.nr == 0">Échec</span>
@@ -124,6 +157,9 @@ Vue.component('chat-compo', {
 							<div v-for="q in [m.q1, m.q2, m.q3]" class="comp_qual_dice" v-bind:class="['rolled_' + q.dice, {comp_dice_can_reroll : m.from == identity.id}, {comp_dice_kept : !q.roll}]" v-on:click="reroll_comp_trigger(m)"><span class="chat_dice_p1">{{ q.dice }}</span></div>
 						</div>
 					</div>
+					<div v-else-if="m.type == 'routine'" class="chat_routine">
+						Épreuve de routine : NR = {{m.nr}}
+					</div>
 					<p v-else>
 					{{ m }}
 					</p>
@@ -133,132 +169,42 @@ Vue.component('chat-compo', {
 		<form class='chat_form' v-on:submit.prevent="sendMessage">
 			<input type="text" placeholder="Message..." v-model.trim="inputMessage" v-on:keydown.up="historyPrev" v-on:keydown.down="historyNext" v-on:keydown.esc="historyReset" />
 		</form>
+
+		<template v-if="rollDetails.shown">
+			<div class="winBack" v-on:click="toggleDetails"></div>
+			<roll-details v-bind:roll="rollDetails"></roll-details>
+		</template>
 	</div>`
 });
 
-Vue.component('jet-competence', {
-	props: ['socket', 'identity'],
-	data: function () {
-		return {
-			qual1: 8,
-			qual2: 8,
-			qual3: 8,
-			vc: 0,
-			bonus: 0,
-		}
-	},
-	methods: {
-		send: function (target) {
-			let messageDict = {
-				'type': 'competence',
-				'from': this.identity.id,
-				'from_name': this.identity.name,
-				'q1': { 'roll': true, 'qual': this.qual1 },
-				'q2': { 'roll': true, 'qual': this.qual2 },
-				'q3': { 'roll': true, 'qual': this.qual3 },
-				'vc': this.vc,
-				'bonus': this.bonus,
-			};
-			if (target) {
-				messageDict.target = target;
-			}
-			this.socket.send(JSON.stringify(messageDict));
-		},
-	},
+Vue.component('roll-details', {
+	props: ['roll'],
 	template: `
-	<div class="inrc_view">
-		<table>
-			<tr>
-				<th>Qualité 1</th>
-				<th>Qualité 2</th>
-				<th>Qualité 3</th>
-				<th>VC</th>
-				<th>Bonus / Malus</th>
-			</tr>
-			<tr>
-				<td><input type="number" v-model.number="qual1"></td>
-				<td><input type="number" v-model.number="qual2"></td>
-				<td><input type="number" v-model.number="qual3"></td>
-				<td><input type="number" v-model.number="vc"></td>
-				<td><input type="number" v-model.number="bonus"></td>
-			</tr>
-		</table>
-		<div class="inrc_actions">
-			<button class="inrc_send" v-on:click="send">Effectuer le jet</button>
+	<div class="rollDetails">
+		<h3>Avec modificateurs :</h3>
+		<div class="modifs-zero">
+			<roll-detail-dice v-bind:result="roll.withZero"></roll-detail-dice>
 		</div>
-		<div class="inrc_actions inrc_actions_2">
-			<button class="inrc_send" v-on:click="send('self')">Jet caché</button>
-			<button class="inrc_send" v-on:click="send('game_master')">Jet derrière l'écran</button>
+		<div class="modifs-list">
+			<div class="modif-col">
+				<roll-detail-dice v-for="r in roll.withMalus" v-bind:result="r" v-bind:key="r.bonus + '_malus'"></roll-detail-dice>
+			</div>
+			<div class="modif-col">
+				<roll-detail-dice v-for="r in roll.withBonus" v-bind:result="r" v-bind:key="r.bonus + '_bonus'"></roll-detail-dice>
+			</div>
 		</div>
-	</div>`
+	</div>
+	`,
 });
 
-Vue.component('reroll-competence', {
-	props: ['socket', 'identity', 'reroll_comp'],
-	data: function () {
-		return {
-			qual1: this.reroll_comp.dice.q1.qual,
-			qual2: this.reroll_comp.dice.q2.qual,
-			qual3: this.reroll_comp.dice.q3.qual,
-			dice1: this.reroll_comp.dice.q1.dice,
-			dice2: this.reroll_comp.dice.q2.dice,
-			dice3: this.reroll_comp.dice.q3.dice,
-			reroll1: false,
-			reroll2: false,
-			reroll3: false,
-			vc: this.reroll_comp.dice.vc,
-			bonus: this.reroll_comp.dice.bonus,
-			target: (typeof this.reroll_comp.dice.target == "string" ?
-				this.reroll_comp.dice.target : "all"),
-		}
-	},
-	methods: {
-		send: function () {
-			let messageDict = {
-				'type': 'competence',
-				'from': this.identity.id,
-				'from_name': this.identity.name,
-				'q1': { 'roll': this.reroll1, 'qual': this.qual1, 'dice': this.dice1 },
-				'q2': { 'roll': this.reroll2, 'qual': this.qual2, 'dice': this.dice2 },
-				'q3': { 'roll': this.reroll3, 'qual': this.qual3, 'dice': this.dice3 },
-				'vc': this.vc,
-				'bonus': this.bonus,
-				'target': this.target,
-			};
-			this.socket.send(JSON.stringify(messageDict));
-			this.close();
-		},
-		close: function () {
-			this.reroll_comp.dice = null;
-		},
-	},
+Vue.component('roll-detail-dice', {
+	props: ['result'],
 	template: `
-	<div class="inrc_view reroll_comp_view">
-		<table>
-			<tr>
-				<th>Qualité 1</th>
-				<th>Qualité 2</th>
-				<th>Qualité 3</th>
-				<th>VC</th>
-				<th>Bonus / Malus</th>
-			</tr>
-			<tr>
-				<td><input type="number" v-model.number="qual1"></td>
-				<td><input type="number" v-model.number="qual2"></td>
-				<td><input type="number" v-model.number="qual3"></td>
-				<td><input type="number" v-model.number="vc"></td>
-				<td><input type="number" v-model.number="bonus"></td>
-			</tr>
-		</table>
-		<div class="list_reroll">
-			<div>Qualités : {{this.qual1}} / {{this.qual2}} / {{this.qual3}}</div>
-			<div class="dice_reroll_ask" v-bind:class="{dice_for_reroll : reroll1}" v-on:click="reroll1 = !reroll1">{{ dice1 }}</div>
-			<div class="dice_reroll_ask" v-bind:class="{dice_for_reroll : reroll2}" v-on:click="reroll2 = !reroll2">{{ dice2 }}</div>
-			<div class="dice_reroll_ask" v-bind:class="{dice_for_reroll : reroll3}" v-on:click="reroll3 = !reroll3">{{ dice3 }}</div>
-		</div>
-		<div class="inrc_actions">
-			<button class="inrc_send" v-on:click="send" v-bind:disabled="!(reroll1 || reroll2 || reroll3)">Relancer les dés</button>
-			<button class="inrc_send" v-on:click="close">Annuler</button>
-		</div>
-	</div>`
-});
+	<div class='rollDetailDice' v-bind:class="{diceOk : result.nr > 0, diceFail : result.nr == 0}">
+		<template v-if="result.bonus >= 0">+</template>{{ result.bonus }} :
+		<template v-if="result.nr > 0">Succès</template>
+		<template v-if="result.nr == 0">Échec</template>
+		(PC={{result.pc}}, NR={{result.nr}})
+	</div>
+	`,
+})

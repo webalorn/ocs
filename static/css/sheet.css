@@ -496,7 +496,7 @@
 	font-size: small;
 }
 .magic_table td:nth-child(2), .magic_table th:nth-child(2) {
-	width: 4em;
+	width: 5em;
 }
 .magic_table td:nth-child(3), .magic_table th:nth-child(3) {
 	width: 1.5em;

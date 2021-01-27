@@ -53,6 +53,8 @@ code {
 }
 .chat_message_self {
 	border-right: 2px solid rgb(54, 130, 202);
+	text-align: right;
+	padding-right: 10px;
 }
 .msg_only_self {
 	font-style: italic;
@@ -61,6 +63,11 @@ code {
 .msg_only_gm {
 	font-style: italic;
     color: #7909f3;
+}
+
+.chat_routine {
+	font-style: italic;
+	color: rgb(0, 59, 25);
 }
 
 /* rolls */
@@ -119,6 +126,13 @@ code {
 	font-family: fantasy;
 	border-bottom: 1px solid black;
 	padding: 3px
+}
+.competence_as_gm .chat_competence_title {
+	cursor: pointer;
+}
+.competence_as_gm .chat_competence_title:hover {
+	opacity: 0.7;
+	font-weight: bold;
 }
 .chat_competence_jet {
 	margin: 6px 0px;
@@ -224,6 +238,7 @@ code {
 	box-shadow: 0px 0px 5px black;
 	z-index: 10;
 	margin-bottom: 2em;
+	line-height: 1.5em;
 }
 .top_edit_sheet {
 	display: inline-block;
@@ -232,6 +247,11 @@ code {
 }
 .top_name {
 	font-style: italic;
+}
+.top_table_name {
+	float: right;
+	margin-right: 1em;
+	display: inline-block;
 }
 
 /* jet de dés */
@@ -255,8 +275,27 @@ code {
 }
 .inrc_view > div {
 }
-.inrc_actions_2 {
+.inrc_actions {
 	margin-top: 1em;
+}
+.inrc_routine {
+	font-style: italic;
+	margin-top: 0.5em;
+	color: gray;
+	cursor: not-allowed;
+}
+.inrc_routine_allowed {
+	color: rgb(0, 107, 62);
+	cursor: pointer;
+}
+.inrc_routine_allowed:hover {
+	color: rgb(67, 7, 95);
+}
+.inrc_send.hidden_roll:not(:hover) {
+	background: rgb(211, 211, 211);
+}
+.inrc_send.screen_roll:not(:hover) {
+	background: rgb(231, 206, 243);
 }
 
 
@@ -298,4 +337,42 @@ code {
     box-shadow: 0 0px 6px 0px rgb(99, 97, 12);
 	background-color: #8dc573;
 	opacity: 1;
+}
+
+/*
+	Roll details
+*/
+.rollDetails {
+	z-index: 100;
+	position: fixed;
+	top: 3em;
+	left: calc(50% - 225px - 2px - 2em);
+	margin: auto;
+	width: 450px;
+	background: #bbbbbb;
+	border: 2px solid black;
+	border-width: 2px;
+	padding: 2em;
+}
+.rollDetails .modifs-zero {
+	text-align: center;
+}
+.rollDetails .modif-col {
+	display: inline-block;
+	width: calc(49% - 7px);
+	border-left: 2px solid rgb(0, 102, 133);
+	padding-left: 5px;
+}
+.rollDetails .modif-col:first-child {
+	border-left: 2px solid rgb(133, 0, 0);
+}
+.rollDetailDice {
+	
+}
+.rollDetailDice.diceOk {
+	color: #005400;
+}
+.rollDetailDice.diceFail {
+	color: #880d0d;
+	font-style: italic;
 }
