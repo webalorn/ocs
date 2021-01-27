@@ -164,6 +164,7 @@ function newDefaultSheet() {
 			"lances": { "vtc": 6, "atcd": 6, "prd": 3 },
 		},
 		"argent": [0, 0, 0, 0],
+		"other_stuff": "",
 		"animal": {
 			"nom": "",
 			"type": "",
@@ -229,6 +230,123 @@ function newDefaultSheet() {
 	}
 }
 
+const talentInfos = {
+	"phy": {
+		"acuite": { "name": "Acuité sensorielle", "roll": "IN/IU/IU", "enc": "EVTL", "am": "D" },
+		"alcool": { "name": "Alcools & drogues", "roll": "IN/CN/FO", "enc": "NON", "am": "A" },
+		"batellerie": { "name": "Batellerie", "roll": "CO/CH/DE", "enc": "OUI", "am": "A" },
+		"chant": { "name": "Chant", "roll": "IN/CH/CN", "enc": "EVTL", "am": "A" },
+		"danse": { "name": "Danse", "roll": "IN/CH/AG", "enc": "OUI", "am": "A" },
+		"equitation": { "name": "Équitation", "roll": "CH/AG/FO", "enc": "OUI", "am": "B" },
+		"escalade": { "name": "Escalade", "roll": "CO/AG/FO", "enc": "OUI", "am": "B" },
+		"furtivite": { "name": "Furtivité", "roll": "CO/IU/AG", "enc": "OUI", "am": "C" },
+		"maitrise_corps": { "name": "Maîtrise corporelle", "roll": "AG/AG/CN", "enc": "OUI", "am": "D" },
+		"maitrise_soi": { "name": "Maîtrise de soi", "roll": "CO/CO/CN", "enc": "NON", "am": "D" },
+		"natation": { "name": "Natation", "roll": "AG/CN/FO", "enc": "OUI", "am": "B" },
+		"tour_force": { "name": "Tour de force", "roll": "CN/FO/FO", "enc": "OUI", "am": "B" },
+		"vol": { "name": "Vol", "roll": "CO/IU/AG", "enc": "OUI", "am": "B" },
+		"vol_tire": { "name": "Vol à la tire", "roll": "CO/DE/AG", "enc": "OUI", "am": "B" },
+	},
+	"soc": {
+		"rue": { "name": "Connaissance de la rue", "roll": "IN/IU/CH", "enc": "EVTL", "am": "C" },
+		"convertir": { "name": "Convertir & convaincre", "roll": "CO/IN/CH", "enc": "NON", "am": "B" },
+		"deguisement": { "name": "Déguisement", "roll": "IU/CH/AG", "enc": "OUI", "am": "B" },
+		"etiquette": { "name": "Étiquette", "roll": "IN/IU/CH", "enc": "EVTL", "am": "B" },
+		"intimidation": { "name": "Intimidation", "roll": "CO/IU/CH", "enc": "NON", "am": "B" },
+		"nature_humaine": { "name": "Nature humaine", "roll": "IN/IU/CH", "enc": "NON", "am": "C" },
+		"persutaation": { "name": "Persutation", "roll": "CO/IU/CH", "enc": "NON", "am": "C" },
+		"seduction": { "name": "Séduction", "roll": "CO/CH/CH", "enc": "EVTL", "am": "B" },
+		"volonte": { "name": "Volonté", "roll": "CO/IU/CH", "enc": "NON", "am": "D" },
+	},
+	"nat": {
+		"botanique": { "name": "Botanique", "roll": "IN/DE/CN", "enc": "EVTL", "am": "C" },
+		"orientation": { "name": "Orientation", "roll": "IN/IU/IU", "enc": "NON", "am": "B" },
+		"peche": { "name": "Pêche", "roll": "DE/AG/CN", "enc": "EVTL", "am": "A" },
+		"pistage": { "name": "Pistage", "roll": "CO/IU/AG", "enc": "OUI", "am": "C" },
+		"noeuds": { "name": "Pratique des noeuds", "roll": "IN/DE/FO", "enc": "EVTL", "am": "A" },
+		"survie": { "name": "Survie", "roll": "CO/AG/CN", "enc": "OUI", "am": "C" },
+		"zoologie": { "name": "Zoologie", "roll": "CO/CO/CH", "enc": "OUI", "am": "C" },
+	},
+	"connaissance": {
+		"art_guerre": { "name": "Art de la guerre", "roll": "CO/IN/IU", "enc": "NON", "am": "B" },
+		"astonomie": { "name": "Astronomie", "roll": "IN/IN/IU", "enc": "NON", "am": "A" },
+		"calcul": { "name": "Calcul", "roll": "IN/IN/IU", "enc": "NON", "am": "A" },
+		"contes_legendes": { "name": "Contes & légendes", "roll": "IN/IN/IU", "enc": "NON", "am": "B" },
+		"dieux_cultes": { "name": "Dieux & cultes", "roll": "IN/IN/IU", "enc": "NON", "am": "B" },
+		"droit": { "name": "Droit", "roll": "IN/IN/IU", "enc": "NON", "am": "A" },
+		"geographie": { "name": "Géographie", "roll": "IN/IN/IU", "enc": "NON", "am": "B" },
+		"histoire": { "name": "Histoire", "roll": "IN/IN/IU", "enc": "NON", "am": "B" },
+		"jeux": { "name": "Jeux", "roll": "IN/IN/IU", "enc": "NON", "am": "A" },
+		"magicologie": { "name": "Magicologie", "roll": "IN/IN/IU", "enc": "NON", "am": "C" },
+		"mecanique": { "name": "Mécanique", "roll": "IN/IN/DE", "enc": "NON", "am": "B" },
+		"spherologie": { "name": "Sphérologie", "roll": "IN/IN/IU", "enc": "NON", "am": "B" },
+	},
+	"savoir": {
+		"alchimie": { "name": "Alchimie", "roll": "CO/IN/DE", "enc": "OUI", "am": "C" },
+		"navires": { "name": "Bateaux & navires", "roll": "DE/AG/FO", "enc": "OUI", "am": "C" },
+		"commerce": { "name": "Commerce", "roll": "IN/IU/CH", "enc": "NON", "am": "B" },
+		"conduite": { "name": "Conduite", "roll": "CH/DE/CN", "enc": "OUI", "am": "A" },
+		"crochetage": { "name": "Crochetage", "roll": "IU/DE/DE", "enc": "OUI", "am": "C" },
+		"cuisine": { "name": "Cuisine", "roll": "IU/DE/DE", "enc": "OUI", "am": "A" },
+		"musique": { "name": "Musique", "roll": "CH/DE/CN", "enc": "OUI", "am": "A" },
+		"peinture_dessin": { "name": "Peinture & dessin", "roll": "IN/DE/DE", "enc": "OUI", "am": "A" },
+		"soin_esprit": { "name": "Soin de l'esprit", "roll": "IU/CH/CN", "enc": "NON", "am": "B" },
+		"soin_blessures": { "name": "Soin des blessures", "roll": "IU/DE/DE", "enc": "OUI", "am": "D" },
+		"soin_maladies": { "name": "Soin des maladies", "roll": "CO/IU/CN", "enc": "OUI", "am": "B" },
+		"soin_poisons": { "name": "Soin des poisons", "roll": "CO/IN/IU", "enc": "OUI", "am": "B" },
+		"pierre": { "name": "Travail de la pierre", "roll": "DE/DE/FO", "enc": "OUI", "am": "A" },
+		"bois": { "name": "Travail du bois", "roll": "DE/AG/FO", "enc": "OUI", "am": "B" },
+		"cuir": { "name": "Travail du cuir", "roll": "DE/AG/CN", "enc": "OUI", "am": "B" },
+		"métal": { "name": "Travail du métal", "roll": "DE/CN/FO", "enc": "OUI", "am": "C" },
+		"tissu": { "name": "Travail du tissu", "roll": "IN/DE/DE", "enc": "OUI", "am": "A" },
+	},
+}
+const talentLists = {
+	"phy": [
+		"acuite", "alcool", "batellerie", "chant", "danse", "equitation", "escalade", "furtivite", "maitrise_corps", "maitrise_soi", "natation", "tour_force", "vol", "vol_tire",],
+	"soc": [
+		"rue", "convertir", "deguisement", "etiquette", "intimidation", "nature_humaine", "persutaation", "seduction", "volonte",],
+	"nat": [
+		"botanique", "orientation", "peche", "pistage", "noeuds", "survie", "zoologie",],
+	"connaissance": [
+		"art_guerre", "astonomie", "calcul", "contes_legendes", "dieux_cultes", "droit", "geographie", "histoire", "jeux", "magicologie", "mecanique", "spherologie",],
+	"savoir": [
+		"alchimie", "navires", "commerce", "conduite", "crochetage", "cuisine", "musique", "peinture_dessin", "soin_esprit", "soin_blessures", "soin_maladies", "soin_poisons", "pierre", "bois", "cuir", "métal", "tissu",],
+};
+
+const fightingInfos = {
+	"arbaletes": { "name": "Arbalètes", "qual": "DE", "am": "A", "contact": false, },
+	"arcs": { "name": "Arcs", "qual": "DE", "am": "C", "contact": false, },
+	"chaines": { "name": "Armes à chaîne", "qual": "FO", "am": "C", "contact": true, },
+	"hast": { "name": "Armes d'hast", "qual": "AG/FO", "am": "C", "contact": true, },
+	"duel": { "name": "Armes de duel", "qual": "AG", "am": "C", "contact": true, },
+	"jet": { "name": "Armes de jet", "qual": "DE", "am": "C", "contact": false, },
+	"bagarre": { "name": "Bagarre", "qual": "AG/FO", "am": "B", "contact": true, },
+	"boucliers": { "name": "Boucliers", "qual": "FO", "am": "C", "contact": true, },
+	"dagues": { "name": "Dagues", "qual": "AG", "am": "B", "contact": true, },
+	"epees": { "name": "Épées", "qual": "AG/FO", "am": "C", "contact": true, },
+	"epees2mains": { "name": "Épées à 2 mains", "qual": "FO", "am": "C", "contact": true, },
+	"haches_masses": { "name": "Haches & masses", "qual": "FO", "am": "C", "contact": true, },
+	"haches_masses_2m": { "name": "Haches & masses à 2 mains", "qual": "FO", "am": "C", "contact": true, },
+	"lances": { "name": "Lances", "qual": "FO", "am": "B", "contact": true, },
+};
+const fightingList = [
+	"arbaletes",
+	"arcs",
+	"chaines",
+	"hast",
+	"duel",
+	"jet",
+	"bagarre",
+	"boucliers",
+	"dagues",
+	"epees",
+	"epees2mains",
+	"haches_masses",
+	"haches_masses_2m",
+	"lances"]
+	;
+
 function compute_derived(sheet) {
 	// Etat des PV
 	let total_ev = sheet.stats.ev.reduce(sum2);
@@ -279,6 +397,114 @@ function compute_derived(sheet) {
 			"max": sheet.qualites.fo * 2,
 		}
 	}
+}
+
+function getQualMax(qualites, qualstr) {
+	let qual = qualstr.toLowerCase().split('/');
+	if (qual.length == 1) {
+		return qualites[qual[0]];
+	} else if (qual.length == 2) {
+		return Math.max(qualites[qual[0]], qualites[qual[1]]);
+	} else {
+		return Math.max(qualites[qual[0]], Math.max(qualites[qual[1]], qualites[qual[2]]));
+	}
+}
+
+function compute_vtc(qualites, name, vtc) {
+	let infos = fightingInfos[name];
+	let at = vtc + Math.max(0, Math.floor((qualites.co - 8) / 3));
+	let cd = vtc + Math.max(0, Math.floor((qualites.co - qualites.de) / 3));
+	let qual = getQualMax(qualites, infos.qual);
+	let prd = Math.ceil(vtc / 2) + Math.max(0, Math.floor((qualites.co - 8) / 3));
+	return { at: at, cd: cd, prd: prd, atcd: infos.contact ? at : cd };
+}
+
+const tab_am_a = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+const tab_am_b = [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28];
+const tab_am_c = [6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42];
+const tab_am_d = [8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56];
+const tab_am_e = [15, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180];
+
+function pav_cost_for(val, am) { // should use val+1 when calling
+	am = am.toUpperCase();
+	if (am != 'A' && am != 'B' && am != 'C' && am != 'D' && am != 'E') {
+		return null;
+	}
+	if (val < 0) { return null; }
+	if (val <= 12) {
+		if (am == 'A') { return 1; }
+		if (am == 'B') { return 2; }
+		if (am == 'C') { return 3; }
+		if (am == 'D') { return 4; }
+		if (val >= 1) {
+			return 15;
+		}
+		return null;
+	}
+	if (val > 25) {
+		return null;
+	}
+	if (am == 'A') { return tab_am_a[val - 13]; }
+	if (am == 'B') { return tab_am_b[val - 13]; }
+	if (am == 'C') { return tab_am_c[val - 13]; }
+	if (am == 'D') { return tab_am_d[val - 13]; }
+	return tab_am_e[val - 13];
+}
+
+function pav_cost_am(val, am) {
+	return pav_cost_for(val + 1, am);
+}
+
+function compute_pav_cost(sheet) {
+	let pav = {
+		stats: {
+			ev: pav_cost_am(sheet.stats.ev[2], 'D'),
+			ea: sheet.stats.ea[0] ? pav_cost_am(sheet.stats.ea[2], 'D') : null,
+			ek: sheet.stats.ek[0] ? pav_cost_am(sheet.stats.ek[2], 'D') : null,
+		}
+	};
+	if (sheet.stats.ev[2] >= sheet.qualites.cn) {
+		pav.stats.ev = "Limite: CN = " + sheet.qualites.cn;
+	}
+	if (sheet.magic.perma_pa > 0) {
+		pav.stats.ea = "Rachat (2PA)";
+	}
+	if (sheet.divin.perma_pk > 0) {
+		pav.stats.ea = "Rachat (2PA)";
+	}
+
+	return pav;
+}
+
+function getQuals(qualites, roll) {
+	let arr = roll.toLowerCase().split("/");
+	return [qualites[arr[0]], qualites[arr[1]], qualites[arr[2]]]
+}
+
+function getRoutine(qualites, roll, baseVc) {
+	let quals = getQuals(qualites, roll);
+	let vc = baseVc
+		- 3 * Math.max(0, 13 - quals[0])
+		- 3 * Math.max(0, 13 - quals[1])
+		- 3 * Math.max(0, 13 - quals[2]);
+	let r = 3 - Math.floor((vc - 1) / 3);
+	if (r > 3) {
+		r = null;
+	}
+	return r;
+}
+
+function computeRoutine(sheet) {
+	let talents = sheet.talents;
+	let routines = {};
+	for (const cat in talents) {
+		routines[cat] = {};
+		for (const stat in talents[cat]) {
+			routines[cat][stat] = getRoutine(sheet.qualites,
+				talentInfos[cat][stat].roll, talents[cat][stat].vc);
+		}
+	}
+	return routines;
 }
 
 const saveIntervalMax = 60 * 1000;
@@ -352,6 +578,30 @@ function newSaveManager(dataInit, prepareData, interval = 200) {
 	Vue tools
 */
 
+function pavTxt(pavCost) {
+	if (pavCost === null) {
+		return 'Non améliorable';
+	}
+	if (Number.isInteger(pavCost)) {
+		return '+1: ' + pavCost + ' PAV';
+	}
+	return pavCost;
+}
+
+function tooltipForSpell(spell) {
+	let vc = spell[2];
+	let am = spell[8];
+	let pav = pav_cost_am(vc, am);
+	if (pav) {
+		let text = pavTxt(pav);
+		if (vc >= 14) {
+			text += " (maîtrise)";
+		}
+		return { 0: text };
+	}
+	return {};
+}
+
 Vue.component('data-saver', {
 	props: ['data', 'manager'],
 	watch: {
@@ -385,21 +635,39 @@ Vue.component('data-saver', {
 	Sheet subviews
 */
 Vue.component('sheet-talent', {
-	props: ['name', 'dices', 'enc', 'am', 'stats'],
+	props: ['talents', 'cat', 'stat', 'qualites'],
 	data: function () {
-		return {}
+		return {
+			talent: this.talents[this.cat][this.stat],
+			infos: talentInfos[this.cat][this.stat],
+		}
+	},
+	computed: {
+		routine: function () {
+			return getRoutine(this.qualites, this.infos.roll, this.talent.vc);
+		},
+		improv_cost: function () {
+			let pav = pavTxt(pav_cost_am(this.talent.vc, this.infos.am));
+			let qual = getQualMax(this.qualites, this.infos.roll);
+			if (this.talent.vc >= qual + 2) {
+				return "Max: Q+2 = " + (qual + 2);
+			}
+			return pav;
+		},
 	},
 	template: `
 	<tr>
-		<td>{{ name }}</td>
-		<td>{{ dices }}</td>
-		<td>{{ enc }}</td>
-		<td>{{ am }}</td>
+		<td :data-tooltip="improv_cost">{{ infos.name }}</td>
+		<td>{{ infos.roll }}</td>
+		<td>{{ infos.enc }}</td>
+		<td>{{ infos.am }}</td>
 		<td>
-			<int-input v-model.number="stats.vc"></int-input>
+			<int-input v-model.number="talent.vc"></int-input>
 		</td>
+		<td v-if="routine !== null">{{ routine }}</td>
+		<td v-if="routine === null">—</td>
 		<td>
-			<input type="text" v-model.trim="stats.remark" />
+			<input type="text" v-model.trim="talent.remark" />
 		</td>
 	</tr>
 	`,
@@ -407,24 +675,36 @@ Vue.component('sheet-talent', {
 
 
 Vue.component('sheet-technique', {
-	props: ['name', 'q', 'am', 'stats'],
+	// props: ['name', 'q', 'am', 'stats'],
+	props: ['techniques', 'tech', 'qualites'],
 	data: function () {
-		return {}
+		return {
+			infos: fightingInfos[this.tech],
+			stats: this.techniques[this.tech],
+		};
+	},
+	computed: {
+		improv_cost: function () {
+			let qual = getQualMax(this.qualites, this.infos.qual);
+			if (qual + 2 <= this.stats.vtc) {
+				return "Max: Q+2 = " + (qual + 2);
+			}
+			return pavTxt(pav_cost_am(this.stats.vtc, this.infos.am));
+		},
+		fight: function () {
+			return compute_vtc(this.qualites, this.tech, this.stats.vtc);
+		},
 	},
 	template: `
 	<tr>
-		<td>{{ name }}</td>
-		<td>{{ q }}</td>
-		<td>{{ am }}</td>
+		<td :data-tooltip="improv_cost">{{ infos.name }}</td>
+		<td>{{ infos.qual }}</td>
+		<td>{{ infos.am }}</td>
 		<td>
 			<int-input v-model.number="stats.vtc"></int-input>
 		</td>
-		<td>
-			<int-input v-model.number="stats.atcd"></int-input>
-		</td>
-		<td v-if="'prd' in stats">
-			<int-input v-model.number="stats.prd"></int-input>
-		</td>
+		<td>{{ fight.atcd }}</td>
+		<td v-if="'prd' in stats">{{ fight.prd }}</td>
 		<td v-if="!('prd' in stats)" class="ts_cell_cross"></td>
 	</tr>
 	`,
@@ -512,14 +792,23 @@ Vue.component('sheet-etats-display', {
 });
 
 Vue.component('sheet-table', {
-	props: ["schema", "data", "titles"],
+	props: ["schema", "data", "titles", "tooltipsFct"],
 	// schema : ['int', 'str', 'str', ...]
 	// data : [ [1, 'a', 'b', ...], ...]
 	// titles : ["title 1", ....]
 	data: function () {
-		return {
-
-		}
+		return {};
+	},
+	computed: {
+		tooltips: function () {
+			let arr = [];
+			if (this.tooltipsFct) {
+				this.data.forEach(line => arr.push(this.tooltipsFct(line)));
+			} else {
+				this.data.forEach(line => arr.push([]));
+			}
+			return arr;
+		},
 	},
 	methods: {
 		isLineEmpty: function (line) {
@@ -563,8 +852,8 @@ Vue.component('sheet-table', {
 		<tr>
 			<th v-for="title in titles">{{ title }}</th>
 		</tr>
-		<tr v-for="line in data">
-			<td v-for="(val, ival) in line">
+		<tr v-for="(line, iline) in data">
+			<td v-for="(val, ival) in line" v-bind:data-tooltip="[ival in tooltips[iline] ? tooltips[iline][ival] : '']">
 				<input type="text" v-model.trim="line[ival]" v-if="schema[ival] == 'str'" />
 				<int-input v-model.number="line[ival]" v-if="schema[ival] == 'int'" />
 			</td>
@@ -585,6 +874,10 @@ function create_sheet_component(sheet_template) {
 				sheet: newDefaultSheet(),
 				active_view: "character",
 				saveManager: null,
+				order: {
+					'techniques': fightingList,
+					'talents': talentLists,
+				}
 			}
 		},
 		mounted: function () {
@@ -621,7 +914,10 @@ function create_sheet_component(sheet_template) {
 			},
 			deriv: function () {
 				return compute_derived(this.sheet);
-			}
+			},
+			pav: function () {
+				return compute_pav_cost(this.sheet);
+			},
 		},
 		methods: {
 			updateAvatar: function () {
@@ -677,7 +973,9 @@ function create_sheet_component(sheet_template) {
 					};
 					fileInput.click();
 				}
-			}
+			},
+			tooltipForSpell: tooltipForSpell,
+			pavTxt: pavTxt,
 		},
 		template: sheet_template,
 	});
@@ -706,11 +1004,11 @@ Vue.component('sheet-short-view', {
 		fetch(url)
 			.then(answer => answer.json())
 			.then(data => {
-				this.sheet = data.content;
+				this.setSheet(data.content);
 			});
 		this.socket.register((event, data) => {
 			if (data.type == 'notification' && data.on == 'sheet' && data.sheet_id == this.id) {
-				this.sheet = data.new_data.content;
+				this.setSheet(data.new_data.content);
 			}
 		});
 	},
@@ -755,6 +1053,12 @@ Vue.component('sheet-short-view', {
 		},
 		toggleDetails: function () {
 			this.detailOpen = !this.detailOpen;
+		},
+		setSheet: function (sheet) {
+			this.sheet = sheet;
+			if (this.id === this.identity.id) {
+				this.identity.sheet = sheet;
+			}
 		},
 	},
 	template: `

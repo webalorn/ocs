@@ -1,10 +1,55 @@
+Vue.component('qual-selector', {
+	props: ['num', 'quals', 'qualities'],
+	data: function () {
+		return {
+			listVisible: false,
+		};
+	},
+	computed: {
+		selectStyle: function () {
+			return {
+				display: this.listVisible ? 'block' : 'none',
+			}
+		},
+	},
+	methods: {
+		toogle: function () {
+			this.listVisible = !this.listVisible;
+		},
+		select: function (val) {
+			this.quals["qual" + this.num] = val;
+			this.listVisible = false;
+		},
+		mouseLeave: function () {
+			this.listVisible = false;
+		},
+	},
+	template: `
+	<th class="inrc_view_qual_th" v-on:mouseleave="mouseLeave" v-on:click="toogle">
+		<div>Qualité {{num}}</div>
+		<div class="inrc_qual_select" v-bind:style="selectStyle" v-on:click.stop="">
+			<div class="inrc_qual_co" v-on:click="select(qualities.co)">CO</div>
+			<div class="inrc_qual_in" v-on:click="select(qualities.in)">IN</div>
+			<div class="inrc_qual_iu" v-on:click="select(qualities.iu)">IU</div>
+			<div class="inrc_qual_ch" v-on:click="select(qualities.ch)">CH</div>
+			<div class="inrc_qual_de" v-on:click="select(qualities.de)">DE</div>
+			<div class="inrc_qual_ag" v-on:click="select(qualities.ag)">AG</div>
+			<div class="inrc_qual_cn" v-on:click="select(qualities.cn)">CN</div>
+			<div class="inrc_qual_fo" v-on:click="select(qualities.fo)">FO</div>
+		</div>
+	</th>
+	`
+});
+
 Vue.component('jet-competence', {
 	props: ['socket', 'identity'],
 	data: function () {
 		return {
-			qual1: 8,
-			qual2: 8,
-			qual3: 8,
+			quals: {
+				qual1: 8,
+				qual2: 8,
+				qual3: 8,
+			},
 			vc: 0,
 			bonus: 0,
 		}
@@ -12,9 +57,9 @@ Vue.component('jet-competence', {
 	computed: {
 		nr_routine: function () {
 			let bonus = Math.min(3, this.bonus);
-			bonus -= Math.max(0, 13 - this.qual1);
-			bonus -= Math.max(0, 13 - this.qual2);
-			bonus -= Math.max(0, 13 - this.qual3);
+			bonus -= Math.max(0, 13 - this.quals.qual1);
+			bonus -= Math.max(0, 13 - this.quals.qual2);
+			bonus -= Math.max(0, 13 - this.quals.qual3);
 			if (this.vc < 10 - 3 * bonus) {
 				return 0;
 			}
@@ -28,9 +73,9 @@ Vue.component('jet-competence', {
 				'type': 'competence',
 				'from': this.identity.id,
 				'from_name': this.identity.name,
-				'q1': { 'roll': true, 'qual': this.qual1 },
-				'q2': { 'roll': true, 'qual': this.qual2 },
-				'q3': { 'roll': true, 'qual': this.qual3 },
+				'q1': { 'roll': true, 'qual': this.quals.qual1 },
+				'q2': { 'roll': true, 'qual': this.quals.qual2 },
+				'q3': { 'roll': true, 'qual': this.quals.qual3 },
 				'vc': this.vc,
 				'bonus': this.bonus,
 			};
@@ -55,16 +100,16 @@ Vue.component('jet-competence', {
 	<div class="inrc_view">
 		<table>
 			<tr>
-				<th>Qualité 1</th>
-				<th>Qualité 2</th>
-				<th>Qualité 3</th>
+				<qual-selector v-bind:quals="quals" v-bind:num="1" v-bind:qualities="identity.sheet.qualites"></qual-selector>
+				<qual-selector v-bind:quals="quals" v-bind:num="2" v-bind:qualities="identity.sheet.qualites"></qual-selector>
+				<qual-selector v-bind:quals="quals" v-bind:num="3" v-bind:qualities="identity.sheet.qualites"></qual-selector>
 				<th>VC</th>
 				<th>Bonus / Malus</th>
 			</tr>
 			<tr>
-				<td><input type="number" v-model.number="qual1"></td>
-				<td><input type="number" v-model.number="qual2"></td>
-				<td><input type="number" v-model.number="qual3"></td>
+				<td><input type="number" v-model.number="quals.qual1"></td>
+				<td><input type="number" v-model.number="quals.qual2"></td>
+				<td><input type="number" v-model.number="quals.qual3"></td>
 				<td><input type="number" v-model.number="vc"></td>
 				<td><input type="number" v-model.number="bonus"></td>
 			</tr>

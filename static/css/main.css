@@ -63,11 +63,73 @@ button:hover {
 	color:#ffffff;
 	background-color:#353535;
 }
-
-
 button:disabled {
 	font-style: italic;
     background: rgb(163, 163, 163);
     color: black;
     cursor: not-allowed;
+}
+
+
+[data-tooltip]:not([data-tooltip=""]),
+[data-tooltip-bottom]:not([data-tooltip-bottom=""]) {
+	position: relative;
+	cursor: context-menu;
+}
+
+[data-tooltip]:not([data-tooltip=""]) *,
+[data-tooltip-bottom]:not([data-tooltip-bottom=""]) * {
+	cursor: context-menu;
+}
+
+[data-tooltip]:hover:after,
+[data-tooltip-bottom]:not([data-tooltip-bottom=""]):hover:after {
+	position: absolute;
+	left: 50%;
+	z-index: 200;
+	white-space: nowrap;
+	padding: 5px 14px;
+	background: #292929;
+	color: #fff;
+	border-radius: 4px;
+	font-size: 15px;
+	font-weight: normal;
+	font-style: normal;
+	text-decoration: none;
+}
+
+[data-tooltip]:hover:after {
+	content: attr(data-tooltip);
+	top: -10px;
+	transform: translateX(-50%) translateY(-100%);
+}
+
+[data-tooltip]:not([data-tooltip=""]):hover:before,
+[data-tooltip-bottom]:not([data-tooltip-bottom=""]):hover:before {
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	font-size: 15px;
+	color: #292929;
+}
+
+
+[data-tooltip]:not([data-tooltip=""]):hover:before {
+	content: "▼";
+	top: -15px;
+}
+
+
+[data-tooltip-bottom]:not([data-tooltip-bottom=""]):hover:after {
+	content: attr(data-tooltip-bottom);
+	bottom: -10px;
+	transform: translateX(-50%) translateY(100%);
+}
+
+[data-tooltip-bottom]:not([data-tooltip-bottom=""]):hover:before {
+	content: "▲";
+	bottom: -15px;
+}
+.qualites_bar [data-tooltip-bottom]:not([data-tooltip-bottom=""]):hover:after {
+	bottom: 0px;
 }
