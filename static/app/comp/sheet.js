@@ -1101,6 +1101,7 @@ Vue.component('sheet-short-view', {
 			this.sheet = sheet;
 			if (this.id === this.identity.id) {
 				this.identity.sheet = sheet;
+				this.identity.deriv = compute_derived(sheet);
 			}
 		},
 	},

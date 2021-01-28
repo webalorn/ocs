@@ -30,6 +30,8 @@
 			</div>
 			<jet-competence v-if="!reroll_comp.dice" v-bind:socket="socket" v-bind:identity="identity"></jet-competence>
 
+			<jet-fight v-bind:socket="socket" v-bind:identity="identity"></jet-fight>
+
 			<reroll-competence v-if="reroll_comp.dice" v-bind:socket="socket" v-bind:identity="identity"
 				v-bind:reroll_comp="reroll_comp"></reroll-competence>
 

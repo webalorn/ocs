@@ -13,6 +13,8 @@ class RollError(Exception):
 
 
 SIMPLE_MESSAGES = ['message', 'routine']
+ROLL_D20 = ['attack', 'parade', 'esquive']
+ROLL_STR = ['initiative', 'damages']
 
 
 def process_message(message_obj):
@@ -20,6 +22,11 @@ def process_message(message_obj):
         return jet_competence(message_obj['q1'], message_obj['q2'],
                               message_obj['q3'], message_obj['vc'],
                               message_obj['bonus'])
+    if message_obj['type'] in ROLL_D20:
+        return jet_d20(message_obj['roll'], message_obj['type'])
+    if message_obj['type'] in ROLL_STR:
+        return jet_simple(message_obj['roll'], message_obj['type'])
+
     if message_obj['type'] not in SIMPLE_MESSAGES:
         raise MessageError("Pas de message ?")
     if message_obj['type'] != 'message':
@@ -69,11 +76,12 @@ def cmd_ini(args):
     if len(args) >= 2:
         dice = args[1]
     expr = ini + '+' + dice
-    return {
-        'type': 'roll',
-        'rolls': [roll_dice(expr) + (expr, )],
-        'roll_type': 'ini',
-    }
+    return jet_simple(expr, 'initiative')
+    # return {
+    #     'type': 'roll',
+    #     'rolls': [roll_dice(expr) + (expr, )],
+    #     'roll_type': 'ini',
+    # }
 
 
 def cmd_competence(args):
@@ -101,17 +109,29 @@ def cmd_competence(args):
     }, vc, bonus)
 
 
+def cmd_d20(args):
+    if len(args) == 0 or not is_int(args[0]):
+        raise MessageError(f"Pas de valeur pour le dé !")
+    n = int(args[0])
+    text = 'Jet simple'
+    if len(args) >= 2:
+        text = ' '.join(args[1:])
+    return jet_d20(n, text)
+
+
 all_commands = {
     'r': cmd_roll,
     'roll': cmd_roll,
     'ini': cmd_ini,
     'c': cmd_competence,
     'competence': cmd_competence,
+    'd20': cmd_d20,
 }
 
 
 # Special actions, parsing, etc...
 def roll_dice(expr):
+    expr = expr.lower()
     if '+' in expr:
         s, dices = 0, []
         for e in expr.split('+'):
@@ -170,3 +190,35 @@ def jet_competence(rq1, rq2, rq3, vc, bonus):
         'critique': bool(len([r for r in jets if r == 1]) >= 2),
         'maladresse': bool(len([r for r in jets if r == 20]) >= 2),
     }
+
+
+def jet_d20(difficulty, type):
+    dice = random.randint(1, 20)
+    dice_conf = random.randint(1, 20)
+    results = {
+        'type': 'd20',
+        'roll_type': type,
+        'dice': dice,
+        'success': bool(dice <= difficulty and dice != 20),
+        'critique': bool(dice == 1 and difficulty > 0),
+        'maladresse': bool(dice == 20),
+        'difficulty': difficulty,
+        'confirmation': False,
+        'dice_conf': dice_conf,
+    }
+    if results['critique'] and dice_conf <= difficulty:
+        results['confirmation'] = True
+    if results['maladresse'] and (dice_conf > difficulty or dice_conf == 20):
+        results['confirmation'] = True
+    return results
+
+
+def jet_simple(roll, type):
+    dice_total, _ = roll_dice(roll)
+    results = {
+        'type': 'simple_roll',
+        'roll_type': type,
+        'dice': dice_total,
+        'expr': roll,
+    }
+    return results

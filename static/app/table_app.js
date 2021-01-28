@@ -90,6 +90,7 @@ var app = new Vue({
 							'name': 'MJ',
 							'gm': true,
 							'sheet': newDefaultSheet(),
+							'deriv': compute_derived(newDefaultSheet()),
 						};
 					} else {
 						if (this.urlParams.get("id") === null) {
@@ -102,6 +103,7 @@ var app = new Vue({
 							'player_name': '',
 							'gm': false,
 							'sheet': newDefaultSheet(),
+							'deriv': compute_derived(newDefaultSheet()),
 						};
 						if (!data['characters'].includes(this.identity.id)) {
 							this.errorMessage = "Le personage " + this.identity.id + " n'appartient pas à cette table de jeu";

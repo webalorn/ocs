@@ -116,8 +116,8 @@ Vue.component('chat-compo', {
 				Vous pouvez envoyer des commandes pour:<br>
 				Lancer des dés avec <code>/r [liste de dés]</code> ou <code>/r</code> (par exemple, <code>/roll d20+3d6  6d3-4</code>).<br>
 				Faire un jet de compétence avec <code>/c qual1 qual2 qual3 VC [bonus]</code> (par exemple <code>/c 9 10 15 12</code>, ou <code>/c 9 10 15 12 -1</code>).<br>
-				Lancer l'initiative avec <code>/ini 12</code> par exemple si la valeur de base d'initiative est 12.<br>
-				Vous pouvez utiliser le modificateur <code>h</code> pour cacher un jet (<code>/rh d20</code>), le modificateur <code>j</code> pour envoyer uniquement au MJ (<code>/rj d20</code>).
+				Jet d'initiative avec <code>/ini n</code>, et jet simple avec <code>/d20 n</code>.<br>
+				<em>Vous pouvez utiliser le modificateur <code>h</code> pour cacher un jet (<code>/rh d20</code>), le modificateur <code>j</code> pour envoyer uniquement au MJ (<code>/rj d20</code>).</em>
 			</div>
 			<div class="chat_message" v-for='m in messages' v-bind:class="{chat_message_self : m.from == identity.id}">
 				<div class="chat_message_name" v-if="m.type != 'error'">
@@ -160,6 +160,33 @@ Vue.component('chat-compo', {
 					</div>
 					<div v-else-if="m.type == 'routine'" class="chat_routine">
 						Épreuve de routine : NR = {{m.nr}}
+					</div>
+					<div v-else-if="m.type == 'simple_roll'" class="simple_roll" v-bind:class="'simple_' + m.roll_type">
+						<span v-if="m.roll_type == 'initiative'" class="chat_simpleroll_type">Initiative :</span>
+						<span v-else-if="m.roll_type == 'damages'" class="chat_simpleroll_type">Dégâts :</span>
+						<span v-else class="chat_simpleroll_type">{{ m.roll_type }} :</span>
+
+						<span class="chat_roll_total">{{ m.dice }}</span>
+						<span class="chat_roll_expr"> (={{ m.expr }})</span>
+					</div>
+					<div v-else-if="m.type == 'd20'" class="chat_d20" v-bind:class="['d20_' + m.roll_type, {d20_reussite : m.success, d20_echec: !m.success, d20_critique: m.critique, d20_maladresse: m.maladresse, d20_as_gm : identity.gm, d20_confirmation: m.confirmation}]">
+						<div class="chat_d20_title">
+							<span v-if="m.maladresse">Maladresse</span>
+							<span v-else-if="m.critique">Coup de maître</span>
+							<span v-else-if="m.success">Réussite</span>
+							<span v-else>Échec</span>
+							<template v-if="m.critique || m.maladresse">
+								<span v-if="m.confirmation" class="d20_non_conf"> (Confirmé)</span>
+								<span v-else  class="d20_conf"> (Non-Confirmé)</span>
+							</template>
+						</div>
+						<div class="chat_d20_jet">
+							<span v-if="m.roll_type == 'attack'" class="chat_d20_type">Attaque :</span>
+							<span v-else class="chat_d20_type">{{ m.roll_type }} :</span>
+
+							<span class="chat_d20_jet_val">{{ m.dice }}</span>
+							<span>(Jet sur {{ m.difficulty }})</span>
+						</div>
 					</div>
 					<p v-else>
 					{{ m }}

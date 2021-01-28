@@ -331,3 +331,92 @@ Vue.component('reroll-competence', {
 		</div>
 	</div>`
 });
+
+/*
+	Fight rolls
+*/
+
+Vue.component('jet-fight', {
+	props: ['socket', 'identity'],
+	data: function () {
+		return {
+			ini: 12,
+			at: 12,
+			modif_at: 0,
+			damages: '1D6+1',
+			prd: 6,
+			esq: 6,
+		};
+	},
+	methods: {
+		sendIni: function () {
+			this.socket.send_json({
+				'type': 'initiative',
+				'from': this.identity.id,
+				'from_name': this.identity.name,
+				'roll': this.ini + '+1d6',
+			});
+		},
+		sendAttack: function () {
+			this.socket.send_json({
+				'type': 'attack',
+				'from': this.identity.id,
+				'from_name': this.identity.name,
+				'roll': this.at + this.modif_at,
+			});
+		},
+		sendDmg: function () {
+			this.socket.send_json({
+				'type': 'damages',
+				'from': this.identity.id,
+				'from_name': this.identity.name,
+				'roll': '' + this.damages,
+			});
+		},
+		sendPrd: function () {
+			this.socket.send_json({
+				'type': 'parade',
+				'from': this.identity.id,
+				'from_name': this.identity.name,
+				'roll': this.prd,
+			});
+		},
+		sendEsq: function () {
+			this.socket.send_json({
+				'type': 'esquive',
+				'from': this.identity.id,
+				'from_name': this.identity.name,
+				'roll': this.esq,
+			});
+		},
+	},
+	template: `
+	<div class="rfight_view">
+		<table>
+			<tr>
+				<th>INI ({{ identity.deriv.stats.ini }})</th>
+				<th>Attaque</th>
+				<th>Bonus / Malus</th>
+				<th>Dégâts</th>
+				<th>PRD</th>
+				<th>ESQ ({{ identity.deriv.stats.esq }})</th>
+			</tr>
+			<tr>
+				<td><input type="number" v-model.number="ini"></td>
+				<td><input type="number" v-model.number="at"></td>
+				<td><input type="number" v-model.number="modif_at"></td>
+				<td><input type="text" v-model.trim="damages"></td>
+				<td><input type="number" v-model.number="prd"></td>
+				<td><input type="number" v-model.number="esq"></td>
+			</tr>
+			<tr>
+				<td><button class="rfight_ini" v-on:click="sendIni">Jet d'INI</button></td>
+				<td colspan="2"><button class="rfight_at" v-on:click="sendAttack">Attaquer</button></td>
+				<td><button class="rfight_dmg" v-on:click="sendDmg">Jet dégâts</button></td>
+				<td><button class="rfight_prd" v-on:click="sendPrd">Parer</button></td>
+				<td><button class="rfight_esq" v-on:click="sendEsq">Esquiver</button></td>
+			</tr>
+		</table>
+	</div>
+	`,
+});

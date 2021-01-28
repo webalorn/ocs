@@ -204,6 +204,20 @@ code {
 	background-image: url(/web/images/hexa_red.png);
 }
 
+/*
+	Jet simples
+*/
+.simple_roll {
+	padding: 0.1em;
+    background: white;
+    border-radius: 5px;
+}
+.simple_roll.simple_initiative {
+	background: #c1d4db;
+}
+.simple_roll.simple_damages {
+	background: #ecd0b9;
+}
 
 /* input */
 
@@ -245,7 +259,7 @@ code {
 	padding: 5px;
 	box-shadow: 0px 0px 5px black;
 	z-index: 10;
-	margin-bottom: 2em;
+	margin-bottom: 1em;
 	line-height: 1.5em;
 }
 .top_edit_sheet {
@@ -441,6 +455,47 @@ code {
 }
 
 /*
+	Roll for fight
+*/
+
+.rfight_view {
+	padding: 10px;
+    background: #e6d3d3;
+	margin-bottom: 1em;
+	text-align: center;
+}
+.rfight_view table {
+	display: inline-block;
+}
+.rfight_view table th {
+	padding: 0.4em 0em;
+}
+.rfight_view table td {
+	text-align: center;
+    width: 6em;
+}
+.rfight_view input {
+	height: 2em;
+    width: 4em;
+    text-align: center;
+}
+
+button.rfight_ini:not(:hover) {
+	background:rgb(193, 213, 219);
+}
+button.rfight_at:not(:hover) {
+	/* background:rgb(255, 255, 255); */
+}
+button.rfight_dmg:not(:hover) {
+	background:rgb(241, 149, 149);
+}
+button.rfight_prd:not(:hover) {
+	background: #d4b097	;
+}
+button.rfight_esq:not(:hover) {
+	background:rgb(192, 218, 186);
+}
+/*
 	Roll details
 */
 .rollDetails {
@@ -479,4 +534,76 @@ code {
 .rollDetailDice.diceFail {
 	color: #880d0d;
 	font-style: italic;
+}
+
+
+
+
+.chat_d20 {
+	text-align: center;
+	background: #d0d0d0;
+    padding: 5px;
+}
+.chat_d20_title {
+	font-family: fantasy;
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
+	padding: 2px;
+	width: 270px;
+    margin: auto;
+    border-radius: 5px;
+}
+.chat_d20_jet {
+	margin-top: 6px;
+	position: relative;
+}
+.chat_d20_type {
+	font-family: fantasy;
+	font-weight: bold;
+}
+.chat_d20_jet_val {
+	font-weight: bold;
+	padding: 0px 5px;
+}
+
+.d20_reussite .chat_d20_title {
+	background: #a9d2b2;
+}
+.d20_critique .chat_d20_title {
+    font-weight: bold;
+    color: black;
+}
+.d20_critique.d20_confirmation .chat_d20_title {
+	background: #00b728;
+}
+.d20_echec .chat_d20_title {
+	background: #e0b8b8;
+}
+.d20_maladresse .chat_d20_title {
+    font-weight: bold;
+    color: #ff0404;
+}
+.d20_maladresse.d20_confirmation .chat_d20_title {
+	background: #1f1f1f;
+}
+.chat_d20_jet:before {
+	display: inline-block;
+	content: "";
+	background-image: url('/web/images/d20.png');
+	background-size: cover;
+	width: 20px;
+	height: 20px;
+	position: relative;
+	z-index: 20;
+	margin-right: 10px;
+	top: 5px;
+}
+.d20_attack .chat_d20_jet:before {
+	background-image: url('/web/images/sword.png');
+}
+.d20_parade .chat_d20_jet:before {
+	background-image: url('/web/images/shield.png');
+}
+.d20_esquive .chat_d20_jet:before {
+	background-image: url('/web/images/dodge.png');
 }
