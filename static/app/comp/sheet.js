@@ -359,12 +359,21 @@ function compute_derived(sheet) {
 	if (cur_ev <= 0) { ev_etats = 5; }
 
 	// Calcul de la masse
-	let masse_stuff = 0, masse_weapons = 0;
+	let masse_stuff = 0, masse_weapons = 0, masse_armor = 0;
 	sheet.stuff.forEach(el => { masse_stuff += el[1] });
 	sheet.armes['melee'].forEach(el => { masse_weapons += el[8] });
 	sheet.armes['distance'].forEach(el => { masse_weapons += el[7] });
-	sheet.armes['armures'].forEach(el => { masse_weapons += el[5] });
+	sheet.armes['armures'].forEach(el => { masse_armor += el[5] });
 	sheet.armes['parade'].forEach(el => { masse_weapons += el[3] });
+
+	// Calcul de valeurs dérivées
+	let magicQual = sheet.magic.qualite_principale.toLowerCase();
+	let magicAstralQual = magicQual in sheet.qualites ? sheet.qualites[magicQual] : 0;
+	let diviQual = sheet.divin.qualite_principale.toLowerCase();
+	let diviKarmaQual = diviQual in sheet.qualites ? sheet.qualites[diviQual] : 0;
+
+	let bonusTM = Math.round((sheet.qualites.co + sheet.qualites.in + sheet.qualites.iu) / 6);
+	let bonusTP = Math.round((sheet.qualites.cn + sheet.qualites.cn + sheet.qualites.fo) / 6);
 
 	return {
 		"xp": {
@@ -378,22 +387,28 @@ function compute_derived(sheet) {
 									sheet.xp.total >= 1000 ? "Moyen" : "Inexpérimenté"
 			),
 		},
+		"deriv": {
+			"tmBonus": bonusTM,
+			"tpBonus": bonusTP,
+		},
 		"stats": {
-			"ev": sheet.stats.ev.reduce(sum2),
-			"ea": sheet.stats.ea.reduce(sum2),
-			"ek": sheet.stats.ek.reduce(sum2),
-			"tm": sheet.stats.tm.reduce(sum2),
-			"tp": sheet.stats.tp.reduce(sum2),
-			"esq": sheet.stats.esq.reduce(sum2),
-			"ini": sheet.stats.ini.reduce(sum2),
+			"ev": sheet.stats.ev.reduce(sum2) + sheet.qualites.cn * 2,
+			"ea": sheet.stats.ea.reduce(sum2) + magicAstralQual,
+			"ek": sheet.stats.ek.reduce(sum2) + diviKarmaQual,
+			"tm": sheet.stats.tm.reduce(sum2) + bonusTM,
+			"tp": sheet.stats.tp.reduce(sum2) + bonusTP,
+			"esq": sheet.stats.esq[1] + Math.round(sheet.qualites.ag / 2),
+			"ini": sheet.stats.ini[1] + Math.round((sheet.qualites.co + sheet.qualites.ag) / 2),
 			"vi": sheet.stats.vi.reduce(sum2),
 		},
 		"des": { "max": sheet.des.valeur + sheet.des.modif },
 		"ev_etats": ev_etats,
 		"masse": {
 			"stuff": masse_stuff,
-			"weapons": masse_weapons,
-			"total": masse_stuff + masse_weapons,
+			"weaponsOnly": masse_weapons,
+			"weapons": masse_weapons + masse_armor,
+			"total": masse_stuff + masse_weapons + masse_armor,
+			"total_enc": masse_stuff + masse_weapons,
 			"max": sheet.qualites.fo * 2,
 		}
 	}
@@ -918,6 +933,34 @@ function create_sheet_component(sheet_template) {
 			pav: function () {
 				return compute_pav_cost(this.sheet);
 			},
+			autoText: function () {
+				let divinQual = this.sheet.divin.qualite_principale.toLowerCase();
+				let magicQual = this.sheet.magic.qualite_principale.toLowerCase();
+
+				return {
+					magicQual: magicQual ?
+						(magicQual in this.sheet.qualites ?
+							magicQual.toUpperCase() + ' = ' + this.sheet.qualites[magicQual]
+							: magicQual + ' inconnue'
+						) : '',
+					divinQual: divinQual ?
+						(divinQual in this.sheet.qualites ?
+							divinQual.toUpperCase() + ' = ' + this.sheet.qualites[divinQual]
+							: divinQual + ' inconnue'
+						) : '',
+					bonusEv: '+2*CN (' + (2 * this.sheet.qualites.cn) + ')',
+					bonusEa: (magicQual || this.sheet.stats.ea[0]) ?
+						(magicQual in this.sheet.qualites ?
+							'+' + magicQual.toUpperCase() + ' (' + this.sheet.qualites[magicQual] + ')'
+							: '+0'
+						) : '',
+					bonusEk: (divinQual || this.sheet.stats.ek[0]) ?
+						(divinQual in this.sheet.qualites ?
+							'+' + divinQual.toUpperCase() + ' (' + this.sheet.qualites[divinQual] + ')'
+							: '+0'
+						) : '',
+				};
+			},
 		},
 		methods: {
 			updateAvatar: function () {
@@ -1123,6 +1166,7 @@ Vue.component('sheet-short-view', {
 			</div>
 			<div class="ssv_status">{{ sheet.status }}</div>
 			<sheet-etats-display v-bind:etats="sheet.etats"></sheet-etats-display>
+			<div class="ssv_status">{{ sheet.modifs_qualites }}</div>
 		</div>
 		<template v-if="detailOpen">
 			<div class="winBack" v-on:click="toggleDetails"></div>

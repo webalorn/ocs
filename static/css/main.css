@@ -74,12 +74,6 @@ button:disabled {
 [data-tooltip]:not([data-tooltip=""]),
 [data-tooltip-bottom]:not([data-tooltip-bottom=""]) {
 	position: relative;
-	cursor: context-menu;
-}
-
-[data-tooltip]:not([data-tooltip=""]) *,
-[data-tooltip-bottom]:not([data-tooltip-bottom=""]) * {
-	cursor: context-menu;
 }
 
 [data-tooltip]:hover:after,
@@ -111,6 +105,7 @@ button:disabled {
 	transform: translateX(-50%);
 	font-size: 15px;
 	color: #292929;
+	z-index: 200;
 }
 
 

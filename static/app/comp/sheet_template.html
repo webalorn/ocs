@@ -9,7 +9,8 @@
 			<input placeholder="Nom du personage" type="text" name="nom" v-model.trim="sheet.head.nom" />
 			<br />
 			<label>PAV :</label>
-			{{sheet.xp.total}} ({{ deriv.xp.degree }})
+			<int-input v-model.number="sheet.xp.spent" style="width: 3.5em; text-align: right;" />
+			/ {{sheet.xp.total}} ({{ deriv.xp.degree }})
 			<br />
 			<label>PV :</label>
 			<int-input v-model.number="sheet.cur_stats.ev" style="width: 4em; text-align: right;" />
@@ -140,8 +141,8 @@
 							<td>Total</td>
 						</tr>
 						<tr>
-							<td :data-tooltip="pavTxt(pav.stats.ev)"><label>Énergie Vitale</label></td>
-							<td class="ts_cell">
+							<td :data-tooltip-bottom="pavTxt(pav.stats.ev)"><label>Énergie Vitale</label></td>
+							<td class="ts_cell" data-tooltip-bottom="Base peuple">
 								<int-input v-model.number="sheet.stats.ev[0]"></int-input>
 							</td>
 							<td class="ts_cell">
@@ -150,11 +151,11 @@
 							<td class="ts_cell">
 								<int-input v-model.number="sheet.stats.ev[2]"></int-input>
 							</td>
-							<td class="ts_cell">{{ deriv.stats.ev }}</td>
+							<td class="ts_cell" :data-tooltip-bottom="autoText.bonusEv">{{ deriv.stats.ev }}</td>
 						</tr>
 						<tr>
-							<td :data-tooltip="pavTxt(pav.stats.ea)"><label>Énergie Astrale</label></td>
-							<td class="ts_cell">
+							<td :data-tooltip-bottom="pavTxt(pav.stats.ea)"><label>Énergie Astrale</label></td>
+							<td class="ts_cell" data-tooltip-bottom="Base tradition">
 								<int-input v-model.number="sheet.stats.ea[0]"></int-input>
 							</td>
 							<td class="ts_cell">
@@ -163,11 +164,15 @@
 							<td class="ts_cell">
 								<int-input v-model.number="sheet.stats.ea[2]"></int-input>
 							</td>
-							<td class="ts_cell">{{ deriv.stats.ea }}</td>
+							<td class="ts_cell" :data-tooltip-bottom="autoText.bonusEa" v-if="deriv.stats.ea != 0">{{
+								deriv.stats.ea }}</td>
+							<td class="ts_cell ts_cell_cross" v-if="deriv.stats.ea == 0">
+								</int-input>
+							</td>
 						</tr>
 						<tr>
-							<td :data-tooltip="pavTxt(pav.stats.ek)"><label>Énergie Karmique</label></td>
-							<td class="ts_cell">
+							<td :data-tooltip-bottom="pavTxt(pav.stats.ek)"><label>Énergie Karmique</label></td>
+							<td class="ts_cell" data-tooltip-bottom="Base tradition">
 								<int-input v-model.number="sheet.stats.ek[0]"></int-input>
 							</td>
 							<td class="ts_cell">
@@ -176,11 +181,15 @@
 							<td class="ts_cell">
 								<int-input v-model.number="sheet.stats.ek[2]"></int-input>
 							</td>
-							<td class="ts_cell">{{ deriv.stats.ek }}</td>
+							<td class="ts_cell" :data-tooltip-bottom="autoText.bonusEk" v-if="deriv.stats.ek != 0">{{
+								deriv.stats.ek }}</td>
+							<td class="ts_cell ts_cell_cross" v-if="deriv.stats.ek == 0">
+								</int-input>
+							</td>
 						</tr>
 						<tr>
 							<td><label>Ténacité Mentale</label></td>
-							<td class="ts_cell">
+							<td class="ts_cell" data-tooltip-bottom="Base peuple">
 								<int-input v-model.number="sheet.stats.tm[0]"></int-input>
 							</td>
 							<td class="ts_cell">
@@ -189,11 +198,12 @@
 							<td class="ts_cell ts_cell_cross">
 								</int-input>
 							</td>
-							<td class="ts_cell">{{ deriv.stats.tm }}</td>
+							<td class="ts_cell" :data-tooltip-bottom="'+' + deriv.deriv.tmBonus">{{ deriv.stats.tm }}
+							</td>
 						</tr>
 						<tr>
 							<td><label>Ténacité Physique</label></td>
-							<td class="ts_cell">
+							<td class="ts_cell" data-tooltip-bottom="Base peuple">
 								<int-input v-model.number="sheet.stats.tp[0]"></int-input>
 							</td>
 							<td class="ts_cell">
@@ -202,12 +212,13 @@
 							<td class="ts_cell ts_cell_cross">
 								</int-input>
 							</td>
-							<td class="ts_cell">{{ deriv.stats.tp }}</td>
+							<td class="ts_cell" :data-tooltip-bottom="'+' + deriv.deriv.tpBonus">{{ deriv.stats.tp }}
+							</td>
 						</tr>
 						<tr>
 							<td><label>Esquive</label></td>
-							<td class="ts_cell">
-								<int-input v-model.number="sheet.stats.esq[0]"></int-input>
+							<td class="ts_cell" data-tooltip-bottom="AG/2">
+								{{ Math.round(sheet.qualites.ag / 2) }}
 							</td>
 							<td class="ts_cell">
 								<int-input v-model.number="sheet.stats.esq[1]"></int-input>
@@ -219,8 +230,8 @@
 						</tr>
 						<tr>
 							<td><label>Initiative</label></td>
-							<td class="ts_cell">
-								<int-input v-model.number="sheet.stats.ini[0]"></int-input>
+							<td class="ts_cell" data-tooltip-bottom="(CO+AG)/2">
+								{{ Math.round((sheet.qualites.co + sheet.qualites.ag) / 2) }}
 							</td>
 							<td class="ts_cell">
 								<int-input v-model.number="sheet.stats.ini[1]"></int-input>
@@ -232,7 +243,7 @@
 						</tr>
 						<tr>
 							<td><label>Vitesse</label></td>
-							<td class="ts_cell">
+							<td class="ts_cell" data-tooltip-bottom="Base peuple">
 								<int-input v-model.number="sheet.stats.vi[0]"></int-input>
 							</td>
 							<td class="ts_cell">
@@ -304,7 +315,7 @@
 					<br />
 					<table class="table_talents s_table">
 						<tr>
-							<th colspan="7">Talents physiques (CO/AG/FO)</th>
+							<th colspan="7">Talents physiques</th>
 						</tr>
 						<sheet-talent v-for="tal in order.talents.phy" v-bind:qualites="sheet.qualites"
 							v-bind:talents="sheet.talents" v-bind:cat="'phy'" v-bind:stat="tal"
@@ -365,7 +376,7 @@
 					</div>
 					<textarea class="s_textarea" v-model="sheet.ecritures"></textarea>
 					<div class="champ_in">
-						<label>Modifications temporaires des qualités</label>
+						<label>Modifications (temporaires) des valeurs</label>
 					</div>
 					<textarea class="s_textarea" v-model="sheet.modifs_qualites"></textarea>
 					<sheet-etats-display v-bind:etats="sheet.etats"></sheet-etats-display>
@@ -387,7 +398,7 @@
 						<int-input v-model.number="sheet.cur_stats.ev" style="width: 4em; text-align: right;" />
 						</int-input> / {{ deriv.stats.ev }}
 						<label>ESQ : </label>{{ deriv.stats.esq }}
-						<label>INI : </label>{{ deriv.stats.ini }}
+						<label>INI : </label>{{ deriv.stats.ini }}+1D6
 						<label>TM : </label>{{ deriv.stats.tm }}
 						<label>TP : </label>{{ deriv.stats.tp }}
 					</div>
@@ -434,6 +445,10 @@
 					<div class="champ_in">
 						<label>Masse des armes & armures :</label>
 						{{ deriv.masse.weapons }}
+					</div>
+					<div class="champ_in">
+						<label>Masse des armes seules :</label>
+						{{ deriv.masse.weaponsOnly }}
 					</div>
 				</div>
 			</div>
@@ -525,6 +540,10 @@
 					</div>
 					<textarea class="s_textarea" v-model="sheet.status"></textarea>
 					<br />
+					<div class="champ_in">
+						<label>Modifications (temporaires) des valeurs</label>
+					</div>
+					<textarea class="s_textarea" v-model="sheet.modifs_qualites"></textarea>
 				</div>
 			</div>
 		</div>
@@ -547,8 +566,13 @@
 						{{ deriv.masse.stuff }}
 					</div>
 					<div class="champ_in">
-						<label>Masse totale transportée:</label>
-						{{ deriv.masse.total }} / {{ deriv.masse.max }}
+						<label>Masse totale transportée :</label>
+						{{ deriv.masse.total }}
+						<!-- / {{ deriv.masse.max }} -->
+					</div>
+					<div class="champ_in">
+						<label>Total pour ENC (sans l'armure) :</label>
+						{{ deriv.masse.total_enc }} / {{ deriv.masse.max }}
 					</div>
 				</div>
 			</div>
@@ -704,9 +728,9 @@
 						<label>Tradition</label>
 						<input type="text" v-model="sheet.magic.tradition" class="field" />
 					</div>
-					<div class="champ_in">
+					<div class="champ_in" :data-tooltip-bottom="autoText.magicQual">
 						<label>Qualité principale</label>
-						<input type="text" v-model="sheet.magic.qualite_principale" class="field" />
+						<input type="text" v-model.trim="sheet.magic.qualite_principale" class="field" />
 					</div>
 					<div class="champ_in">
 						<label>Domaine</label>
@@ -757,9 +781,9 @@
 						<label>Tradition</label>
 						<input type="text" v-model="sheet.divin.tradition" class="field" />
 					</div>
-					<div class="champ_in">
+					<div class="champ_in" :data-tooltip-bottom="autoText.divinQual">
 						<label>Qualité principale</label>
-						<input type="text" v-model="sheet.divin.qualite_principale" class="field" />
+						<input type="text" v-model.trim="sheet.divin.qualite_principale" class="field" />
 					</div>
 					<div class="champ_in">
 						<label>Aspect</label>

@@ -57,6 +57,22 @@ def cmd_roll(args):
     return {
         'type': 'roll',
         'rolls': rolls,
+        'roll_type': 'simple',
+    }
+
+
+def cmd_ini(args):
+    if len(args) == 0:
+        raise MessageError(f"Pas de valeur d'initiative !")
+    ini = args[0]
+    dice = 'd6'
+    if len(args) >= 2:
+        dice = args[1]
+    expr = ini + '+' + dice
+    return {
+        'type': 'roll',
+        'rolls': [roll_dice(expr) + (expr, )],
+        'roll_type': 'ini',
     }
 
 
@@ -88,6 +104,7 @@ def cmd_competence(args):
 all_commands = {
     'r': cmd_roll,
     'roll': cmd_roll,
+    'ini': cmd_ini,
     'c': cmd_competence,
     'competence': cmd_competence,
 }
@@ -135,6 +152,12 @@ def jet_competence(rq1, rq2, rq3, vc, bonus):
     pc = (vc - max(rq1['dice'] - rq1['qual'] - bonus, 0) -
           max(rq2['dice'] - rq2['qual'] - bonus, 0) -
           max(rq3['dice'] - rq3['qual'] - bonus, 0))
+
+    rolls = [rq1['dice'], rq2['dice'], rq3['dice']]
+    if rolls.count(20) >= 2:
+        pc = -1
+    elif rolls.count(1) >= 2:
+        pc = vc
     return {
         'type': 'competence',
         'q1': rq1,

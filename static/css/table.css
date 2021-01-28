@@ -81,6 +81,14 @@ code {
 }
 .chat_roll_total {
 	margin-right: 0.5em;
+	font-weight: bold;
+    font-family: fantasy;
+}
+.chat_roll_ini {
+	color: #4e4e4e;
+    font-family: fantasy;
+    font-style: italic;
+    padding-right: 0.8em;
 }
 .chat_dice {
 	display: inline-block;
@@ -252,6 +260,8 @@ code {
 	float: right;
 	margin-right: 1em;
 	display: inline-block;
+	font-family: fantasy;
+    font-size: 0.95em;
 }
 
 /* jet de dés */
@@ -279,11 +289,11 @@ code {
 	padding: 0.6em 0em;
 }
 
-.inrc_view_qual_th {
+.inrc_view_clickable {
 	cursor: pointer;
 	position: relative;
 }
-.inrc_view_qual_th:hover {
+.inrc_view_clickable:hover {
 	background: white;
 	border-radius: 5px;
 }
@@ -383,6 +393,54 @@ code {
 }
 
 /*
+	Roll for talents
+*/
+.talent_select {
+	z-index: 100;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translateX(-50%) translateY(-50%);
+	margin: auto;
+	height: 800px;
+	max-height: 90%;
+	width: 650px;
+	max-width: 90%;
+	background: #ccd4d6;
+	border: 2px solid black;
+	padding: 0.6em;
+}
+.talent_select .col_talents {
+	width: 49%;
+	display: inline-block;
+	vertical-align:top;
+	text-align: left;
+}
+.talent_select h3 {
+	margin: 0.5em 0em;
+	border-bottom: 1px solid rgb(123, 82, 54);
+	font-family: fantasy;
+}
+.inrc_talent {
+	padding: 0.3em;
+    cursor: pointer;
+	background: #e0e0e0;
+	font-size: small;
+}
+.inrc_talent:hover {
+	background: rgb(202 184 169);
+    color: #464646;
+}
+.inrc_tal_roll {
+	font-style: italic;
+}
+.inrc_tal_val {
+	float: right;
+	font-weight: bold;
+	padding: 0em 1em;
+}
+
+/*
 	Roll details
 */
 .rollDetails {
@@ -408,6 +466,9 @@ code {
 }
 .rollDetails .modif-col:first-child {
 	border-left: 2px solid rgb(133, 0, 0);
+}
+.rollDetails h3 {
+	margin-top: 0px;
 }
 .rollDetailDice {
 	

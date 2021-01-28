@@ -65,7 +65,14 @@ var app = new Vue({
 					this.setTitle(this.newTableName);
 				}
 			});
-		}
+		},
+		compCharacters: function (char1, char2) {
+			if (char1 == this.identity.id) { return -1; }
+			if (char2 == this.identity.id) { return 1; }
+			if (char1 < char2) { return -1; }
+			if (char1 > char2) { return 1; }
+			return 0;
+		},
 	},
 	mounted: function () {
 		this.tableId = this.urlParams.get("table");
@@ -110,7 +117,8 @@ var app = new Vue({
 					}
 					this.connected = true;
 					this.characters = data['characters'];
-				})
+					this.characters.sort(this.compCharacters);
+				});
 			}
 		}).catch((error) => {
 			this.cantConnect = true;

@@ -103,7 +103,6 @@ Vue.component('chat-compo', {
 				withZero: withZero,
 				shown: true,
 			};
-			console.log(JSON.stringify(this.rollDetails));
 		},
 		toggleDetails: function (m) {
 			this.rollDetails = !this.rollDetails;
@@ -115,8 +114,9 @@ Vue.component('chat-compo', {
 			<div class="chat_help">
 				Envoyez des messages en appuyant sur <code>entrée</code>.<br>
 				Vous pouvez envoyer des commandes pour:<br>
-				Lancer des dés avec <code>/roll [liste de dés]</code> ou <code>/r</code> (par exemple, <code>/roll d20+3d6  6d3-4</code>).<br>
+				Lancer des dés avec <code>/r [liste de dés]</code> ou <code>/r</code> (par exemple, <code>/roll d20+3d6  6d3-4</code>).<br>
 				Faire un jet de compétence avec <code>/c qual1 qual2 qual3 VC [bonus]</code> (par exemple <code>/c 9 10 15 12</code>, ou <code>/c 9 10 15 12 -1</code>).<br>
+				Lancer l'initiative avec <code>/ini 12</code> par exemple si la valeur de base d'initiative est 12.<br>
 				Vous pouvez utiliser le modificateur <code>h</code> pour cacher un jet (<code>/rh d20</code>), le modificateur <code>j</code> pour envoyer uniquement au MJ (<code>/rj d20</code>).
 			</div>
 			<div class="chat_message" v-for='m in messages' v-bind:class="{chat_message_self : m.from == identity.id}">
@@ -130,6 +130,7 @@ Vue.component('chat-compo', {
 					<p class="chat_message_error" v-else-if="m.type == 'error'">{{ m.message }}</p>
 					<template v-else-if="m.type == 'roll'">
 						<div v-for="roll in m.rolls" class="chat_roll_line">
+							<span v-if="m.roll_type == 'ini'" class="chat_roll_ini">Initiative :</span>
 							<span class="chat_roll_total">{{ roll[0] }}</span>
 							<span class="chat_roll_expr"> (={{ roll[2] }})</span>
 							<div v-for="d in roll[1]" class="chat_dice" v-bind:class="['dice_' + d[1], 'rolled_' + d[0]]"><span class="chat_dice_p1">{{ d[0] }}</span><span class="chat_dice_p2">/{{ d[1] }}</span></div>
@@ -179,6 +180,9 @@ Vue.component('chat-compo', {
 
 Vue.component('roll-details', {
 	props: ['roll'],
+	methods: {
+		signed: n => n < 0 ? '' + n : '+' + n,
+	},
 	template: `
 	<div class="rollDetails">
 		<h3>Avec modificateurs :</h3>
@@ -192,6 +196,9 @@ Vue.component('roll-details', {
 			<div class="modif-col">
 				<roll-detail-dice v-for="r in roll.withBonus" v-bind:result="r" v-bind:key="r.bonus + '_bonus'"></roll-detail-dice>
 			</div>
+		</div>
+		<div style="text-align:center;">
+			<em>Lancé avec un modificateur de : {{ signed(roll.m.bonus) }}</em>
 		</div>
 	</div>
 	`,
