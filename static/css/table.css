@@ -322,6 +322,7 @@ code {
 	transform: translateX(-50%) translateY(100%);
 	padding: 6px;
 	padding-bottom: 3px;
+	z-index: 10;
 }
 .inrc_qual_select > div {
 	margin-bottom: 3px;
@@ -409,7 +410,7 @@ code {
 /*
 	Roll for talents
 */
-.talent_select {
+.select_win {
 	z-index: 100;
 	position: fixed;
 	top: 50%;
@@ -424,13 +425,13 @@ code {
 	border: 2px solid black;
 	padding: 0.6em;
 }
-.talent_select .col_talents {
+.col_in_win {
 	width: 49%;
 	display: inline-block;
 	vertical-align:top;
 	text-align: left;
 }
-.talent_select h3 {
+.select_win h3 {
 	margin: 0.5em 0em;
 	border-bottom: 1px solid rgb(123, 82, 54);
 	font-family: fantasy;
@@ -452,6 +453,10 @@ code {
 	float: right;
 	font-weight: bold;
 	padding: 0em 1em;
+}
+
+.inrc_spell_error {
+	color: #ff4b4b;
 }
 
 /*
@@ -606,4 +611,44 @@ button.rfight_esq:not(:hover) {
 }
 .d20_esquive .chat_d20_jet:before {
 	background-image: url('/web/images/dodge.png');
+}
+
+/*
+	Select weapons, show bonuses
+*/
+.select_weapon_item {
+	padding: 0.3em;
+    cursor: pointer;
+	background: #e0e0e0;
+}
+.select_weapon_item:hover {
+	background: rgb(202 184 169);
+    color: #464646;
+}
+.select_win h4 {
+	font-family: fantasy;
+	margin-bottom: 0px;
+	margin-left: 5px;
+	text-align: left;
+}
+.select_win h3 {
+	text-align: left;
+}
+.select_win ul {
+	margin: 0px;
+    padding-left: 20px;
+    list-style: none;
+	text-align: left;
+}
+.select_win li {
+	border-bottom: 1px solid #a99f7e;
+    margin-bottom: 2px;
+}
+.select_win ul li em {
+	float: right;
+    font-weight: bold;
+    font-style: normal;
+}
+.bonusesWin {
+	width: 800px;
 }

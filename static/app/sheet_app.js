@@ -19,6 +19,14 @@ function build_app() {
 					if (response.ok) {
 						this.connected = true;
 						this.sheet = response.json();
+
+						let urlSocket = "/ws/sheet/" + this.sheetId;
+						this.socket = newReSocket(urlSocket, socketOk => {
+							if (!socketOk) {
+								this.connected = false;
+								this.cantConnect = true;
+							}
+						});
 					} else {
 						this.cantConnect = true;
 					}

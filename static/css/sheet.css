@@ -411,10 +411,10 @@
 	width: 8em;
 }
 .weapon_table td:nth-child(4), .weapon_table th:nth-child(4) {
-	width: 4em;
+	width: 5em;
 }
 .weapon_table td:nth-child(5), .weapon_table th:nth-child(5) {
-	width: 6em;
+	width: 5em;
 }
 .weapon_table td:nth-child(6), .weapon_table th:nth-child(6) {
 	width: 8em;

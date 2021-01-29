@@ -5,8 +5,8 @@
 			<label for="owner">Joueur :</label>
 			<input placeholder="Nom du joueur" type="text" name="owner" v-model.trim="sheet.owner" />
 			<br />
-			<label for="nom">Personage :</label>
-			<input placeholder="Nom du personage" type="text" name="nom" v-model.trim="sheet.head.nom" />
+			<label for="nom">Personnage :</label>
+			<input placeholder="Nom du personnage" type="text" name="nom" v-model.trim="sheet.head.nom" />
 			<br />
 			<label>PAV :</label>
 			<int-input v-model.number="sheet.xp.spent" style="width: 3.5em; text-align: right;" />
@@ -64,8 +64,16 @@
 						<div class='field'><input type="text" v-model.trim="sheet.head.peuple" /></div>
 					</div>
 					<div class="champ_in">
-						<label>Date de naissance</label>
-						<div class='field'><input type="text" v-model.trim="sheet.head.date_naissance" /></div>
+						<label>Culture</label>
+						<div class='field'><input type="text" v-model.trim="sheet.head.culture" /></div>
+					</div>
+					<div class="champ_in">
+						<label>Profession</label>
+						<div class='field'><input type="text" v-model.trim="sheet.head.profession" /></div>
+					</div>
+					<div class="champ_in">
+						<label>Niveau social</label>
+						<div class='field'><input type="text" v-model.trim="sheet.head.niveau_social" /></div>
 					</div>
 					<div class="champ_in">
 						<label>Âge</label>
@@ -84,16 +92,8 @@
 						<div class='field'><input type="text" v-model.trim="sheet.head.taille_masse" /></div>
 					</div>
 					<div class="champ_in">
-						<label>Profession</label>
-						<div class='field'><input type="text" v-model.trim="sheet.head.profession" /></div>
-					</div>
-					<div class="champ_in">
-						<label>Culture</label>
-						<div class='field'><input type="text" v-model.trim="sheet.head.culture" /></div>
-					</div>
-					<div class="champ_in">
-						<label>Niveau social</label>
-						<div class='field'><input type="text" v-model.trim="sheet.head.niveau_social" /></div>
+						<label>Date de naissance</label>
+						<div class='field'><input type="text" v-model.trim="sheet.head.date_naissance" /></div>
 					</div>
 					<div class="champ_in">
 						<label>Lieu de naissance</label>

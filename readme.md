@@ -14,3 +14,5 @@ uvicorn api.main:app --reload --reload-dir api --workers 1
 ```
 
 Ou sur un serveur avec la commande définie dans `Procfile`. Si le serveur est lancé sur une instance heroku, il démare automatiquement.
+
+Outils utilisés : Vue.js pour le front-end, FastAPI (python) pour le backend, DynamoDB pour la DB, et Heroku pour le déploiement.

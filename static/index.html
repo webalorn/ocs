@@ -8,10 +8,10 @@
 	<link rel="icon" type="image/png" href="/web/images/icon.png" />
 
 	<!-- development version, includes helpful console warnings -->
-	<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+	<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script> -->
 
 	<!-- production version, optimized for size and speed -->
-	<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2"></script> -->
+	<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
 </head>
 
 <body>
@@ -24,7 +24,7 @@
 			</p>
 			<h2>Nouveau</h2>
 			<div id="create_block">
-				<button v-on:click="new_character">Nouveau personage</button>
+				<button v-on:click="new_character">Nouveau personnage</button>
 				<br />
 				<button v-on:click="new_table">Nouvelle table</button>
 			</div><template v-if="tables.length">
@@ -37,7 +37,7 @@
 			</template>
 
 			<template v-if="characters.length">
-				<h2>Personages</h2>
+				<h2>Personnages</h2>
 				<ol>
 					<li v-for="id in characters">
 						<a :href="'/web/sheet.html?id=' + id" target="_blank">{{ id }}</a>

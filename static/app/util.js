@@ -159,6 +159,50 @@ function areEqual(cur, add) {
 	}
 }
 
+function updateSavedData(local, lastSave, remote) {
+	if (remote === undefined || remote === null) {
+		return local;
+	}
+	let typeLocal = getType(local);
+	let typeSaved = getType(lastSave);
+	let typeRemote = getType(remote);
+
+	if (typeSaved != typeLocal || typeSaved != typeRemote) {
+		console.error("Can't merge types", typeLocal, typeSaved, typeRemote);
+		return local;
+	}
+	if (typeLocal == "Array") {
+		// remove : currently, no (todo ?)
+		for (let i in local) {
+			if (i < lastSave.length && i < remote.length) {
+				local[i] = updateSavedData(local[i], lastSave[i], remote[i]);
+				lastSave[i] = local[i];
+			}
+		}
+		for (let i = Math.max(local.length, lastSave.length); i < remote.length; i++) {
+			local.push(remote[i]);
+			lastSave.push(remote[i]);
+		}
+	} else if (typeLocal == "object") {
+		for (let prop in remote) {
+			if (prop in local && prop in lastSave) {
+				local[prop] = updateSavedData(local[prop], lastSave[prop], remote[prop]);
+				lastSave[prop] = local[prop];
+			} else if (!(prop in local || prop in lastSave)) {
+				local[prop] = remote[prop];
+				lastSave[prop] = remote[prop];
+			}
+		}
+	} else if (typeLocal == "number" || typeLocal == "string") {
+		if (local === lastSave) {
+			local = remote;
+		}
+	} else {
+		console.warn("Can't update types", typeLocal);
+	}
+	return local;
+}
+
 function storage_get(key) {
 	let storedValue = localStorage.getItem(key);
 	if (storedValue === null) {

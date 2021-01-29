@@ -80,7 +80,6 @@ Vue.component('chat-compo', {
 			let pc = m.vc - Math.max(m.q1.dice - m.q1.qual - bonus, 0)
 				- Math.max(m.q2.dice - m.q2.qual - bonus, 0)
 				- Math.max(m.q3.dice - m.q3.qual - bonus, 0);
-			let nr = Math.min(6, Math.max(1, 1 + Math.floor((pc - 1) / 3)));
 			if (pc < 0) {
 				nr = 0;
 			}

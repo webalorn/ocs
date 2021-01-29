@@ -102,14 +102,15 @@ Vue.component('jet-competence', {
 	data: function () {
 		return {
 			quals: {
-				qual1: 8,
-				qual2: 8,
-				qual3: 8,
+				qual1: 12,
+				qual2: 12,
+				qual3: 12,
 			},
 			vc: 0,
 			bonus: 0,
 			showTalentSelect: false,
 			talentLists: talentLists,
+			showBonuses: false,
 		};
 	},
 	computed: {
@@ -122,7 +123,7 @@ Vue.component('jet-competence', {
 				return 0;
 			}
 			let pc = Math.floor(this.vc / 2);
-			return 1 + Math.max(0, Math.floor((pc - 1) / 3));
+			return Math.min(6, 1 + Math.max(0, Math.floor((pc - 1) / 3)));
 		},
 		success_proba: function () {
 			let repartition = getProbas(this.quals.qual1, this.quals.qual2, this.quals.qual3, this.vc, this.bonus);
@@ -161,6 +162,9 @@ Vue.component('jet-competence', {
 		toogleTalentView: function () {
 			this.showTalentSelect = !this.showTalentSelect;
 		},
+		toogleBonusView: function () {
+			this.showBonuses = !this.showBonuses;
+		},
 		selectTalent: function (rollOn, vc) {
 			let quals = rollOn.toLowerCase().split("/");
 			this.vc = vc;
@@ -179,7 +183,7 @@ Vue.component('jet-competence', {
 				<qual-selector v-bind:quals="quals" v-bind:num="2" v-bind:qualities="identity.sheet.qualites"></qual-selector>
 				<qual-selector v-bind:quals="quals" v-bind:num="3" v-bind:qualities="identity.sheet.qualites"></qual-selector>
 				<th class="inrc_view_clickable" v-on:click="toogleTalentView">VC</th>
-				<th :data-tooltip="success_proba">Bonus / Malus</th>
+				<th :data-tooltip="success_proba" class="inrc_view_clickable" v-on:click="toogleBonusView">Bonus / Malus</th>
 			</tr>
 			<tr>
 				<td><input type="number" v-model.number="quals.qual1"></td>
@@ -202,8 +206,8 @@ Vue.component('jet-competence', {
 
 		<template v-if="showTalentSelect">
 			<div class="winBack" v-on:click="toogleTalentView"></div>
-			<div class="talent_select scrollable">
-				<div class="col_talents">
+			<div class="talent_select select_win scrollable">
+				<div class="col_in_win">
 					<h3>Talents physiques</h3>
 					<inrc-selector-talent v-for="tal in talentLists.phy"
 						v-bind:eventFct="selectTalent"
@@ -222,7 +226,7 @@ Vue.component('jet-competence', {
 						v-bind:talents="identity.sheet.talents" v-bind:cat="'nat'" 
 						v-bind:stat="tal" v-bind:key="'stal_nat_' + tal"></inrc-selector-talent>
 				</div>
-				<div class="col_talents">
+				<div class="col_in_win">
 					<h3>Connaissances</h3>
 					<inrc-selector-talent v-for="tal in talentLists.connaissance"
 						v-bind:eventFct="selectTalent"
@@ -234,6 +238,110 @@ Vue.component('jet-competence', {
 						v-bind:eventFct="selectTalent"
 						v-bind:talents="identity.sheet.talents" v-bind:cat="'savoir'" 
 						v-bind:stat="tal" v-bind:key="'stal_savoir_' + tal"></inrc-selector-talent>
+				</div>
+
+				<template v-if="identity.deriv.stats.ea">
+					<h3>Sortilièges</h3>
+					<select-spell-item v-for="(w, iw) in identity.sheet.sorts" :key="'spell_' + iw" :eventFct="selectTalent" :name="w[0]" :vc="w[2]" :roll="w[1]"></select-spell-item>
+				</template>
+
+				<template v-if="identity.deriv.stats.ek">
+					<h3>Liturgies</h3>
+					<select-spell-item v-for="(w, iw) in identity.sheet.liturgies" :key="'liturgie_' + iw" :eventFct="selectTalent" :name="w[0]" :vc="w[2]" :roll="w[1]"></select-spell-item>
+				</template>
+			</div>
+		</template>
+
+		<template v-if="showBonuses">
+			<div class="winBack" v-on:click="toogleBonusView"></div>
+			<div class="bonusesWin select_win scrollable" v-on:click="toogleBonusView">
+				<div class="col_in_win">
+					<h3>Compétence</h3>
+					Prendre en compte les états, status, et l'encombrement si applicable.
+					<h4>Gêne visuelle</h4>
+					<ul>
+						<li>Niveau I (feuillage léger, brume légère) : <em>-1</em></li>
+						<li>Niveau II (Brouillard, pleine lune) : <em>-2</em></li>
+						<li>Niveau III (Boruillard épas, nuit sans lune) : <em>-3</em></li>
+						<li>Niveau IV (obscurité totale) : <em>-4</em></li>
+					</ul>
+				</div>
+				<div class="col_in_win">
+					<h3>Magie et divin</h3>
+
+					<h4>Moditication de sorts, rituels, litugies, cérémonies</h4>
+					(Max : 1 modification / 4 VC)
+					<ul>
+						<li>Consolider : <em>+1, coût +1 niv</em></li>
+						<li>Diminuer le coût : <em>-1, coût -1 niv</em></li>
+						<li>Portée : <em>-1, portée +1 niv</em></li>
+						<li>Durée d'incantation (+) : <em>+1, durée +1 niv</em></li>
+						<li>Durée d'incantation (-) : <em>-1, durée -1 niv</em></li>
+						<li>Sans les gestes / paroles (-) [sorts et liturgies] : <em>-2 ou -4</em></li>
+					</ul>
+
+					<h4>Niveaux de sorts et liturgies</h4>
+					<table>
+						<tr>
+							<th>Durée</th>
+							<td>1 action	</td>
+							<td>2</td>
+							<td>3</td>
+							<td>8</td>
+							<td>16</td>
+							<td>32</td>
+						</tr>
+						<tr>
+							<th>Portée</th>
+							<td>contact</td>
+							<td>4</td>
+							<td>8</td>
+							<td>16</td>
+							<td>32</td>
+							<td>64</td>
+						</tr>
+						<tr>
+							<th>Coût</th>
+							<td>1 PA/PK</td>
+							<td>2</td>
+							<td>4</td>
+							<td>8</td>
+							<td>16</td>
+							<td>32</td>
+						</tr>
+					</table>
+
+					<h4>Niveaux de rituels / cérémonies</h4>
+					<table>
+						<tr>
+							<th>Durée</th>
+							<td>5m</td>
+							<td>30m</td>
+							<td>3h</td>
+							<td>8h</td>
+							<td>16h</td>
+							<td>32h</td>
+						</tr>
+						<tr>
+							<th>Portée</th>
+							<td>contact</td>
+							<td>4</td>
+							<td>8</td>
+							<td>16</td>
+							<td>32</td>
+							<td>64</td>
+						</tr>
+						<tr>
+							<th>Coût</th>
+							<td>8 PA/PK</td>
+							<td>16</td>
+							<td>32</td>
+							<td>64</td>
+							<td>128</td>
+							<td>256</td>
+						</tr>
+					</table>
+					Rituels et cérémonies : modificateurs selon le lieu, la tenue, le moment, les outils... (se repporter aux règles).
 				</div>
 			</div>
 		</template>
@@ -258,6 +366,35 @@ Vue.component('inrc-selector-talent', {
 		<span class="inrc_tal_name">{{ infos.name }}</span>
 		<span class="inrc_tal_roll">({{ infos.roll }})</span>
 		<span class="inrc_tal_val">{{ talent.vc }}</span>
+	</div>
+	`,
+});
+
+Vue.component('select-spell-item', {
+	props: ['eventFct', 'name', 'vc', 'roll'],
+	data: function () {
+		let qs = this.roll.toLowerCase().split('/');
+		return {
+			qualsOk: qs.length == 3 && qualNames.includes(qs[0])
+				&& qualNames.includes(qs[1]) && qualNames.includes(qs[2]),
+		};
+	},
+	methods: {
+		select: function () {
+			if (this.qualsOk) {
+				this.eventFct(this.roll, this.vc);
+			} else {
+				alert(`Erreur : "${this.roll}" n'a pas le bon format pour l'épreuve de talent (Q1/Q2/Q3)`);
+			}
+		},
+	},
+	template: `
+	<div>
+		<div class="inrc_talent" v-on:click="select" v-if="name.trim()" v-bind:class="{inrc_spell_error : !qualsOk}">
+			<span class="inrc_tal_name">{{ name }}</span>
+			<span class="inrc_tal_roll">({{ roll }})</span>
+			<span class="inrc_tal_val">{{ vc }}</span>
+		</div>
 	</div>
 	`,
 });
@@ -346,6 +483,8 @@ Vue.component('jet-fight', {
 			damages: '1D6+1',
 			prd: 6,
 			esq: 6,
+			showAttackSelect: false,
+			showBonuses: false,
 		};
 	},
 	methods: {
@@ -389,14 +528,26 @@ Vue.component('jet-fight', {
 				'roll': this.esq,
 			});
 		},
+		toogleAttackView: function () {
+			this.showAttackSelect = !this.showAttackSelect;
+		},
+		toogleBonusView: function () {
+			this.showBonuses = !this.showBonuses;
+		},
+		selectWeapon: function (at, prd, pi) {
+			this.showAttackSelect = false;
+			this.at = at === null ? this.at : at;
+			this.prd = prd === null ? this.prd : prd;
+			this.damages = pi === null ? this.damages : '' + pi;
+		},
 	},
 	template: `
 	<div class="rfight_view">
 		<table>
 			<tr>
 				<th>INI ({{ identity.deriv.stats.ini }})</th>
-				<th>Attaque</th>
-				<th>Bonus / Malus</th>
+				<th class="inrc_view_clickable" v-on:click="toogleAttackView">Attaque</th>
+				<th class="inrc_view_clickable" v-on:click="toogleBonusView">Bonus / Malus</th>
 				<th>Dégâts</th>
 				<th>PRD</th>
 				<th>ESQ ({{ identity.deriv.stats.esq }})</th>
@@ -405,7 +556,7 @@ Vue.component('jet-fight', {
 				<td><input type="number" v-model.number="ini"></td>
 				<td><input type="number" v-model.number="at"></td>
 				<td><input type="number" v-model.number="modif_at"></td>
-				<td><input type="text" v-model.trim="damages"></td>
+				<td><input type="text" v-model.trim="damages" style="width: 5em;"></td>
 				<td><input type="number" v-model.number="prd"></td>
 				<td><input type="number" v-model.number="esq"></td>
 			</tr>
@@ -417,6 +568,125 @@ Vue.component('jet-fight', {
 				<td><button class="rfight_esq" v-on:click="sendEsq">Esquiver</button></td>
 			</tr>
 		</table>
+
+
+		<template v-if="showAttackSelect">
+			<div class="winBack" v-on:click="toogleAttackView"></div>
+			<div class="attack_select select_win scrollable">
+				<h3>Armes de contact</h3>
+				<select-weapon-item v-for="(w, iw) in identity.sheet.armes.melee" :key="'melee_' + iw" :eventFct="selectWeapon" :name="w[0]" :pi="w[3]" :at="w[6]" :prd="w[7]"></select-weapon-item>
+
+				<h3>Armes à distance</h3>
+				<select-weapon-item v-for="(w, iw) in identity.sheet.armes.distance" :key="'dist_' + iw" :eventFct="selectWeapon" :name="w[0]" :pi="w[3]" :at="w[6]" :prd="0"></select-weapon-item>
+			</div>
+		</template>
+
+		<template v-if="showBonuses">
+			<div class="winBack" v-on:click="toogleBonusView"></div>
+			<div class="bonusesWin select_win scrollable" v-on:click="toogleBonusView">
+				Prendre en compte les états, status, et l'encombrement si applicable.
+				<div class="col_in_win">
+					<h3>Combat rapproché</h3>
+
+					<h4>Taille d'armes</h4>
+					<ul>
+						<li>Courte contre moyenne : <em>-2 AT</em></li>
+						<li>Courte contre longue : <em>-4 AT</em></li>
+						<li>Moyenne contre longue : <em>-2 AT</em></li>
+					</ul>
+
+					<h4>Taille de l'adversaire</h4>
+					<ul>
+						<li>Très petit (rat) : <em>-4 AT</em></li>
+						<li>Petit (Chèvre) / Moyen (Humain) : <em>-4 AT</em></li>
+						<li>Grand (Ogre) : <em>parade : bouclier uniquement</em></li>
+						<li>Très grand (Dragon) : <em>PRD=0</em></li>
+					</ul>
+
+					<h4>Espace restreint</h4>
+					<ul>
+						<li>Arme courte : <em>±0 AT / ±0 PRD</em></li>
+						<li>Arme moyenne : <em>-4 AT / -4 PRD</em></li>
+						<li>Arme longue : <em>-8 AT / -8 PRD</em></li>
+						<li>Petit bouclier : <em>-2 AT / -2 PRD</em></li>
+						<li>Bouclier moyen : <em>-4 AT / -3 PRD</em></li>
+						<li>Grand bouclier : <em>-6 AT / -4 PRD</em></li>
+					</ul>
+
+					<h4>Défense contre attaque à distance</h4>
+					<ul>
+						<li>Arme de tir : <em>-4 PRD / -4 ESQ</em></li>
+						<li>Arme de jet : <em>-2 PRD / -2 ESQ</em></li>
+					</ul>
+				</div>
+				<div class="col_in_win">
+					<h3>Combat à distance</h3>
+
+					<h4>Portée</h4>
+					<ul>
+						<li>Courte : <em>+2 CD, +1 PI</em></li>
+						<li>Moyenne : <em>±0 CD</em></li>
+						<li>Longue : <em>-2 CD, -1 PI</em></li>
+					</ul>
+
+					<h4>Taille de l'adversaire</h4>
+					<ul>
+						<li>Très petit (rat) : <em>-8 CD</em></li>
+						<li>Petit (Chèvre) : <em>-4 CD</em></li>
+						<li>Moyen (Humain) : <em>±0 CD</em></li>
+						<li>Grand (Ogre) : <em>+4 CD</em></li>
+						<li>Très grand (Dragon) : <em>+8 CD</em></li>
+					</ul>
+
+					<h4>Mouvement</h4>
+					<ul>
+						<li>Cible immobile : <em>+2 CD</em></li>
+						<li>Cible bouge peu (≤ 4 pas) : <em>±0 CD</em></li>
+						<li>Cible boude rapidement (≥ 5 pas) : <em>-2 CD</em></li>
+						<li>Cible court en zigzag : <em>-4 CD, VI cible/2</em></li>
+						<li>Tirer en marchant (≤ 4 pas) : <em>-2 CD</em></li>
+						<li>Tirer en courant (≥ 5 pas) : <em>-4 CD</em></li>
+					</ul>
+
+					<h4>À cheval</h4>
+					<ul>
+						<li>Monture immobile : <em>±0 CD</em></li>
+						<li>Monture au pas : <em>-2 CD</em></li>
+						<li>Monture au trot : <em>1 sur 1D20</em></li>
+						<li>Monture au galop : <em>-8 CD</em></li>
+					</ul>
+				</div>
+				
+				<h3>Gêne visuelle</h3>
+				<ul>
+					<li>Niveau I (feuillage léger, brume légère) : <em>-1 AT / -1 PRD / -1 ESQ / -2 CD</em></li>
+					<li>Niveau II (Brouillard, pleine lune) : <em>-2 AT / -2 PRD / -2 ESQ / -4 CD</em></li>
+					<li>Niveau III (Boruillard épas, nuit sans lune) : <em>-3 AT / -3 PRD / -3 ESQ / -6 CD</em></li>
+					<li>Niveau IV (obscurité totale) : <em>AT/2 / PRD, ESQ, CD uniquement avec 1 sur 1D20 (pas de défense contre CD)</em></li>
+				</ul>
+			</div>
+		</template>
+	</div>
+	`,
+});
+
+Vue.component('select-weapon-item', {
+	props: ['eventFct', 'name', 'pi', 'at', 'prd'],
+	data: function () {
+		return {
+		};
+	},
+	methods: {
+		select: function () {
+			this.eventFct(this.at, this.prd, this.pi);
+		},
+	},
+	template: `
+	<div>
+		<div class="select_weapon_item" v-on:click="select" v-if="name.trim()">
+			<span class="weapon_name">{{ name }}</span>
+			<span class="weapon_dmg">({{ pi }} PI)</span>
+		</div>
 	</div>
 	`,
 });

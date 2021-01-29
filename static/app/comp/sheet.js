@@ -2,6 +2,8 @@
 	Sheet tools
 */
 let sum2 = (a, b) => a + b;
+const qualNames = ["co", "in", "iu", "ch", "de", "ag", "cn", "fo"];
+
 function newDefaultSheet() {
 	return {
 		"owner": "",
@@ -162,6 +164,8 @@ function newDefaultSheet() {
 			"haches_masses": { "vtc": 6, "atcd": 6, "prd": 3 },
 			"haches_masses_2m": { "vtc": 6, "atcd": 6, "prd": 3 },
 			"lances": { "vtc": 6, "atcd": 6, "prd": 3 },
+			"frondes": { "vtc": 6, "atcd": 6 },
+			"fouets": { "vtc": 6, "atcd": 6 },
 		},
 		"argent": [0, 0, 0, 0],
 		"other_stuff": "",
@@ -329,6 +333,8 @@ const fightingInfos = {
 	"haches_masses": { "name": "Haches & masses", "qual": "FO", "am": "C", "contact": true, },
 	"haches_masses_2m": { "name": "Haches & masses à 2 mains", "qual": "FO", "am": "C", "contact": true, },
 	"lances": { "name": "Lances", "qual": "FO", "am": "B", "contact": true, },
+	"frondes": { "name": "Frondes", "qual": "DE", "am": "B", "contact": false, },
+	"fouets": { "name": "Fouets", "qual": "DE", "am": "B", "contact": true, },
 };
 const fightingList = [
 	"arbaletes",
@@ -344,8 +350,10 @@ const fightingList = [
 	"epees2mains",
 	"haches_masses",
 	"haches_masses_2m",
-	"lances"]
-	;
+	"lances",
+	"frondes",
+	"fouets",
+];
 
 function compute_derived(sheet) {
 	// Etat des PV
@@ -523,13 +531,14 @@ function computeRoutine(sheet) {
 }
 
 const saveIntervalMax = 60 * 1000;
-const saveInactiveDelay = 3 * 1000;
+const saveInactiveDelay = 4 * 1000;
 
 function newSaveManager(dataInit, prepareData, interval = 200) {
 	let data = dataInit;
 	let lastSavedData = cloneData(data);
 	let lastModif = Date.now();
 	let lastTrySave = Date.now();
+	let ignoreNextChange = false;
 
 	let manager = {
 		lastSavedAt: lastModif,
@@ -537,10 +546,14 @@ function newSaveManager(dataInit, prepareData, interval = 200) {
 		saving: false,
 		saveError: false,
 		changed: function (dataNew) {
+			if (ignoreNextChange) {
+				ignoreNextChange = false;
+				return false;
+			}
 			data = dataNew;
-			// if (!this.unsaved && !areEqual(data, lastSavedData)) {
-			//	 this.unsaved = true;
-			// }
+			if (!this.unsaved && areEqual(data, lastSavedData)) {
+				return true;
+			}
 			this.unsaved = true;
 			lastModif = Date.now();
 		},
@@ -582,6 +595,11 @@ function newSaveManager(dataInit, prepareData, interval = 200) {
 				(Date.now() - lastModif > saveInactiveDelay)) {
 				this.pushSave();
 			}
+		},
+		remoteUpdate: function (newData) {
+			ignoreNextChange = true;
+			updateSavedData(data, lastSavedData, newData);
+			lastSavedData = cloneData(data);
 		},
 	};
 	setInterval(() => manager.autoSave(), interval);
@@ -910,6 +928,8 @@ function create_sheet_component(sheet_template) {
 								return [url, data];
 							});
 							this.loaded = true;
+
+							this.socket.register(this.socketListener);
 						});
 					}
 				});
@@ -964,7 +984,7 @@ function create_sheet_component(sheet_template) {
 		},
 		methods: {
 			updateAvatar: function () {
-				let nouv = prompt("Nouvelle url de l'image du personage :", this.sheet.image);
+				let nouv = prompt("Nouvelle url de l'image du personnage :", this.sheet.image);
 				if (nouv !== null) {
 					this.sheet.image = nouv;
 				}
@@ -1015,6 +1035,11 @@ function create_sheet_component(sheet_template) {
 						this.sheet = json;
 					};
 					fileInput.click();
+				}
+			},
+			socketListener: function (event, data) {
+				if (data.type == 'notification' && data.on == 'sheet' && data.sheet_id == this.id) {
+					this.saveManager.remoteUpdate(data.new_data.content)
 				}
 			},
 			tooltipForSpell: tooltipForSpell,
@@ -1179,6 +1204,18 @@ Vue.component('sheet-short-view', {
 				<div class="champ_in">
 					<label>Âge</label>
 					<span>{{ sheet.head.age}}</span>
+				</div>
+				<div class="champ_in">
+					<label>Sexe</label>
+					<span>{{ sheet.head.sexe}}</span>
+				</div>
+				<div class="champ_in">
+					<label>Peuple</label>
+					<span>{{ sheet.head.peuple}}</span>
+				</div>
+				<div class="champ_in">
+					<label>Culture</label>
+					<span>{{ sheet.head.culture}}</span>
 				</div>
 				<div class="champ_in">
 					<label>Couleur de cheveux</label>

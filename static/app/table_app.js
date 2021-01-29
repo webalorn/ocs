@@ -94,7 +94,7 @@ var app = new Vue({
 						};
 					} else {
 						if (this.urlParams.get("id") === null) {
-							this.errorMessage = "Il faut un personage pour rejoindre";
+							this.errorMessage = "Il faut un personnage pour rejoindre";
 							return;
 						}
 						this.identity = {
@@ -106,7 +106,7 @@ var app = new Vue({
 							'deriv': compute_derived(newDefaultSheet()),
 						};
 						if (!data['characters'].includes(this.identity.id)) {
-							this.errorMessage = "Le personage " + this.identity.id + " n'appartient pas à cette table de jeu";
+							this.errorMessage = "Le personnage " + this.identity.id + " n'appartient pas à cette table de jeu";
 							return;
 						}
 						let tableUrl = "/api/sheet/" + this.identity.id;
@@ -133,5 +133,7 @@ var app = new Vue({
 				this.cantConnect = true;
 			}
 		});
+
+		document.getElementById("app").setAttribute("style", "");
 	},
 });

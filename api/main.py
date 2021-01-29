@@ -53,7 +53,7 @@ async def get_sheet(sheet_id: str):
 async def put_sheet(sheet: Sheet, sheet_id: str):
     sheet.id = sheet_id
     await set_item(**sheet.dict())
-    await table_groups['notif_' + sheet_id].broadcast({
+    await sheet_groups[sheet_id].broadcast({
         'type': 'notification',
         'on': 'sheet',
         'sheet_id': sheet_id,
@@ -145,6 +145,7 @@ class WebsocketGroup:
 
 
 table_groups = defaultdict(lambda: WebsocketGroup())
+sheet_groups = defaultdict(lambda: WebsocketGroup())
 
 
 @app.websocket("/ws/table/{table_id}")  # Chat
@@ -155,7 +156,7 @@ async def websocket_endpoint(websocket: WebSocket, table_id: str):
     await websocket.accept()
     await group.connect(websocket)
     for user_id in table['characters']:
-        await table_groups['notif_' + user_id].connect(websocket)
+        await sheet_groups[user_id].connect(websocket)
     try:
         while True:
             message = await websocket.receive_json()
@@ -187,4 +188,23 @@ async def websocket_endpoint(websocket: WebSocket, table_id: str):
     finally:
         group.disconnect(websocket)
         for user_id in table['characters']:
-            table_groups['notif_' + user_id].disconnect(websocket)
+            sheet_groups[user_id].disconnect(websocket)
+
+
+@app.websocket("/ws/sheet/{sheet_id}")  # Sheet
+async def websocket_endpoint(websocket: WebSocket, sheet_id: str):
+    group = sheet_groups[sheet_id]
+
+    await websocket.accept()
+    await group.connect(websocket)
+    try:
+        while True:
+            message = await websocket.receive_json()
+            await websocket.send_json({
+                'type': 'error',
+                'message': 'Sender only',
+            })
+    except WebSocketDisconnect:
+        pass
+    finally:
+        group.disconnect(websocket)

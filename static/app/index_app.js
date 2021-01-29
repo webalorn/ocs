@@ -6,7 +6,7 @@ var app = new Vue({
 	},
 	methods: {
 		new_character: function () {
-			if (confirm("Créer un nouveau personage ?")) {
+			if (confirm("Créer un nouveau personnage ?")) {
 				let urlPost = "/api/sheet/";
 				fetch(urlPost, {
 					method: 'POST',
@@ -21,7 +21,7 @@ var app = new Vue({
 							window.open(url, '_blank');
 						});
 					} else {
-						alert("Erreur lors de la création du personage");
+						alert("Erreur lors de la création du personnage");
 					}
 				});
 			}
