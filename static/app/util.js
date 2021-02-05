@@ -105,7 +105,7 @@ function cloneData(cur) {
 		for (let i in cur) {
 			newData.push(cloneData(cur[i]));
 		}
-		return cur;
+		return newData;
 	} else if (typeCur == "object") {
 		let newData = {};
 		for (let prop in cur) {

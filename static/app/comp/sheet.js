@@ -436,9 +436,9 @@ function getQualMax(qualites, qualstr) {
 function compute_vtc(qualites, name, vtc) {
 	let infos = fightingInfos[name];
 	let at = vtc + Math.max(0, Math.floor((qualites.co - 8) / 3));
-	let cd = vtc + Math.max(0, Math.floor((qualites.co - qualites.de) / 3));
+	let cd = vtc + Math.max(0, Math.floor((qualites.de - 8) / 3));
 	let qual = getQualMax(qualites, infos.qual);
-	let prd = Math.ceil(vtc / 2) + Math.max(0, Math.floor((qualites.co - 8) / 3));
+	let prd = Math.ceil(vtc / 2) + Math.max(0, Math.floor((qual - 8) / 3));
 	return { at: at, cd: cd, prd: prd, atcd: infos.contact ? at : cd };
 }
 
@@ -640,6 +640,7 @@ Vue.component('data-saver', {
 	watch: {
 		data: {
 			handler(val) {
+				console.log("Changed");
 				this.manager.changed(this.data);
 			},
 			deep: true
@@ -852,7 +853,7 @@ Vue.component('sheet-table', {
 			}
 			return true;
 		},
-		getNewLine: function (line) {
+		getNewLine: function () {
 			let l = [];
 			for (let i in this.schema) {
 				if (this.schema[i] == 'int') {
@@ -873,6 +874,26 @@ Vue.component('sheet-table', {
 				this.data.pop();
 			}
 		},
+		insertLine: function (iLine) {
+			this.data.splice(iLine + 1, 0, this.getNewLine());
+			var nextLine = this.$el.querySelector('.cell_' + (iLine + 1) + '_0 > *');
+			if (nextLine) {
+				nextLine.focus();
+			}
+		},
+		delIfEmptySet: function (iLine) { // Hey, problem ! Delete after !!!
+			this.delLine = this.isLineEmpty(this.data[iLine]);
+		},
+		delIfEmptyDo: function (iLine) { // Hey, problem ! Delete after !!!
+			if (this.delLine) {
+				this.data.splice(iLine, 1);
+				this.delLine = false;
+			}
+		},
+		goToCell: function (iLine, iCol) {
+			console.log(iLine, iCol);
+			this.$el.querySelector('.cell_' + iLine + '_' + iCol + ' > *').focus();
+		},
 	},
 	beforeUpdate: function () {
 		this.refreshData();
@@ -885,8 +906,10 @@ Vue.component('sheet-table', {
 		<tr>
 			<th v-for="title in titles">{{ title }}</th>
 		</tr>
-		<tr v-for="(line, iline) in data">
-			<td v-for="(val, ival) in line" v-bind:data-tooltip="[ival in tooltips[iline] ? tooltips[iline][ival] : '']">
+		<tr v-for="(line, iline) in data"
+			v-on:keydown.enter="insertLine(iline)" v-on:keydown.backspace="delIfEmptySet(iline)"
+			v-on:keyup.backspace="delIfEmptyDo(iline)">
+			<td v-for="(val, ival) in line" v-bind:data-tooltip="[ival in tooltips[iline] ? tooltips[iline][ival] : '']" :class="'cell_' + iline + '_' + ival">
 				<input type="text" v-model.trim="line[ival]" v-if="schema[ival] == 'str'" />
 				<int-input v-model.number="line[ival]" v-if="schema[ival] == 'int'" />
 			</td>

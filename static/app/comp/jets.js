@@ -265,12 +265,20 @@ Vue.component('jet-competence', {
 						<li>Niveau III (Boruillard épas, nuit sans lune) : <em>-3</em></li>
 						<li>Niveau IV (obscurité totale) : <em>-4</em></li>
 					</ul>
-				</div>
-				<div class="col_in_win">
+
+
 					<h3>Magie et divin</h3>
 
+					Pour un sort de tradition étrangère : -2<br>
+					Banissement du fer : malus de -1 par tranche de 2 pierres de fer ou aliage portées sur soi.<br>
+					Agir selon le codex d'un dieu peut octroyer un bonus. De même pour les sorcières agissant selon leur émotions.
+
+				</div>
+				<div class="col_in_win">
+					<h3>Modifications de sorts / liturgies</h3>
+
 					<h4>Moditication de sorts, rituels, litugies, cérémonies</h4>
-					(Max : 1 modification / 4 VC)
+					(Max : 1 modification / 4 VC, impossible sur les sorts de tradition étrangère)
 					<ul>
 						<li>Consolider : <em>+1, coût +1 niv</em></li>
 						<li>Diminuer le coût : <em>-1, coût -1 niv</em></li>
@@ -588,6 +596,10 @@ Vue.component('jet-fight', {
 				<div class="col_in_win">
 					<h3>Combat rapproché</h3>
 
+					Position avantageuse : +2 AT/PRD/ESQ<br>
+					Attaqué de dos : -4 PRD / -4 ESQ <br>
+					Manier une arme à une main avec 2 mains : PI+1, PRD-1 (sauf dague/duel).
+
 					<h4>Taille d'armes</h4>
 					<ul>
 						<li>Courte contre moyenne : <em>-2 AT</em></li>
@@ -613,7 +625,7 @@ Vue.component('jet-fight', {
 						<li>Grand bouclier : <em>-6 AT / -4 PRD</em></li>
 					</ul>
 
-					<h4>Défense contre attaque à distance</h4>
+					<h4>Défense contre une attaque à distance</h4>
 					<ul>
 						<li>Arme de tir : <em>-4 PRD / -4 ESQ</em></li>
 						<li>Arme de jet : <em>-2 PRD / -2 ESQ</em></li>
@@ -621,6 +633,8 @@ Vue.component('jet-fight', {
 				</div>
 				<div class="col_in_win">
 					<h3>Combat à distance</h3>
+
+					Il est possible de viser pendant 1 ou 2 tours pour obtenir +2 ou +4 au tir.
 
 					<h4>Portée</h4>
 					<ul>
