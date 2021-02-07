@@ -145,6 +145,10 @@ code {
 .chat_competence_jet {
 	margin: 6px 0px;
 }
+.chat_roll_on_desc {
+	font-style: italic;
+    color: #464646;
+}
 .comp_qual_dice {
 	display: inline-block;
     padding: 1px;
@@ -300,16 +304,21 @@ code {
 .inrc_view > div {
 }
 .inrc_view > table th {
-	padding: 0.6em 0em;
+	padding: 0.5em 0em;
 }
 
 .inrc_view_clickable {
 	cursor: pointer;
 	position: relative;
+	border-radius: 5px;
+	border: 1px solid transparent;
 }
 .inrc_view_clickable:hover {
 	background: white;
-	border-radius: 5px;
+	color: black;
+}
+th.inrc_qual {
+	border: 1px solid black;
 }
 .inrc_qual_select {
 	position: absolute;
@@ -338,10 +347,10 @@ code {
 .inrc_qual_in { background: rgb(134, 86, 179); color: rgb(236, 236, 236); }
 .inrc_qual_iu { background: rgb(33, 137, 27); color: rgb(236, 236, 236); }
 .inrc_qual_ch { background: rgb(3, 3, 3); color: rgb(236, 236, 236); }
-.inrc_qual_de { background: rgb(205, 178, 80); }
-.inrc_qual_ag { background: rgb(101, 138, 205); }
-.inrc_qual_cn { background: rgb(241, 232, 230); }
-.inrc_qual_fo { background: rgb(208, 150, 94); }
+.inrc_qual_de { background: rgb(205, 178, 80); color: black; }
+.inrc_qual_ag { background: rgb(101, 138, 205); color: black; }
+.inrc_qual_cn { background: rgb(241, 232, 230); color: black; }
+.inrc_qual_fo { background: rgb(208, 150, 94); color: black; }
 
 .inrc_actions {
 	margin-top: 1em;
@@ -477,7 +486,7 @@ code {
 }
 .rfight_view table td {
 	text-align: center;
-    width: 6em;
+    width: 6.5em;
 }
 .rfight_view input {
 	height: 2em;

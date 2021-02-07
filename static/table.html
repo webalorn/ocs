@@ -30,10 +30,10 @@
 			</div>
 			<jet-competence v-if="!reroll_comp.dice" v-bind:socket="socket" v-bind:identity="identity"></jet-competence>
 
-			<jet-fight v-bind:socket="socket" v-bind:identity="identity"></jet-fight>
-
 			<reroll-competence v-if="reroll_comp.dice" v-bind:socket="socket" v-bind:identity="identity"
 				v-bind:reroll_comp="reroll_comp"></reroll-competence>
+
+			<jet-fight v-bind:socket="socket" v-bind:identity="identity"></jet-fight>
 
 			<sheet-short-view v-for="id in characters" v-bind:key="id" v-bind:table="tableId" v-bind:identity="identity"
 				v-bind:id="id" v-bind:socket="socket" v-bind:isgm="identity.gm">

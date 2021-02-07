@@ -5,19 +5,35 @@ Vue.component('qual-selector', {
 			listVisible: false,
 		};
 	},
+	watch: {
+		quals: {
+			handler(val) {
+				if (this.selectedQual &&
+					this.quals['qual' + this.num] != this.qualities[this.selectedQual]) {
+					this.quals['select' + this.num] = null;
+				}
+			},
+			deep: true
+		},
+	},
 	computed: {
 		selectStyle: function () {
 			return {
 				display: this.listVisible ? 'block' : 'none',
 			}
 		},
+		selectedQual: function () {
+			return this.quals['select' + this.num];
+		},
 	},
 	methods: {
 		toogle: function () {
 			this.listVisible = !this.listVisible;
 		},
-		select: function (val) {
+		select: function (qual) {
+			let val = this.qualities[qual];
 			this.quals["qual" + this.num] = val;
+			this.quals['select' + this.num] = qual;
 			this.listVisible = false;
 		},
 		mouseLeave: function () {
@@ -25,17 +41,19 @@ Vue.component('qual-selector', {
 		},
 	},
 	template: `
-	<th class="inrc_view_clickable" v-on:mouseleave="mouseLeave" v-on:click="toogle">
-		<div>Qualité {{num}}</div>
+	<th class="inrc_view_clickable" v-on:mouseleave="mouseLeave" v-on:click="toogle"
+		v-bind:class="[selectedQual ? 'inrc_qual_' + selectedQual : false, {inrc_qual : selectedQual}]">
+		<div v-if="selectedQual">{{ selectedQual.toUpperCase() }}</div>
+		<div v-else>Qualité {{num}}</div>
 		<div class="inrc_qual_select" v-bind:style="selectStyle" v-on:click.stop="">
-			<div class="inrc_qual_co" v-on:click="select(qualities.co)">CO</div>
-			<div class="inrc_qual_in" v-on:click="select(qualities.in)">IN</div>
-			<div class="inrc_qual_iu" v-on:click="select(qualities.iu)">IU</div>
-			<div class="inrc_qual_ch" v-on:click="select(qualities.ch)">CH</div>
-			<div class="inrc_qual_de" v-on:click="select(qualities.de)">DE</div>
-			<div class="inrc_qual_ag" v-on:click="select(qualities.ag)">AG</div>
-			<div class="inrc_qual_cn" v-on:click="select(qualities.cn)">CN</div>
-			<div class="inrc_qual_fo" v-on:click="select(qualities.fo)">FO</div>
+			<div class="inrc_qual_co" v-on:click="select('co')">CO</div>
+			<div class="inrc_qual_in" v-on:click="select('in')">IN</div>
+			<div class="inrc_qual_iu" v-on:click="select('iu')">IU</div>
+			<div class="inrc_qual_ch" v-on:click="select('ch')">CH</div>
+			<div class="inrc_qual_de" v-on:click="select('de')">DE</div>
+			<div class="inrc_qual_ag" v-on:click="select('ag')">AG</div>
+			<div class="inrc_qual_cn" v-on:click="select('cn')">CN</div>
+			<div class="inrc_qual_fo" v-on:click="select('fo')">FO</div>
 		</div>
 	</th>
 	`
@@ -62,9 +80,9 @@ let computed_probas = {};
 function getProbas(q1, q2, q3, vc, bonus) {
 	let id = [q1, q2, q3, vc, bonus];
 	if (!(id in computed_probas)) {
-		q1_val = Math.min(Math.max(q1 + bonus, 0), 19)
-		q2_val = Math.min(Math.max(q2 + bonus, 0), 19)
-		q3_val = Math.min(Math.max(q3 + bonus, 0), 19)
+		q1_val = Math.min(q1 + bonus, 19)
+		q2_val = Math.min(q2 + bonus, 19)
+		q3_val = Math.min(q3 + bonus, 19)
 		compte = new Array(7).fill(0)
 
 		for (let a_val = 1; a_val <= 20; a_val++) {
@@ -105,6 +123,9 @@ Vue.component('jet-competence', {
 				qual1: 12,
 				qual2: 12,
 				qual3: 12,
+				select1: null,
+				select2: null,
+				select3: null,
 			},
 			vc: 0,
 			bonus: 0,
@@ -140,6 +161,7 @@ Vue.component('jet-competence', {
 				'q1': { 'roll': true, 'qual': this.quals.qual1 },
 				'q2': { 'roll': true, 'qual': this.quals.qual2 },
 				'q3': { 'roll': true, 'qual': this.quals.qual3 },
+				'on': `${this.quals.select1 ? this.quals.select1.toUpperCase() : '-'}/${this.quals.select2 ? this.quals.select2.toUpperCase() : '-'}/${this.quals.select3 ? this.quals.select3.toUpperCase() : '-'}`,
 				'vc': this.vc,
 				'bonus': this.bonus,
 			};
@@ -171,6 +193,9 @@ Vue.component('jet-competence', {
 			this.quals.qual1 = this.identity.sheet.qualites[quals[0]];
 			this.quals.qual2 = this.identity.sheet.qualites[quals[1]];
 			this.quals.qual3 = this.identity.sheet.qualites[quals[2]];
+			this.quals.select1 = quals[0];
+			this.quals.select2 = quals[1];
+			this.quals.select3 = quals[2];
 			this.showTalentSelect = false;
 			// this.bonus = 0;
 		},
@@ -410,7 +435,7 @@ Vue.component('select-spell-item', {
 Vue.component('reroll-competence', {
 	props: ['socket', 'identity', 'reroll_comp'],
 	data: function () {
-		return {
+		let dataVals = {
 			qual1: this.reroll_comp.dice.q1.qual,
 			qual2: this.reroll_comp.dice.q2.qual,
 			qual3: this.reroll_comp.dice.q3.qual,
@@ -424,7 +449,17 @@ Vue.component('reroll-competence', {
 			bonus: this.reroll_comp.dice.bonus,
 			target: (typeof this.reroll_comp.dice.target == "string" ?
 				this.reroll_comp.dice.target : "all"),
+			select1: null,
+			select2: null,
+			select3: null,
+		};
+		let rolledOn = this.reroll_comp.dice.on.split('/');
+		if (rolledOn.length == 3) {
+			if (rolledOn[0].length == 2) { dataVals.select1 = rolledOn[0].toUpperCase(); }
+			if (rolledOn[1].length == 2) { dataVals.select2 = rolledOn[1].toUpperCase(); }
+			if (rolledOn[2].length == 2) { dataVals.select3 = rolledOn[2].toUpperCase(); }
 		}
+		return dataVals;
 	},
 	methods: {
 		send: function () {
@@ -436,9 +471,11 @@ Vue.component('reroll-competence', {
 				'q2': { 'roll': this.reroll2, 'qual': this.qual2, 'dice': this.dice2 },
 				'q3': { 'roll': this.reroll3, 'qual': this.qual3, 'dice': this.dice3 },
 				'vc': this.vc,
+				'on': this.reroll_comp.dice.on,
 				'bonus': this.bonus,
 				'target': this.target,
 			};
+			console.log(messageDict);
 			this.socket.send_json(messageDict);
 			this.close();
 		},
@@ -450,9 +487,9 @@ Vue.component('reroll-competence', {
 	<div class="inrc_view reroll_comp_view">
 		<table>
 			<tr>
-				<th>Qualité 1</th>
-				<th>Qualité 2</th>
-				<th>Qualité 3</th>
+				<th v-bind:class="[select1 ? 'inrc_qual_' + select1.toLowerCase() : false, select1 ? 'inrc_qual' : false]">{{ select1 ? select1 : 'Qualité 1' }}</th>
+				<th v-bind:class="[select2 ? 'inrc_qual_' + select2.toLowerCase() : false, select2 ? 'inrc_qual' : false]">{{ select2 ? select2 : 'Qualité 2' }}</th>
+				<th v-bind:class="[select3 ? 'inrc_qual_' + select3.toLowerCase() : false, select3 ? 'inrc_qual' : false]">{{ select3 ? select3 : 'Qualité 3' }}</th>
 				<th>VC</th>
 				<th>Bonus / Malus</th>
 			</tr>

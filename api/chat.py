@@ -21,7 +21,7 @@ def process_message(message_obj):
     if message_obj['type'] == 'competence':
         return jet_competence(message_obj['q1'], message_obj['q2'],
                               message_obj['q3'], message_obj['vc'],
-                              message_obj['bonus'])
+                              message_obj['bonus'], message_obj['on'])
     if message_obj['type'] in ROLL_D20:
         return jet_d20(message_obj['roll'], message_obj['type'])
     if message_obj['type'] in ROLL_STR:
@@ -106,7 +106,7 @@ def cmd_competence(args):
     }, {
         'roll': True,
         'qual': q3
-    }, vc, bonus)
+    }, vc, bonus, '-')
 
 
 def cmd_d20(args):
@@ -164,7 +164,7 @@ def roll_dice(expr):
     return sum([r[0] for r in rolls]), rolls
 
 
-def jet_competence(rq1, rq2, rq3, vc, bonus):
+def jet_competence(rq1, rq2, rq3, vc, bonus, on):
     if rq1['roll']: rq1['dice'] = random.randint(1, 20)
     if rq2['roll']: rq2['dice'] = random.randint(1, 20)
     if rq3['roll']: rq3['dice'] = random.randint(1, 20)
@@ -186,6 +186,7 @@ def jet_competence(rq1, rq2, rq3, vc, bonus):
         'vc': vc,
         'bonus': bonus,
         'pc': pc,
+        'on': on,
         'nr': 0 if pc < 0 else min(6, max(1, 1 + (pc - 1) // 3)),
         'critique': bool(len([r for r in jets if r == 1]) >= 2),
         'maladresse': bool(len([r for r in jets if r == 20]) >= 2),

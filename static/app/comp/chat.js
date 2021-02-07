@@ -151,7 +151,8 @@ Vue.component('chat-compo', {
 							{{m.q1.qual}}/{{m.q2.qual}}/{{m.q3.qual}},
 							<span v-if="m.bonus > 0">+{{m.bonus}}</span>
 							<span v-if="m.bonus < 0">{{m.bonus}}</span>
-							<span v-if="m.bonus == 0">+0</span>
+							<span v-if="m.bonus == 0">±0</span>
+							<span class="chat_roll_on_desc">({{m.on}})</span>
 						</div>
 						<div>
 							<div v-for="q in [m.q1, m.q2, m.q3]" class="comp_qual_dice" v-bind:class="['rolled_' + q.dice, {comp_dice_can_reroll : m.from == identity.id}, {comp_dice_kept : !q.roll}]" v-on:click="reroll_comp_trigger(m)"><span class="chat_dice_p1">{{ q.dice }}</span></div>
