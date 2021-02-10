@@ -49,7 +49,7 @@ var app = new Vue({
 		setTitle: function (title) {
 			this.tableName = title;
 			this.newTableName = title;
-			document.title = this.tableName + ' | Game table';
+			document.title = this.tableName + ' | Table de jeu';
 		},
 		updateTableName: function () {
 			let urlPost = "/api/table/" + this.tableId + "/update";

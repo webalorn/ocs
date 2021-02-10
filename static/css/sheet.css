@@ -230,6 +230,9 @@
 	height: 100%;
 	overflow: scroll;
 }
+.col_33 > div > *:last-child, .col_5 > div > *:last-child, .col_666 > div > *:last-child {
+	margin-bottom: 50px;
+}
 .col_33 > div::-webkit-scrollbar, .col_5 > div::-webkit-scrollbar, .col_666 > div::-webkit-scrollbar {
 	display: none;
 }
@@ -351,6 +354,21 @@
 
 .etat_display_line {
 	font-size: small;
+}
+
+/*
+	Niveau de réussite
+*/
+.nr_table {
+	margin-top: 1em;
+    margin-bottom: 2em;
+	text-align: center;
+}
+.nr_table th {
+	font-size: 0.9em;
+}
+.nr_table th, .nr_table td {
+	padding: 0.3em;
 }
 
 /*

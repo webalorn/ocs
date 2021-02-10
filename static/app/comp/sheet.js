@@ -1005,6 +1005,18 @@ function create_sheet_component(sheet_template) {
 				};
 			},
 		},
+		watch: {
+			sheet: {
+				handler(val) {
+					let title = 'Fiche de personnage';
+					if (this.sheet && this.sheet.head.nom) {
+						title = this.sheet.head.nom + ' | ' + title;
+					}
+					document.title = title;
+				},
+				deep: true
+			},
+		},
 		methods: {
 			updateAvatar: function () {
 				let nouv = prompt("Nouvelle url de l'image du personnage :", this.sheet.image);

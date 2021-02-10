@@ -43,8 +43,8 @@
 			<div class="s_sidebar_stats" v-on:click="active_view='stats';"></div>
 			<div class="s_sidebar_fight" v-on:click="active_view='fight';"></div>
 			<div class="s_sidebar_stuff" v-on:click="active_view='stuff';"></div>
-			<div class="s_sidebar_magic" v-on:click="active_view='magic';"></div>
-			<div class="s_sidebar_gods" v-on:click="active_view='gods';"></div>
+			<div class="s_sidebar_magic" v-if="deriv.stats.ea != 0" v-on:click="active_view='magic';"></div>
+			<div class="s_sidebar_gods" v-if="deriv.stats.ek != 0" v-on:click="active_view='gods';"></div>
 			<div class="s_sidebar_notes" v-on:click="active_view='notes';"></div>
 		</div>
 
@@ -380,6 +380,37 @@
 					</div>
 					<textarea class="s_textarea" v-model="sheet.modifs_qualites"></textarea>
 					<sheet-etats-display v-bind:etats="sheet.etats"></sheet-etats-display>
+
+					<table class="s_table nr_table">
+						<tr>
+							<th>Points de<br>compétence</th>
+							<th>Niveau de<br>réussite</th>
+						</tr>
+						<tr>
+							<td>0-3</td>
+							<td>1</td>
+						</tr>
+						<tr>
+							<td>4-6</td>
+							<td>2</td>
+						</tr>
+						<tr>
+							<td>7-9</td>
+							<td>3</td>
+						</tr>
+						<tr>
+							<td>10-12</td>
+							<td>4</td>
+						</tr>
+						<tr>
+							<td>13-15</td>
+							<td>5</td>
+						</tr>
+						<tr>
+							<td>+16</td>
+							<td>6</td>
+						</tr>
+					</table>
 				</div>
 			</div>
 		</div>
@@ -674,10 +705,10 @@
 						<input type="text" v-model="sheet.animal.defense" style="width: 4em;"></int-input>
 
 						<label>PI</label>
-						<input type="text" v-model="sheet.animal.pi" style="width: 4em;"></int-input>
+						<input type="text" v-model="sheet.animal.pi" style="width: 5em;"></int-input>
 
 						<label>AL/PO</label>
-						<input type="text" v-model="sheet.animal.alpo" style="width: 4em;"></int-input>
+						<input type="text" v-model="sheet.animal.alpo" style="width: 6em;"></int-input>
 					</div>
 					<div class="champ_in">
 						<label>Actions</label>
@@ -685,14 +716,18 @@
 					</div>
 
 					<div class="champ_in">
-						<label>Capacités spéciales</label>
-						<input type="text" v-model="sheet.animal.cs" class="field"></int-input>
+						<label>Capacités spéciales, autres attaques, sorts...</label>
+						<!-- <input type="text" v-model="sheet.animal.cs" class="field"></int-input> -->
 					</div>
+					<textarea class="s_textarea" v-model="sheet.animal.cs"></textarea>
+
 
 					<div class="champ_in">
 						<label>Notes</label>
-						<input type="text" v-model="sheet.animal.notes" class="field"></int-input>
+						<!-- <input type="text" v-model="sheet.animal.notes" class="field"></int-input> -->
 					</div>
+					<textarea class="s_textarea" v-model="sheet.animal.notes"></textarea>
+
 				</div>
 			</div>
 		</div>
