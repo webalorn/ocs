@@ -2,6 +2,8 @@ from typing import Optional, List
 from collections import defaultdict
 
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import File, UploadFile
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import RedirectResponse
@@ -10,8 +12,12 @@ from api.db import get_item, set_item
 from api.chat import *
 from api.util import new_id
 
+from pathlib import Path
+import shutil, os
+
 app = FastAPI()
 app.mount("/web", StaticFiles(directory="static"), name="static")
+Path("upload").mkdir(parents=True, exist_ok=True)
 
 
 class Sheet(BaseModel):
@@ -119,6 +125,26 @@ async def create_table(new_table: NewTable):
     table = Table(id=new_id(), characters=[], name=new_table.name)
     await set_item(**table.dict())
     return table
+
+
+# ========== Uploads and files ==========
+
+
+@app.post("/api/upload")
+async def create_upload_file(file: UploadFile = File(...)):
+    path = "upload/" + new_id() + '.' + file.filename.split('.')[-1]
+    with open(path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    return {"url": '/api/' + path}
+
+
+@app.get("/api/upload/{image_name}")
+async def create_upload_file(image_name: str):
+    path = "upload/" + image_name
+    if '/' in image_name or not os.path.isfile(path):
+        raise HTTPException(status_code=404,
+                            detail=f"Image {image_name} doesn't exists")
+    return FileResponse(path)
 
 
 # ========== Sockets ==========

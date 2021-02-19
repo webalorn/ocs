@@ -258,3 +258,41 @@ Vue.component('intnum-input', {
     >
   `
 });
+
+
+/*
+	Links and images
+*/
+
+const LINK_REG = /^https?:\/\/\S+\.\S+$/i;
+const IMAGE_EXTS = ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.svg'];
+const IMAGE_CONTENT_TYPE = {
+	'png': 'image/png',
+	'jpg': 'image/jpeg',
+	'jpeg': 'image/jpeg',
+	'gif': 'image/gif',
+	'bmp': 'image/bmp',
+	'svg': 'image/svg',
+};
+
+function isLink(string) {
+	return string.match(LINK_REG) !== null;
+}
+
+function isImageName(name) {
+	let string = name.toLowerCase();
+	return IMAGE_EXTS.some(ext => string.endsWith(ext));
+}
+
+function isImage(string) {
+	return isLink(string) && isImageName(string);
+}
+
+function imageContentType(name) {
+	for (let ext in IMAGE_CONTENT_TYPE) {
+		if (name.endsWith(ext)) {
+			return IMAGE_CONTENT_TYPE[ext];
+		}
+	}
+	return 'image/*';
+}

@@ -10,6 +10,7 @@
 .vscode/
 .env
 env/
+upload/
 
 netsim/toplevel
 netsim/run

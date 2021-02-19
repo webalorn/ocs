@@ -16,7 +16,7 @@
 </head>
 
 <body>
-	<div id="app" style="display: none;">
+	<div id="app" style="display: none;" v-on:drop="dropHandler" v-on:dragover="dragHandler">
 		<div v-if="!connected && !cantConnect" class="loading">Loading...</div>
 		<div v-if="!connected && cantConnect" class="error">Error, can't connect to the table "{{ tableId }}"</div>
 		<div v-if="errorMessage" class="error">{{ errorMessage }}</div>

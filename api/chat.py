@@ -34,26 +34,27 @@ def process_message(message_obj):
 
     message = message_obj['message'].strip()
     if not message.startswith('/'):
+        message_obj['display'] = 'text'
         return message_obj
 
     parts = message.split()
     cmd = parts[0][1:]
     args = parts[1:]
     if cmd in all_commands:
-        return all_commands[cmd](args)
+        return all_commands[cmd](message_obj, args)
     elif cmd[:-1] in all_commands:
         if cmd[-1] == 'h':
-            r = all_commands[cmd[:-1]](args)
+            r = all_commands[cmd[:-1]](message_obj, args)
             r['target'] = 'self'
             return r
         if cmd[-1] == 'j':
-            r = all_commands[cmd[:-1]](args)
+            r = all_commands[cmd[:-1]](message_obj, args)
             r['target'] = 'game_master'
             return r
     raise MessageError(f"La commande {cmd} n'existe pas")
 
 
-def cmd_roll(args):
+def cmd_roll(message_obj, args):
     rolls = []
     for expr in args:
         try:
@@ -68,7 +69,7 @@ def cmd_roll(args):
     }
 
 
-def cmd_ini(args):
+def cmd_ini(message_obj, args):
     if len(args) == 0:
         raise MessageError(f"Pas de valeur d'initiative !")
     ini = args[0]
@@ -84,7 +85,7 @@ def cmd_ini(args):
     # }
 
 
-def cmd_competence(args):
+def cmd_competence(message_obj, args):
     for i, a in enumerate(args):
         if not is_int(a):
             raise MessageError(f"{a} n'est pas un entier")
@@ -109,7 +110,7 @@ def cmd_competence(args):
     }, vc, bonus, '-')
 
 
-def cmd_d20(args):
+def cmd_d20(message_obj, args):
     if len(args) == 0 or not is_int(args[0]):
         raise MessageError(f"Pas de valeur pour le dé !")
     n = int(args[0])
@@ -119,6 +120,14 @@ def cmd_d20(args):
     return jet_d20(n, text)
 
 
+def cmd_image(message_obj, args):
+    if len(args) == 0:
+        raise MessageError(f"Pas d'url donnée pour l'image")
+    message_obj['display'] = 'image'
+    message_obj['message'] = args[0]
+    return message_obj
+
+
 all_commands = {
     'r': cmd_roll,
     'roll': cmd_roll,
@@ -126,6 +135,8 @@ all_commands = {
     'c': cmd_competence,
     'competence': cmd_competence,
     'd20': cmd_d20,
+    'image': cmd_image,
+    'img': cmd_image,
 }
 
 

@@ -9,6 +9,7 @@ Vue.component('chat-compo', {
 			messages: [],
 			toSend: [],
 			rollDetails: { shown: false },
+			shownImage: null,
 		}
 	},
 	mounted: function () {
@@ -23,6 +24,14 @@ Vue.component('chat-compo', {
 			data.target_ok = true;
 			if (data.target == 'game_master' && !this.identity.gm) {
 				data.target_ok = false;
+			}
+			if (data.type == 'message' && data.display == 'text') {
+				if (isLink(data.message)) {
+					data.display = 'link';
+				}
+				if (isImage(data.message)) {
+					data.display = 'image';
+				}
 			}
 			this.messages.push(data);
 		});
@@ -106,6 +115,9 @@ Vue.component('chat-compo', {
 		toggleDetails: function (m) {
 			this.rollDetails = !this.rollDetails;
 		},
+		showImage: function (url) {
+			this.shownImage = url;
+		},
 	},
 	template: `
 	<div class="chat">
@@ -116,6 +128,7 @@ Vue.component('chat-compo', {
 				Lancer des dés avec <code>/r [liste de dés]</code> ou <code>/r</code> (par exemple, <code>/roll d20+3d6  6d3-4</code>).<br>
 				Faire un jet de compétence avec <code>/c qual1 qual2 qual3 VC [bonus]</code> (par exemple <code>/c 9 10 15 12</code>, ou <code>/c 9 10 15 12 -1</code>).<br>
 				Jet d'initiative avec <code>/ini n</code>, et jet simple avec <code>/d20 n</code>.<br>
+				Liens et images supportés (peut nécessiter <code>/img url</code>).<br>
 				<em>Vous pouvez utiliser le modificateur <code>h</code> pour cacher un jet (<code>/rh d20</code>), le modificateur <code>j</code> pour envoyer uniquement au MJ (<code>/rj d20</code>).</em>
 			</div>
 			<div class="chat_message" v-for='m in messages' v-bind:class="{chat_message_self : m.from == identity.id}">
@@ -125,7 +138,11 @@ Vue.component('chat-compo', {
 					<span v-if="m.target=='self'" class="msg_only_self">(Jet secret)</span>
 				</div>
 				<template v-if="m.target_ok">
-					<p class="chat_message_text" v-if="m.type == 'message'">{{ m.message }}</p>
+					<template v-if="m.type == 'message'">
+						<p class="chat_message_text" v-if="m.display == 'text'">{{ m.message }}</p>
+						<p class="chat_message_text" v-else-if="m.display == 'link'"><a :href="m.message" class="chat_link" target="_blank">{{ m.message }}</a></p>
+						<img v-else-if="m.display == 'image'" :src="m.message" class="chat_image" v-on:click="showImage(m.message)" />
+					</template>
 					<p class="chat_message_error" v-else-if="m.type == 'error'">{{ m.message }}</p>
 					<template v-else-if="m.type == 'roll'">
 						<div v-for="roll in m.rolls" class="chat_roll_line">
@@ -201,6 +218,11 @@ Vue.component('chat-compo', {
 		<template v-if="rollDetails.shown">
 			<div class="winBack" v-on:click="toggleDetails"></div>
 			<roll-details v-bind:roll="rollDetails"></roll-details>
+		</template>
+
+		<template v-if="shownImage">
+			<div class="winBack" v-on:click="showImage(null)"></div>
+			<img :src="shownImage" class="chat_shown_image" v-on:click="showImage(null)" />
 		</template>
 	</div>`
 });

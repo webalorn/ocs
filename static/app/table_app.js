@@ -73,6 +73,52 @@ var app = new Vue({
 			if (char1 > char2) { return 1; }
 			return 0;
 		},
+		sendChatFile: function (file) {
+			if (!isImageName(file.name)) {
+				return false;
+			}
+
+			let formData = new FormData();
+			formData.append('file', file, file.name);
+			fetch("/api/upload", {
+				method: 'POST',
+				cache: 'no-cache',
+				body: formData,
+				// headers: {
+				// 	"Content-Type": imageContentType(file.name),
+				// },
+			}).then(
+				ans => ans.json()
+			).then(data => {
+				let url = document.location.origin + data['url'];
+				this.socket.send_json({
+					'type': 'message',
+					'message': '/img ' + url,
+					'from': this.identity.id,
+					'from_name': this.identity.name,
+				});
+			});
+		},
+		dropHandler: function (ev) {
+			ev.preventDefault();
+			if (ev.dataTransfer.items) {
+				// Use DataTransferItemList interface to access the file(s)
+				for (var i = 0; i < ev.dataTransfer.items.length; i++) {
+					// If dropped items aren't files, reject them
+					if (ev.dataTransfer.items[i].kind === 'file') {
+						this.sendChatFile(ev.dataTransfer.items[i].getAsFile());
+					}
+				}
+			} else {
+				// Use DataTransfer interface to access the file(s)
+				for (var i = 0; i < ev.dataTransfer.files.length; i++) {
+					this.sendChatFile(ev.dataTransfer.files[i]);
+				}
+			}
+		},
+		dragHandler: function (ev) {
+			ev.preventDefault();
+		}
 	},
 	mounted: function () {
 		this.tableId = this.urlParams.get("table");
