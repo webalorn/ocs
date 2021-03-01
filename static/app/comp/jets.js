@@ -398,6 +398,7 @@ Vue.component('inrc-selector-talent', {
 	<div class="inrc_talent" v-on:click="select">
 		<span class="inrc_tal_name">{{ infos.name }}</span>
 		<span class="inrc_tal_roll">({{ infos.roll }})</span>
+		<span class="inrc_tal_enc" v-if="infos.enc!='NON'">[ENC : {{infos.enc}}]</span>
 		<span class="inrc_tal_val">{{ talent.vc }}</span>
 	</div>
 	`,

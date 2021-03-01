@@ -484,7 +484,8 @@ function compute_pav_cost(sheet) {
 			ev: pav_cost_am(sheet.stats.ev[2], 'D'),
 			ea: sheet.stats.ea[0] ? pav_cost_am(sheet.stats.ea[2], 'D') : null,
 			ek: sheet.stats.ek[0] ? pav_cost_am(sheet.stats.ek[2], 'D') : null,
-		}
+		},
+		qualites: {},
 	};
 	if (sheet.stats.ev[2] >= sheet.qualites.cn) {
 		pav.stats.ev = "Limite: CN = " + sheet.qualites.cn;
@@ -494,6 +495,9 @@ function compute_pav_cost(sheet) {
 	}
 	if (sheet.divin.perma_pk > 0) {
 		pav.stats.ea = "Rachat (2PA)";
+	}
+	for (let qual in sheet.qualites) {
+		pav.qualites[qual] = pav_cost_am(sheet.qualites[qual], 'E');
 	}
 
 	return pav;

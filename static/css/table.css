@@ -136,7 +136,9 @@ code {
     line-height: 1.6em;
     border-radius: 2em;
 }
-.chat_dice.dice_20 .chat_dice_p2 {
+.chat_dice.dice_20 .chat_dice_p2,
+.chat_dice.dice_4 .chat_dice_p2,
+.chat_dice.dice_6 .chat_dice_p2 {
 	display: none;
 }
 .chat_dice.dice_20.rolled_1 {
@@ -149,6 +151,29 @@ code {
 	background-image: url(/web/images/hexa_red.png);
     font-weight: bold;
 	color: #ec4646;
+}
+.chat_dice.dice_4 {
+	background-color: #d3fbff;
+    background-image: url(/web/images/d4.png);
+    background-size: 105%;
+    background-position: center;
+    height: 1.5em;
+    width: 1.5em;
+    text-align: center;
+    line-height: 1.8em;
+    border-radius: 0em;
+}
+
+.chat_dice.dice_6 {
+	background-color: #ffa5a5;
+    background-image: url(/web/images/d6.png);
+    background-size: cover;
+    height: 1.5em;
+    width: 1.2em;
+    text-align: center;
+    line-height: 1.9em;
+    border-radius: 0em;
+    padding-right: 0.4em;
 }
 
 /* Jets de competence */
@@ -484,6 +509,10 @@ th.inrc_qual {
 }
 .inrc_tal_roll {
 	font-style: italic;
+}
+.inrc_tal_enc {
+    font-size: 0.8em;
+    color: #333333;
 }
 .inrc_tal_val {
 	float: right;

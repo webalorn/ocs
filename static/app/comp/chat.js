@@ -33,7 +33,9 @@ Vue.component('chat-compo', {
 					data.display = 'image';
 				}
 			}
-			this.messages.push(data);
+			if (data.target != 'self' || this.identity.gm || data.from == this.identity.id) {
+				this.messages.push(data);
+			}
 		});
 	},
 	updated: function () {
