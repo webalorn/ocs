@@ -50,6 +50,7 @@ var app = new Vue({
 			this.tableName = title;
 			this.newTableName = title;
 			document.title = this.tableName + ' | Table de jeu';
+			storage_set_in_dict('idToName', this.tableId, title);
 		},
 		updateTableName: function () {
 			let urlPost = "/api/table/" + this.tableId + "/update";

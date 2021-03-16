@@ -17,9 +17,10 @@
 <body>
 	<div id="app">
 		<div id="app_column">
+			<h1>Système de fiches et tables pour l'Oeil Noir</h1>
 			<p style="font-style: italic;">
 				Veuillez sauvegarder toutes les url des fiches et des tables que vous créez de votre côté. Les url ne
-				sont stockées que localement et seront perdues si vous effacez les données ou utiliser un autre
+				sont stockées que localement et seront perdues si vous effacez les données ou utilisez un autre
 				appareil.
 			</p>
 			<h2>Nouveau</h2>
@@ -31,7 +32,7 @@
 				<h2>Tables</h2>
 				<ol>
 					<li v-for="id in tables">
-						<a :href="'/web/table.html?table=' + id + '&gm=1'" target="_blank">{{ id }}</a>
+						<a :href="'/web/table.html?table=' + id + '&gm=1'" target="_blank">{{ idToName[id] || id }}</a>
 					</li>
 				</ol>
 			</template>
@@ -40,7 +41,7 @@
 				<h2>Personnages</h2>
 				<ol>
 					<li v-for="id in characters">
-						<a :href="'/web/sheet.html?id=' + id" target="_blank">{{ id }}</a>
+						<a :href="'/web/sheet.html?id=' + id" target="_blank">{{ idToName[id] || id }}</a>
 					</li>
 				</ol>
 			</template>

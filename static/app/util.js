@@ -203,19 +203,31 @@ function updateSavedData(local, lastSave, remote) {
 	return local;
 }
 
-function storage_get(key) {
+function storage_get(key, defaultVal = []) {
 	let storedValue = localStorage.getItem(key);
 	if (storedValue === null) {
-		return [];
+		return defaultVal;
 	} else {
 		return JSON.parse(storedValue);
 	}
+}
+function storage_get_in_dict(key, field) {
+	return storage_get(key, {})[field];
 }
 
 function storage_add(key, value) {
 	let allValues = storage_get(key);
 	allValues.push(value);
 	localStorage.setItem(key, JSON.stringify(allValues));
+}
+
+function storage_replace(key, value) {
+	localStorage.setItem(key, JSON.stringify(value));
+}
+function storage_set_in_dict(key, field, value) {
+	let curDict = storage_get(key, {});
+	curDict[field] = value;
+	localStorage.setItem(key, JSON.stringify(curDict));
 }
 
 /*

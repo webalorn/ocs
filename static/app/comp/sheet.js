@@ -1015,6 +1015,9 @@ function create_sheet_component(sheet_template) {
 					let title = 'Fiche de personnage';
 					if (this.sheet && this.sheet.head.nom) {
 						title = this.sheet.head.nom + ' | ' + title;
+						storage_set_in_dict('idToName', this.id, this.sheet.head.nom);
+					} else if (this.sheet) {
+						storage_set_in_dict('idToName', this.id, null);
 					}
 					document.title = title;
 				},

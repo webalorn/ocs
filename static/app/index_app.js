@@ -80,6 +80,7 @@ var app = new Vue({
 	},
 	mounted: function () {
 		this.characters = storage_get('characters');
+		this.idToName = storage_get('idToName', {});
 		this.tables = storage_get('tables');
 	},
 	computed: {
