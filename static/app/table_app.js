@@ -132,6 +132,10 @@ var app = new Vue({
 				answer.json().then(data => {
 					this.setTitle(data['name']);
 					if (this.urlParams.get("gm")) {
+						if (this.urlParams.get('gm') != miniHash(this.urlParams.get('table'))) {
+							this.errorMessage = "Vous n'êtes pas le MJ";
+							return;
+						}
 						this.identity = {
 							'id': '0',
 							'name': 'MJ',

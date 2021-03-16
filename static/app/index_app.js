@@ -3,6 +3,9 @@ var app = new Vue({
 	data: {
 		characters: [],
 		tables: [],
+		importExShown: false,
+		tableImportList: "",
+		charImportList: "",
 	},
 	methods: {
 		new_character: function () {
@@ -43,7 +46,7 @@ var app = new Vue({
 							let id = data['id'];
 							this.tables.push(id);
 							storage_add('tables', id);
-							let url = '/web/table.html?table=' + id + '&gm=1';
+							let url = '/web/table.html?table=' + id + '&gm=' + miniHash(id);
 							window.open(url, '_blank');
 						});
 					} else {
@@ -74,9 +77,52 @@ var app = new Vue({
 								if (ans.ok) { location.reload(); }
 							});
 						}
-					})
+					});
 			}
-		}
+		},
+		toogleImportExport: function () {
+			this.importExShown = !this.importExShown;
+		},
+		importTables: function () {
+			let lines = this.tableImportList.split('\n');
+			let errors = [];
+			console.log(lines);
+			lines.forEach(l => {
+				let parts = l.trim().split(';');
+				if (parts.length == 2 && !this.tables.includes(parts[0])) {
+					if (miniHash(parts[0]) == parts[1]) {
+						this.tables.push(parts[0]);
+						storage_add('tables', parts[0]);
+					} else {
+						errors.push(l);
+					}
+				}
+			});
+			if (errors.length) {
+				alert("Erreur lors de l'import de certaines tables")
+			}
+			this.tableImportList = errors.join('\n');
+		},
+		importCharacters: function () {
+			let lines = this.charImportList.split('\n');
+			let errors = [];
+			console.log(lines);
+			lines.forEach(l => {
+				let parts = l.trim().split(';');
+				if (parts.length == 2 && !this.characters.includes(parts[0])) {
+					if (miniHashStep(parts[0], 2) == parts[1]) {
+						this.characters.push(parts[0]);
+						storage_add('characters', parts[0]);
+					} else {
+						errors.push(l);
+					}
+				}
+			});
+			if (errors.length) {
+				alert("Erreur lors de l'import de certains personnages")
+			}
+			this.charImportList = errors.join('\n');
+		},
 	},
 	mounted: function () {
 		this.characters = storage_get('characters');

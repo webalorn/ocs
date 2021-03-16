@@ -364,6 +364,8 @@ code {
 	position: relative;
 	border-radius: 5px;
 	border: 1px solid transparent;
+	/* border: 1px dotted #8080808a; */
+	background: #80808024;
 }
 .inrc_view_clickable:hover {
 	background: white;
@@ -471,32 +473,6 @@ th.inrc_qual {
 /*
 	Roll for talents
 */
-.select_win {
-	z-index: 100;
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translateX(-50%) translateY(-50%);
-	margin: auto;
-	height: 800px;
-	max-height: 90%;
-	width: 650px;
-	max-width: 90%;
-	background: #ccd4d6;
-	border: 2px solid black;
-	padding: 0.6em;
-}
-.col_in_win {
-	width: 49%;
-	display: inline-block;
-	vertical-align:top;
-	text-align: left;
-}
-.select_win h3 {
-	margin: 0.5em 0em;
-	border-bottom: 1px solid rgb(123, 82, 54);
-	font-family: fantasy;
-}
 .inrc_talent {
 	padding: 0.3em;
     cursor: pointer;

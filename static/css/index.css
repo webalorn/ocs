@@ -45,3 +45,13 @@ footer a {
 footer a:hover {
 	color: rgb(138, 138, 202);
 }
+
+.importExportButton {
+	margin: auto;
+    display: block;
+    margin-top: 3em;
+}
+.imp_exp_win textarea {
+	width: 95%;
+    height: 10em
+}

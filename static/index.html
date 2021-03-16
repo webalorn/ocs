@@ -32,7 +32,8 @@
 				<h2>Tables</h2>
 				<ol>
 					<li v-for="id in tables">
-						<a :href="'/web/table.html?table=' + id + '&gm=1'" target="_blank">{{ idToName[id] || id }}</a>
+						<a :href="'/web/table.html?table=' + id + '&gm=' + miniHash(id)" target="_blank">{{ idToName[id]
+							|| id }}</a>
 					</li>
 				</ol>
 			</template>
@@ -45,10 +46,48 @@
 					</li>
 				</ol>
 			</template>
+
+			<button v-on:click="toogleImportExport" class="importExportButton">Importer / Exporter</button>
+
+			<template v-if="importExShown">
+				<div class="winBack" v-on:click="toogleImportExport"></div>
+				<div class="imp_exp_win select_win scrollable">
+					<div class="col_in_win">
+						<h3>Tables</h3>
+						<h4>Importer</h4>
+						<p>Veuillez entrer un ID par ligne</p>
+						<textarea v-model="tableImportList"></textarea>
+						<button v-on:click="importTables" class="importButton">Importer</button>
+						<h4>Exporter (copier la liste)</h4>
+						<p>
+							<template v-for="id in tables">
+								<span>{{ id }};{{ miniHash(id) }}</span>
+								<br />
+							</template>
+						</p>
+
+					</div>
+					<div class="col_in_win">
+						<h3>Personnages</h3>
+						<h4>Importer</h4>
+						<p>Veuillez entrer un ID par ligne</p>
+						<textarea v-model="charImportList"></textarea>
+						<button v-on:click="importCharacters" class="importButton">Importer</button>
+						<h4>Exporter (copier la liste)</h4>
+						<p>
+							<template v-for="id in characters">
+								<span>{{ id }};{{ miniHashStep(id, 2) }}</span>
+								<br />
+							</template>
+						</p>
+					</div>
+					<button v-on:click="toogleImportExport" class="importExportButton">Fermer</button>
+				</div>
+			</template>
 		</div>
 
 		<footer>
-			<a href="https://github.com/webalorn/ocs">Code source disponible sur github</a>
+			<a href="https://github.com/webalorn/ocs">Code source disponible sur github</a> - Par webalorn
 		</footer>
 	</div>
 
