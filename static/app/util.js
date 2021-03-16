@@ -74,6 +74,10 @@ function miniHashStep(str, steps) {
 	}
 }
 
+function roundDecimal(n, d) {
+	let m = Math.pow(10, d);
+	return Math.round((n + Number.EPSILON) * m) / m;
+}
 
 /*
 	Datas

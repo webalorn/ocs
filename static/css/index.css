@@ -55,3 +55,31 @@ footer a:hover {
 	width: 95%;
     height: 10em
 }
+
+.drag_item {
+	cursor: move;
+	cursor: grab;
+}
+.drag_item:active {
+    cursor: grabbing;
+}
+.item_line a {
+	color: #0a63a2;
+}
+.item_line:hover {
+	background: #f3f3f3;
+}
+.itemOver {
+	background: rgb(176, 207, 162);
+}
+.del_item {
+    color: #545454;
+    margin-left: 1em;
+    margin-right: 0.5em;
+    font-style: italic;
+    cursor: pointer;
+    float: right;
+}
+.del_item:hover {
+    color: #e26d6d;
+}

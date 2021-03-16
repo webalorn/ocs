@@ -21,7 +21,8 @@
 			<p style="font-style: italic;">
 				Veuillez sauvegarder toutes les url des fiches et des tables que vous créez de votre côté. Les url ne
 				sont stockées que localement et seront perdues si vous effacez les données ou utilisez un autre
-				appareil.
+				appareil. Un autre solution est de sauvegarder la liste des identifiants (liste dans la section
+				"exporter" plus bas).
 			</p>
 			<h2>Nouveau</h2>
 			<div id="create_block">
@@ -29,22 +30,42 @@
 				<br />
 				<button v-on:click="new_table">Nouvelle table</button>
 			</div><template v-if="tables.length">
-				<h2>Tables</h2>
+				<h2>Tables créées</h2>
 				<ol>
-					<li v-for="id in tables">
+					<li v-for="id in tables" class="item_line drag_item" :id="'tables_' + id" draggable
+						@dragstart="startDrag($event, id, 'tables')" @drop="onDrop($event, 'tables', id, tables)"
+						@dragover.prevent @dragenter="onDragEnter($event, 'tables', id)"
+						@dragleave="onDragLeave($event, 'tables', id)">
 						<a :href="'/web/table.html?table=' + id + '&gm=' + miniHash(id)" target="_blank">{{ idToName[id]
 							|| id }}</a>
+						<span class="del_item" v-on:click="delTable(id)">(✗)</span>
 					</li>
 				</ol>
 			</template>
 
 			<template v-if="characters.length">
-				<h2>Personnages</h2>
+				<h2>Personnages créés</h2>
 				<ol>
-					<li v-for="id in characters">
-						<a :href="'/web/sheet.html?id=' + id" target="_blank">{{ idToName[id] || id }}</a>
+					<li v-for="id in characters" class="item_line drag_item" :id="'characters_' + id" draggable
+						@dragstart="startDrag($event, id, 'characters')"
+						@drop="onDrop($event, 'characters', id, characters)" @dragover.prevent
+						@dragenter="onDragEnter($event, 'characters', id)"
+						@dragleave="onDragLeave($event, 'characters', id)">
+						<a :href="'/web/sheet.html?id=' + id" target="_blank">{{ idToName[id] || id }}</a> <span
+							class="del_item" v-on:click="delCharacter(id)">(✗)</span>
 					</li>
 				</ol>
+			</template>
+
+			<template v-if="recentTables.length">
+				<h2>Tables de jeu récentes</h2>
+				<ul>
+					<li v-for="table in recentTables" class="item_line">
+						<a :href="table.url" target="_blank">{{ idToName[table.tableId] || table.tableId }} ({{
+							table.gm ? 'MJ' : idToName[table.playerId]
+							}})</a>
+					</li>
+				</ul>
 			</template>
 
 			<button v-on:click="toogleImportExport" class="importExportButton">Importer / Exporter</button>

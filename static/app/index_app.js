@@ -3,6 +3,7 @@ var app = new Vue({
 	data: {
 		characters: [],
 		tables: [],
+		recentTables: [],
 		importExShown: false,
 		tableImportList: "",
 		charImportList: "",
@@ -55,31 +56,6 @@ var app = new Vue({
 				});
 			}
 		},
-		addPlayer: function () {
-			if (this.newPlayerId) {
-				for (let i in this.players) {
-					if (this.players[i].id == this.newPlayerId) {
-						alert("Déjà à cette table !");
-						return;
-					}
-				}
-				let urlFiche = "/api/sheet/" + this.newPlayerId;
-				fetch(urlFiche)
-					.then(answer => {
-						if (!answer.ok) {
-							alert("Ce joueur n'existe pas !");
-						} else {
-							let urlPost = "/api/table/" + this.tableId + "/player/" + this.newPlayerId;
-							fetch(urlPost, {
-								method: 'POST',
-								cache: 'no-cache',
-							}).then(ans => {
-								if (ans.ok) { location.reload(); }
-							});
-						}
-					});
-			}
-		},
 		toogleImportExport: function () {
 			this.importExShown = !this.importExShown;
 		},
@@ -123,11 +99,55 @@ var app = new Vue({
 			}
 			this.charImportList = errors.join('\n');
 		},
+		delCharacter: function (id) {
+			let name = this.idToName[id] || id;
+			if (confirm("Voulez vous vraiment supprimer le personnage '" + name + '" de cette liste?')) {
+				this.characters = this.characters.filter(el => el !== id)
+				storage_replace('characters', this.characters);
+			}
+		},
+		delTable: function (id) {
+			let name = this.idToName[id] || id;
+			if (confirm("Voulez vous vraiment supprimer la table '" + name + '" de cette liste?')) {
+				this.tables = this.tables.filter(el => el !== id)
+				storage_replace('tables', this.tables);
+			}
+		},
+		startDrag: function (event, id, type) {
+			event.dataTransfer.dropEffect = 'move';
+			event.dataTransfer.effectAllowed = 'move';
+			event.dataTransfer.setData('itemId', id);
+			event.dataTransfer.setData('itemType', type);
+		},
+		onDrop: function (event, type, dropId, list) {
+			const dragId = event.dataTransfer.getData('itemId');
+			const itemType = event.dataTransfer.getData('itemType');
+			if (itemType == type) {
+				const posDrag = list.findIndex(el => el == dragId);
+				const posDrop = list.findIndex(el => el == dropId);
+				list.splice(posDrag, 1);
+				list.splice(posDrop, 0, dragId);
+
+				storage_replace(type, list);
+			}
+			Array.prototype.forEach.call(document.getElementsByClassName('itemOver'), el => {
+				el.classList.remove('itemOver');
+			});
+		},
+		onDragEnter: function (event, type, id) {
+			let el = document.getElementById(type + '_' + id);
+			el.classList.add('itemOver');
+		},
+		onDragLeave: function (event, type, id) {
+			let el = document.getElementById(type + '_' + id);
+			el.classList.remove('itemOver');
+		},
 	},
 	mounted: function () {
 		this.characters = storage_get('characters');
-		this.idToName = storage_get('idToName', {});
 		this.tables = storage_get('tables');
+		this.recentTables = storage_get('recentTables');
+		this.idToName = storage_get('idToName', {});
 	},
 	computed: {
 	}

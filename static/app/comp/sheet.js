@@ -412,11 +412,11 @@ function compute_derived(sheet) {
 		"des": { "max": sheet.des.valeur + sheet.des.modif },
 		"ev_etats": ev_etats,
 		"masse": {
-			"stuff": masse_stuff,
-			"weaponsOnly": masse_weapons,
-			"weapons": masse_weapons + masse_armor,
-			"total": masse_stuff + masse_weapons + masse_armor,
-			"total_enc": masse_stuff + masse_weapons,
+			"stuff": roundDecimal(masse_stuff, 4),
+			"weaponsOnly": roundDecimal(masse_weapons, 4),
+			"weapons": roundDecimal(masse_weapons + masse_armor, 4),
+			"total": roundDecimal(masse_stuff + masse_weapons + masse_armor, 4),
+			"total_enc": roundDecimal(masse_stuff + masse_weapons, 4),
 			"max": sheet.qualites.fo * 2,
 		}
 	}
@@ -1015,7 +1015,11 @@ function create_sheet_component(sheet_template) {
 					let title = 'Fiche de personnage';
 					if (this.sheet && this.sheet.head.nom) {
 						title = this.sheet.head.nom + ' | ' + title;
-						storage_set_in_dict('idToName', this.id, this.sheet.head.nom);
+						let sheetName = this.sheet.head.nom;
+						if (this.sheet.owner) {
+							sheetName += ' (' + this.sheet.owner + ')';
+						}
+						storage_set_in_dict('idToName', this.id, sheetName);
 					} else if (this.sheet) {
 						storage_set_in_dict('idToName', this.id, null);
 					}

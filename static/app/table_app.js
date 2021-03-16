@@ -1,3 +1,5 @@
+const MAX_RECENT = 5;
+
 var app = new Vue({
 	el: '#app',
 	data: {
@@ -100,6 +102,32 @@ var app = new Vue({
 				});
 			});
 		},
+		markAsRecentTable: function () {
+			let recent = storage_get('recentTables');
+			let asGm = this.identity.gm;
+			recent.forEach(el => {
+				if (el.tableId == this.tableId && el.gm) {
+					asGm = true;
+				}
+			});
+			recent = recent.filter(el => el.tableId != this.tableId);
+			let url = '/web/table.html?table=' + this.tableId;
+			if (asGm) {
+				url += '&gm=' + miniHash(this.tableId);
+			} else {
+				url += '&id=' + this.identity.id;
+			}
+			recent = [{
+				tableId: this.tableId,
+				gm: asGm,
+				url: url,
+				playerId: this.identity.id,
+			}].concat(recent);
+			while (recent.length > MAX_RECENT) {
+				recent.pop();
+			}
+			storage_replace('recentTables', recent);
+		},
 		dropHandler: function (ev) {
 			ev.preventDefault();
 			if (ev.dataTransfer.items) {
@@ -166,11 +194,13 @@ var app = new Vue({
 							.then(data => {
 								this.identity.name = data.content.head.nom;
 								this.identity.player_name = data.content.owner;
+								storage_set_in_dict('idToName', this.identity.id, this.identity.name);
 							});
 					}
 					this.connected = true;
 					this.characters = data['characters'];
 					this.characters.sort(this.compCharacters);
+					this.markAsRecentTable();
 				});
 			}
 		}).catch((error) => {
