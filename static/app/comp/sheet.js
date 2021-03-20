@@ -3,6 +3,7 @@
 */
 let sum2 = (a, b) => a + b;
 const qualNames = ["co", "in", "iu", "ch", "de", "ag", "cn", "fo"];
+const DEFAULT_IMAGE = "/web/images/helmet.svg";
 
 function newDefaultSheet() {
 	return {

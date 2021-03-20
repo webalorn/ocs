@@ -203,6 +203,17 @@ var app = new Vue({
 					this.markAsRecentTable();
 				});
 			}
+			document.onpaste = event => {
+				var items = (event.clipboardData || event.originalEvent.clipboardData).items;
+				for (index in items) {
+					var item = items[index];
+					if (item.kind === 'file' && item.type.startsWith("image")) {
+						if (confirm("Envoyer l'image ?")) {
+							this.sendChatFile(item.getAsFile());
+						}
+					}
+				}
+			}
 		}).catch((error) => {
 			this.cantConnect = true;
 		});

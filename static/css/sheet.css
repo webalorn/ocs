@@ -47,14 +47,16 @@
 	vertical-align: middle;
 }
 .avatar {
-	width : 90px;
-	height: 90px;
+	width : 88px;
+	height: 88px;
 	margin-right: 30px;
 	background-color: gray;
 	cursor: pointer;
+	border: 1px solid black;
+	border-radius: 2px;
 }
 .avatar:hover {
-	background: rgb(182, 182, 182);
+	background-color: rgb(182, 182, 182);
 	opacity: 80%;
 }
 .s_header .infos {
@@ -312,10 +314,6 @@
 	border: 1px solid black;
 	text-align: center;
 }
-.ts_cell_cross {
-	background-image: url('/web/images/cross.svg');
-	background-size: 100% 100%;
-}
 .table_stats tr:first-child {
 	font-size: small;
 	vertical-align: bottom;
@@ -323,6 +321,15 @@
 }
 .table_stats td:not(:first-child), .ts_cell, .ts_cell_head {
 	width: 2.5em;
+}
+.table_stats tr:not(:first-child) td:last-child:not(.ts_cell_cross) {
+	width: 2.5em;
+	background: #fdf6e5;
+}
+.ts_cell_cross {
+	background-color: #bbbbbb;
+	background-image: url('/web/images/cross.svg');
+	background-size: 100% 100%;
 }
 
 .table_xp td {
