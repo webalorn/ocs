@@ -26,7 +26,7 @@
 		<div class="qualites_bar">
 			<div class="qualite" v-for="(val, name) in sheet.qualites">
 				<div class="qualite_symb" v-bind:class="'qual_' + name"
-					:data-tooltip-bottom="pavTxt(pav.qualites[name])">{{
+					:data-tooltip-bottom="qualPlainName(name) + ' ; ' + pavTxt(pav.qualites[name])">{{
 					name.toUpperCase() }}</div>
 				<div class="qualite_val">
 					<int-input v-model.number="sheet.qualites[name]" />

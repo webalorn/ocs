@@ -54,6 +54,7 @@
 	cursor: pointer;
 	border: 1px solid black;
 	border-radius: 2px;
+	background-size: cover;
 }
 .avatar:hover {
 	background-color: rgb(182, 182, 182);
@@ -405,6 +406,19 @@
 	text-align: center;
 	width: 3em;
 }
+.table_techniques td.has_vtc {
+	background-color: #fdf6e5;
+}
+
+.table_techniques td.has_vtc input {
+	font-weight: bold;
+}
+.table_techniques input {
+	background-color: transparent;
+}
+.table_techniques input:focus {
+	background-color: white;
+}
 
 
 /* Etats */
@@ -433,10 +447,10 @@
 	width: 8em;
 }
 .weapon_table td:nth-child(3), .weapon_table th:nth-child(3) {
-	width: 8em;
+	width: 7em;
 }
 .weapon_table td:nth-child(4), .weapon_table th:nth-child(4) {
-	width: 5em;
+	width: 6em;
 }
 .weapon_table td:nth-child(5), .weapon_table th:nth-child(5) {
 	width: 5em;
@@ -500,6 +514,7 @@
 	cursor: pointer;
 	border: 6px solid #bda109;
 	/* margin-right: 30px; */
+	background-size: cover;
 }
 .avatarAnimal:hover {
 	background: rgb(182, 182, 182);

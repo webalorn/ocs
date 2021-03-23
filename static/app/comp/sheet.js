@@ -4,6 +4,16 @@
 let sum2 = (a, b) => a + b;
 const qualNames = ["co", "in", "iu", "ch", "de", "ag", "cn", "fo"];
 const DEFAULT_IMAGE = "/web/images/helmet.svg";
+const qualPlainNameDict = {
+	"co": "Courage",
+	"in": "Intelligence",
+	"iu": "Intuition",
+	"ch": "Charisme",
+	"de": "Dextérité",
+	"ag": "Agilité",
+	"cn": "Constituation",
+	"fo": "Force",
+};
 
 function newDefaultSheet() {
 	return {
@@ -562,9 +572,10 @@ function newSaveManager(dataInit, prepareData, interval = 200) {
 			this.unsaved = true;
 			lastModif = Date.now();
 		},
-		pushSave: function () {
-			if ((this.unsaved || this.saveError)
-				&& (!this.saving || Date.now() - lastTrySave > 6 * 1000)) {
+		pushSave: function (forceSave = false) {
+			if (((this.unsaved || this.saveError)
+				&& (!this.saving || Date.now() - lastTrySave > 6 * 1000))
+				|| forceSave) {
 				lastSavedData = cloneData(data);
 				lastTrySave = Date.now();
 				this.saving = true;
@@ -602,9 +613,11 @@ function newSaveManager(dataInit, prepareData, interval = 200) {
 			}
 		},
 		remoteUpdate: function (newData) {
-			ignoreNextChange = true;
-			updateSavedData(data, lastSavedData, newData);
-			lastSavedData = cloneData(data);
+			if (!areEqual(newData, data)) {
+				ignoreNextChange = true;
+				updateSavedData(data, lastSavedData, newData);
+				lastSavedData = cloneData(data);
+			}
 		},
 	};
 	setInterval(() => manager.autoSave(), interval);
@@ -624,6 +637,9 @@ function pavTxt(pavCost) {
 		return '+1: ' + pavCost + ' PAV';
 	}
 	return pavCost;
+}
+function qualPlainName(qual) {
+	return qualPlainNameDict[qual.toLowerCase()];
 }
 
 function tooltipForSpell(spell) {
@@ -645,7 +661,6 @@ Vue.component('data-saver', {
 	watch: {
 		data: {
 			handler(val) {
-				console.log("Changed");
 				this.manager.changed(this.data);
 			},
 			deep: true
@@ -653,7 +668,7 @@ Vue.component('data-saver', {
 	},
 	methods: {
 		save: function () {
-			this.manager.pushSave();
+			this.manager.pushSave(true);
 		},
 	},
 	template: `
@@ -739,7 +754,7 @@ Vue.component('sheet-technique', {
 		<td :data-tooltip="improv_cost">{{ infos.name }}</td>
 		<td>{{ infos.qual }}</td>
 		<td>{{ infos.am }}</td>
-		<td>
+		<td :class="{has_vtc : stats.vtc > 6}">
 			<int-input v-model.number="stats.vtc"></int-input>
 		</td>
 		<td>{{ fight.atcd }}</td>
@@ -769,9 +784,9 @@ Vue.component('sheet-etats-display', {
 					"Incapable dʼagir, autrement toutes les épreuves –4",
 				]],
 				"encombrement": ["Encombrement", ["",
-					"Légèrement encombré, épreuves pour les talents influencés par lʼencombrement à –1, AT –1, défense –1, INI – 1, VI – 1",
-					"Encombré, épreuves pour les talents influencés par lʼencombrement à –2, AT –2, défense –2, INI – 2, VI – 2",
-					"Très encombré, épreuves pour les talents influencés par lʼencombrement à –3, AT –3, défense –3, INI – 3, VI – 3",
+					"Légèrement encombré, épreuves pour les talents influencés par lʼencombrement à –1, AT –1, défenses (=PRD/ESQ) –1, INI – 1, VI – 1",
+					"Encombré, épreuves pour les talents influencés par lʼencombrement à –2, AT –2, défenses (=PRD/ESQ) –2, INI – 2, VI – 2",
+					"Très encombré, épreuves pour les talents influencés par lʼencombrement à –3, AT –3, défenses (=PRD/ESQ) –3, INI – 3, VI – 3",
 					"Incapable dʼagir",
 				]],
 				"etourdissement": ["Étourdissement", ["",
@@ -965,13 +980,13 @@ function create_sheet_component(sheet_template) {
 		computed: {
 			avatarStyle: function () {
 				if (this.sheet.image) {
-					return "background: url('" + this.sheet.image + "'); background-size: cover;"
+					return "background-image: url('" + this.sheet.image + "');"
 				}
 				return "";
 			},
 			avatarAnimalStyle: function () {
 				if (this.sheet.animal.image) {
-					return "background: url('" + this.sheet.animal.image + "'); background-size: cover;"
+					return "background: url('" + this.sheet.animal.image + "');"
 				}
 				return "";
 			},
@@ -1091,6 +1106,7 @@ function create_sheet_component(sheet_template) {
 			},
 			tooltipForSpell: tooltipForSpell,
 			pavTxt: pavTxt,
+			qualPlainName: qualPlainName,
 		},
 		template: sheet_template,
 	});

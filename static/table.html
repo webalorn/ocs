@@ -25,7 +25,7 @@
 				<span class="label">Connecté : </span>
 				<span class="top_username">{{ identity.player_name }}</span>
 				<span class="top_name">({{ identity.name }})</span>
-				<button v-on:click="open_sheet" v-if="!identity.gm" class="top_edit_sheet">Modifier ma fiche</button>
+				<button v-on:click="open_sheet" v-if="!identity.gm" class="top_edit_sheet">Voir ma fiche</button>
 				<span class="top_table_name">{{ tableName }}</span>
 			</div>
 			<jet-competence v-if="!reroll_comp.dice" v-bind:socket="socket" v-bind:identity="identity"></jet-competence>
