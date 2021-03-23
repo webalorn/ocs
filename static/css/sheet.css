@@ -215,16 +215,19 @@
 	width: 33.33%;
 	height: 100%;
 	display: inline-block;
+	vertical-align: top;
 }
 .col_5 {
 	width: 50%;
 	height: 100%;
 	display: inline-block;
+	vertical-align: top;
 }
 .col_666 {
 	width: 66.6%;
 	height: 100%;
 	display: inline-block;
+	vertical-align: top;
 }
 .col_33 > div, .col_5 > div, .col_666 > div {
 	font-size: 1rem;
@@ -297,6 +300,11 @@
 }
 .expand_table th {
 	text-align: center;
+}
+
+/* Show table */
+.show_table {
+	word-break: break-word;
 }
 
 /*
@@ -561,6 +569,13 @@
 }
 .magic_table td:nth-child(11), .magic_table th:nth-child(11) {
 	width: 2em;
+}
+
+.magic_table_display td:nth-child(4), .magic_table_display th:nth-child(4) {
+	width: 5em;
+}
+.magic_table_display td:nth-child(8), .magic_table_display th:nth-child(8) {
+	width: 6.5em;
 }
 
 

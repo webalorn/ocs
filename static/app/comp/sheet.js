@@ -269,7 +269,7 @@ const talentInfos = {
 		"etiquette": { "name": "Étiquette", "roll": "IN/IU/CH", "enc": "EVTL", "am": "B" },
 		"intimidation": { "name": "Intimidation", "roll": "CO/IU/CH", "enc": "NON", "am": "B" },
 		"nature_humaine": { "name": "Nature humaine", "roll": "IN/IU/CH", "enc": "NON", "am": "C" },
-		"persutaation": { "name": "Persutation", "roll": "CO/IU/CH", "enc": "NON", "am": "C" },
+		"persutaation": { "name": "Persuasion", "roll": "CO/IU/CH", "enc": "NON", "am": "C" },
 		"seduction": { "name": "Séduction", "roll": "CO/CH/CH", "enc": "EVTL", "am": "B" },
 		"volonte": { "name": "Volonté", "roll": "CO/IU/CH", "enc": "NON", "am": "D" },
 	},
@@ -938,6 +938,32 @@ Vue.component('sheet-table', {
 	`,
 });
 
+Vue.component('show-table', {
+	props: ["data", "titles"],
+	methods: {
+		isLineEmpty: function (line) {
+			for (let i in line) {
+				if (line[i]) {
+					return false;
+				}
+			}
+			return true;
+		},
+	},
+	template: `
+	<table class="s_table expand_table show_table">
+		<tr>
+			<th v-for="title in titles">{{ title }}</th>
+		</tr>
+		<tr v-for="(line, iline) in data" v-if="!isLineEmpty(line)">
+			<td v-for="(val, ival) in line">
+				{{ val }}
+			</td>
+		</tr>
+	</table>
+	`,
+});
+
 /*
 	Sheet main view
 */
@@ -986,7 +1012,7 @@ function create_sheet_component(sheet_template) {
 			},
 			avatarAnimalStyle: function () {
 				if (this.sheet.animal.image) {
-					return "background: url('" + this.sheet.animal.image + "');"
+					return "background-image: url('" + this.sheet.animal.image + "');"
 				}
 				return "";
 			},

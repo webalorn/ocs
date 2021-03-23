@@ -738,6 +738,19 @@
 		<div class="s_main_area scrollable" v-if="active_view == 'magic'">
 			<div class="col_666">
 				<div>
+					<div class="champ_in">
+						<label>Liste des sorts</label>
+					</div>
+					<br>
+					<show-table v-bind:data="sheet.sorts"
+						v-bind:titles="['Sort/Rituel', 'Épreuve', 'VC', 'Coût', 'Durée', 'Portée', 'Durée incantation', 'Domaine', 'am', 'Effets', 'p.']"
+						class="magic_table magic_table_display"></show-table>
+
+					<br>
+					<div class="champ_in">
+						<label>Modifier la liste des sorts (affichage condensé)</label>
+					</div>
+					<br>
 					<sheet-table
 						v-bind:schema="['str', 'str', 'int', 'str', 'str', 'str', 'str', 'str', 'str', 'str', 'str']"
 						v-bind:data="sheet.sorts"
@@ -792,6 +805,20 @@
 
 			<div class="col_666">
 				<div>
+
+					<div class="champ_in">
+						<label>Liste des liturgies</label>
+					</div>
+					<br>
+					<show-table v-bind:data="sheet.liturgies"
+						v-bind:titles="['Liturgie/Cérémonie', 'Épreuve', 'VC', 'Coût', 'Durée', 'Portée', 'Durée d\'oraison', 'Aspect', 'am', 'Effets', 'p.']"
+						v-bind:tooltipsFct="tooltipForSpell" class="magic_table"></show-table>
+
+					<br>
+					<div class="champ_in">
+						<label>Modifier la liste des liturgies (affichage condensé)</label>
+					</div>
+					<br>
 					<sheet-table
 						v-bind:schema="['str', 'str', 'int', 'str', 'str', 'str', 'str', 'str', 'str', 'str', 'str']"
 						v-bind:data="sheet.liturgies"
@@ -871,8 +898,7 @@
 					<div class="champ_in">
 						<label>Notes de partie & secrets</label>
 					</div>
-					<textarea class="s_textarea" v-model="sheet.divin.benedictions"
-						style="min-height: 20em;"></textarea>
+					<textarea class="s_textarea" v-model="sheet.notes.notes" style="min-height: 20em;"></textarea>
 
 
 					<div class="champ_in">
