@@ -16,21 +16,28 @@ function build_app() {
 			this.sheetId = this.urlParams.get("id");
 			fetch('/api/sheet/' + this.sheetId)
 				.then(response => {
-					if (response.ok) {
-						this.connected = true;
-						this.sheet = response.json();
-
-						let urlSocket = "/ws/sheet/" + this.sheetId;
-						this.socket = newReSocket(urlSocket, socketOk => {
-							if (!socketOk) {
+					if (!response.ok) {
+						this.cantConnect = true;
+					} else {
+						response.json().then(sheet => {
+							this.connected = true;
+							this.sheet = sheet;
+							if (!updateSheetVersion(this.sheet.content)) {
 								this.connected = false;
 								this.cantConnect = true;
+								return;
 							}
+
+							let urlSocket = "/ws/sheet/" + this.sheetId;
+							this.socket = newReSocket(urlSocket, socketOk => {
+								if (!socketOk) {
+									this.connected = false;
+									this.cantConnect = true;
+								}
+							});
 						});
-					} else {
-						this.cantConnect = true;
 					}
-				});
+				})
 		},
 	});
 }

@@ -18,9 +18,7 @@ Vue.component('chat-compo', {
 				return;
 			}
 			let elMsgList = this.$el.querySelector('.chat_message_list');
-			if (elMsgList.clientHeight + elMsgList.scrollTop + 20 >= elMsgList.scrollHeight) {
-				this.scrollMsg = true;
-			}
+			this.scrollMsg = (elMsgList.clientHeight + elMsgList.scrollTop + 50 >= elMsgList.scrollHeight);
 			data.target_ok = true;
 			if (data.target == 'game_master' && !this.identity.gm) {
 				data.target_ok = false;

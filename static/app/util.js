@@ -1,5 +1,8 @@
 let global_elements = {};
 
+const sum2 = (a, b) => a + b;
+
+
 function newReSocket(url_path, connnectCallback) {
 	let socketProtol = location.protocol == 'http:' ? 'ws://' : 'wss://'
 	let url = socketProtol + window.location.host + url_path;
