@@ -1,6 +1,9 @@
 from pathlib import Path
 import yaml
 import copy
+import aiohttp
+
+from api.util import config
 
 CONVERT_TARGET = "1.0.0"
 
@@ -28,22 +31,6 @@ def as_float(n):
 OPTO_SEXS = {'m': 'Masculin', 'f': 'Féminin'}
 OPTO_AL = ['AL?', 'Courte', 'Moyenne', 'Longue', 'Très longue']
 OPTO_DATA_V1 = None
-TECH_QUALS = {
-    'CT_1': 'DE',
-    'CT_2': 'DE',
-    'CT_3': 'AG',
-    'CT_4': 'AG',
-    'CT_5': 'FO',
-    'CT_6': 'FO',
-    'CT_7': 'FO',
-    'CT_9': 'AG/FO',
-    'CT_10': 'FO',
-    'CT_12': 'AG/FO',
-    'CT_13': 'AG/FO',
-    'CT_14': 'DE',
-    'CT_15': 'FO',
-    'CT_16': 'FO',
-}
 
 
 def list_ids_to_dicts(data):
@@ -153,13 +140,33 @@ def load_optolith_data():
         OPTO_DATA_V1 = prepare_data(merge_data(data_en, data_fr, True))
 
 
+async def upload_b64_image(img):
+    if config['imgbb_token'] is None:
+        return None
+    if img.startswith('data:image/'):
+        img = img[img.find(',') + 1:]
+    payload = {
+        "key": config['imgbb_token'],
+        "image": img,
+    }
+    async with aiohttp.ClientSession() as session:
+        async with session.post("https://api.imgbb.com/1/upload",
+                                data=payload) as resp:
+            answer = await resp.json()
+            if answer.get('success', False):
+                url = answer['data']['url']
+                return url
+            else:
+                print('Upload error:', answer)
+
+
 # ========== Conversion ==========
 
 
 def to_roman(n):
     if n == 5:
         return 'V'
-    if n == '4':
+    if n == 4:
         return 'IV'
     return 'I' * n
 
@@ -234,7 +241,7 @@ def is_it_requirement(conf, name):
     return name in requirements
 
 
-def convert_from_optolith_v1(data):
+async def convert_from_optolith_v1(data):
     opto = OPTO_DATA_V1
     personal = data.get("pers", {})
 
@@ -242,8 +249,8 @@ def convert_from_optolith_v1(data):
     for q in data['attr']['values']:
         quals[q['id']] = q['value']
 
-    taille_masse = personal.get("", "") + "pieds / " + personal.get(
-        "", "") + " pierres"
+    taille_masse = personal.get("", "?") + "pieds / " + personal.get(
+        "", "?") + " pierres"
     sexe = OPTO_SEXS.get(data.get("sex", ""), '')
 
     race = opt_get(data['r'])
@@ -269,7 +276,7 @@ def convert_from_optolith_v1(data):
 
     avantages = []
     desavantages = []
-    special_abilities = [f'Connaissance locale ({lieu_origine})']
+    special_abilities = [f'connaissance locale ({lieu_origine})']
     cs_combat, cs_magie, cs_divin = [], [], []
     langues, ecritures = [], []
     for name, conf in data.get('activatable', {}).items():
@@ -361,18 +368,29 @@ def convert_from_optolith_v1(data):
         if 'combatTechnique' in item:
             tech = opto['CombatTechniques'][item['combatTechnique']]
             pi_dice = item['damageDiceNumber']
-            pi_bonus = item['damageFlat']
+            pi_flat = item['damageFlat']
+            tech_quals = tech['primary']
+            vtc = data['ct'].get(item['combatTechnique'], 6)
+            at_val = vtc + max(0, (quals['ATTR_1'] - 8) // 3)
+            prd_val = (vtc + 1) // 2 + max([0] + [(quals[q] - 8) // 3
+                                                  for q in tech_quals])
+            cd_val = vtc + max(0, (quals['ATTR_5'] - 8) // 3)
+
             if 'at' in item:
-                damage_bonus = str(item['primaryThreshold']['threshold'])
+                damage_bonus_palier = item['primaryThreshold']['threshold']
+                pi_bonus = max(
+                    [0] + [quals[q] - damage_bonus_palier for q in tech_quals])
+                pi_bonus_str = '' if pi_bonus <= 0 else ('+' + str(pi_bonus))
+
                 items_melee.append([
                     name,
                     tech['name'],
-                    f"{TECH_QUALS[tech['id']]} {damage_bonus}",
-                    f'{pi_dice}d6+{pi_bonus}',
+                    f"{qual_format(*tech_quals)} {damage_bonus_palier}",
+                    f'{pi_dice}d6+{pi_flat}{pi_bonus_str}',
                     f"{item['at']}/{item['pa']}",
                     OPTO_AL[item['reach']],
-                    0,
-                    0,
+                    at_val + item['at'],
+                    prd_val + item['pa'],
                     weight,
                 ])
             elif 'range' in item:
@@ -380,16 +398,22 @@ def convert_from_optolith_v1(data):
                     name, tech['name'], f'{item["reloadTime"]} assauts',
                     f'{pi_dice}d6+{pi_bonus}', '',
                     f'{item["range"][0]}/{item["range"][1]}/{item["range"][2]}',
-                    0, weight
+                    cd_val, weight
                 ])
         elif 'pro' in item and item['pro'] != 0:
             items_armures.append([
                 name, item['pro'], item['enc'],
-                '-1 VI, -1 INI' if item['pro'] % 2 == 1 else '',
-                item.get('where', ''), weight
+                '-1 VI, -1 INI' if item['pro'] % 2 == 1 else '', '', weight
             ])
         else:
-            items.append([name, weight, ''])
+            items.append([name, weight, item.get('where', '')])
+
+    worn = [None, 0, 0, '', '', 0]
+    if items_armures:
+        for a in items_armures:
+            if worn[0] is None or worn[1] < a[1]:
+                worn = a
+        worn[4] = "Actuellement porté"
 
     cantrips, blessings = [], []
     for can in data.get('cantrips', []):
@@ -460,19 +484,32 @@ def convert_from_optolith_v1(data):
             "image": "",
         }
 
+    avatar = ""
+    if data.get('avatar', None):
+        avatar = await upload_b64_image(data['avatar'])
+        avatar = avatar or ""
+    titre = personal.get('title', '')
+    if titre:
+        titre = ' (' + titre + ')'
+    age = personal.get("age", "")
+    if age:
+        age = str(age) + ' ans'
+
     sheet = {
         "owner":
-        "Importé d'Optolith",
+        "-Importé d'Optolith-",
         "sheetType":
         "ocs-tde",
+        "image":
+        avatar,
         "version":
         CONVERT_TARGET,
         "head": {
-            "nom": data.get("name", ""),
+            "nom": data.get("name", "") + titre,
             "sexe": sexe,
             "peuple": opto['Races'][data['r']]['name'] + peuple_from,
-            "date_naissance": personal.get("", ""),
-            "age": str(personal.get("age", "")),
+            "date_naissance": personal.get("dateofbirth", ""),
+            "age": age,
             "cheveux": haircolor,
             "yeux": eyecolor,
             "taille_masse": taille_masse,
@@ -480,7 +517,7 @@ def convert_from_optolith_v1(data):
             "culture": opto['Cultures'][data['c']]['name'],
             "niveau_social": socialstatus,
             "lieu_naissance": personal.get("placeofbirth", ""),
-            "famille": personal.get("", ""),
+            "famille": personal.get("family", ""),
         },
         "qualites": {
             "co": quals['ATTR_1'],
@@ -770,8 +807,11 @@ def convert_from_optolith_v1(data):
             as_int(data['belongings']['purse']['h']),
             as_int(data['belongings']['purse']['k']),
         ],
-        "other_stuff":
-        "",
+        "etats": {
+            "encombrement": worn[2],
+        },
+        "modifs_qualites":
+        (f'{worn[0].title()} : {worn[3]}' if worn[3] else ""),
         "animal":
         animal,
         "divin": {
@@ -824,14 +864,14 @@ def is_optolith_available():
     return Path("optolith-data/bsconfig.json").is_file()
 
 
-def convert_from_optolith(data):
+async def convert_from_optolith(data):
     if not is_optolith_available():
         raise OptolithConversionError("Optolith data not found")
     if not 'clientVersion' in data:
         raise OptolithConversionError("Wrong format")
 
     if data['clientVersion'].startswith("1."):
-        return convert_from_optolith_v1(data)
+        return await convert_from_optolith_v1(data)
     else:
         raise OptolithConversionError(
             f"Can't convert from version {data['clientVersion']}")

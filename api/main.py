@@ -101,7 +101,7 @@ async def create_sheet(import_data: JsonData):
         raise HTTPException(status_code=501,
                             detail=f"Missing optolith ressources")
     try:
-        return convert_from_optolith(import_data.data)
+        return await convert_from_optolith(import_data.data)
     except OptolithConversionError as e:
         raise HTTPException(status_code=400, detail=str(e))
 

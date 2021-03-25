@@ -2,6 +2,7 @@ import json
 import random
 from decouple import config as env_config
 
+
 class Nothing:
     pass
 
@@ -13,6 +14,7 @@ config = {
     'aws_secret_access_key': env_config('AWS_SECRET_ACCESS_KEY'),
     'region_name': env_config('AWS_REGION_NAME'),
     'github_token': env_config('GIHUB_TOKEN', None),
+    'imgbb_token': env_config('IMGBB_KEY', None),
 }
 
 

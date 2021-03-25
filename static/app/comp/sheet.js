@@ -597,16 +597,19 @@ function create_sheet_component(sheet_template) {
 						ans.json().then(data => {
 							data = mergeDatas(newDefaultSheet(), data);
 							this.sheet = data;
-							alert("Import Optolith OK : il faut compléter les champs manquants (PAV, encombrement, AT/PRD...)");
+							alert("Import Optolith réussi : il faut compléter les champs manquants (Nom du joueur, PAV dépensés)");
 						});
 					} else {
 						ans.json().then(data => {
 							message = '' + data.detail;
 							alert("Erreur lors de l'import d'Optolith : " + message);
 							console.error("error optolith import", data)
+						}).catch(error => {
+							console.error("Error : ", error);
+							alert("Server Error");
 						});
 					}
-				});
+				})
 			},
 			socketListener: function (event, data) {
 				if (data.type == 'notification' && data.on == 'sheet' && data.sheet_id == this.id) {
