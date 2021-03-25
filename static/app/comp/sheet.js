@@ -367,7 +367,7 @@ Vue.component('sheet-table', {
 			}
 		},
 		goToCell: function (iLine, iCol) {
-			console.log(iLine, iCol);
+			// console.debug(iLine, iCol);
 			this.$el.querySelector('.cell_' + iLine + '_' + iCol + ' > *').focus();
 		},
 	},
@@ -555,8 +555,8 @@ function create_sheet_component(sheet_template) {
 				}, 0);
 			},
 			import_sheet: function () {
-				let doit = confirm("Voulez vous vraiment importer une ancienne fiche ? Cela effacera toutes les données de celle-ci");
-				if (doit) {
+				let erase_ok = confirm("Voulez vous vraiment importer une ancienne fiche ? Cela effacera toutes les données de celle-ci");
+				if (erase_ok) {
 					let fileInput = document.createElement("input");
 					fileInput.type = 'file';
 					fileInput.style.display = 'none';
@@ -576,10 +576,37 @@ function create_sheet_component(sheet_template) {
 					};
 					fileInput.func = txt => {
 						let json = JSON.parse(txt);
-						this.sheet = json;
+						if (json.sheetType == "ocs-tde") {
+							this.sheet = json;
+						} else if (json.clientVersion !== undefined) {
+							this.importOptolith(json);
+						} else {
+							alert("Mauvais format !");
+						}
 					};
 					fileInput.click();
 				}
+			},
+			importOptolith: function (json) {
+				fetch("/api/sheet/optolith", {
+					method: 'POST',
+					cache: 'no-cache',
+					body: JSON.stringify({ 'data': json }),
+				}).then(ans => {
+					if (ans.ok) {
+						ans.json().then(data => {
+							data = mergeDatas(newDefaultSheet(), data);
+							this.sheet = data;
+							alert("Import Optolith OK : il faut compléter les champs manquants (PAV, encombrement, AT/PRD...)");
+						});
+					} else {
+						ans.json().then(data => {
+							message = '' + data.detail;
+							alert("Erreur lors de l'import d'Optolith : " + message);
+							console.error("error optolith import", data)
+						});
+					}
+				});
 			},
 			socketListener: function (event, data) {
 				if (data.type == 'notification' && data.on == 'sheet' && data.sheet_id == this.id) {

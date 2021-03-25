@@ -62,7 +62,6 @@ var app = new Vue({
 		importTables: function () {
 			let lines = this.tableImportList.split('\n');
 			let errors = [];
-			console.log(lines);
 			lines.forEach(l => {
 				let parts = l.trim().split(';');
 				if (parts.length == 2 && !this.tables.includes(parts[0])) {
@@ -82,7 +81,6 @@ var app = new Vue({
 		importCharacters: function () {
 			let lines = this.charImportList.split('\n');
 			let errors = [];
-			console.log(lines);
 			lines.forEach(l => {
 				let parts = l.trim().split(';');
 				if (parts.length == 2 && !this.characters.includes(parts[0])) {

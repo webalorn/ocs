@@ -71,8 +71,6 @@ function newDefaultSheet() {
 		"cs": {
 			"generales": "",
 			"combat": "",
-			"magiques": "",
-			"divines": "",
 		},
 		"langues": "",
 		"ecriture": "",
@@ -185,14 +183,14 @@ function newDefaultSheet() {
 			"pv": 0,
 			"pa": 0,
 			"qualites": {
-				"co": 8,
-				"in": 8,
-				"iu": 8,
-				"ch": 8,
-				"de": 8,
-				"ag": 8,
-				"cn": 8,
-				"fo": 8,
+				"co": '8',
+				"in": '8',
+				"iu": '8',
+				"ch": '8',
+				"de": '8',
+				"ag": '8',
+				"cn": '8',
+				"fo": '8',
 			},
 			"tm": 0,
 			"tp": 0,
@@ -549,6 +547,9 @@ function computeRoutine(sheet) {
 */
 
 function updateSheetVersion(sheet) {
+	if (sheet.owner === undefined) {
+		return true; // Not created
+	}
 	if (sheet.version === CUR_VERSION) {
 		// Ok
 	} else if (sheet.version === undefined) {

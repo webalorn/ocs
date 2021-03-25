@@ -476,7 +476,6 @@ Vue.component('reroll-competence', {
 				'bonus': this.bonus,
 				'target': this.target,
 			};
-			console.log(messageDict);
 			this.socket.send_json(messageDict);
 			this.close();
 		},

@@ -375,7 +375,7 @@
 					<div class="champ_in">
 						<label>Écritures</label>
 					</div>
-					<textarea class="s_textarea" v-model="sheet.ecritures"></textarea>
+					<textarea class="s_textarea" v-model="sheet.ecriture"></textarea>
 					<div class="champ_in">
 						<label>Modifications (temporaires) des valeurs</label>
 					</div>
@@ -662,23 +662,23 @@
 					</div>
 					<div class="champ_in">
 						<label>CO</label>
-						<int-input v-model="sheet.animal.qualites.co" style="width: 3em;"></int-input>
+						<input type="text" v-model="sheet.animal.qualites.co" style="width: 3em;"></input>
 						<label>IN</label>
-						<int-input v-model="sheet.animal.qualites.in" style="width: 3em;"></int-input>
+						<input type="text" v-model="sheet.animal.qualites.in" style="width: 3em;"></input>
 						<label>IU</label>
-						<int-input v-model="sheet.animal.qualites.iu" style="width: 3em;"></int-input>
+						<input type="text" v-model="sheet.animal.qualites.iu" style="width: 3em;"></input>
 						<label>CH</label>
-						<int-input v-model="sheet.animal.qualites.ch" style="width: 3em;"></int-input>
+						<input type="text" v-model="sheet.animal.qualites.ch" style="width: 3em;"></input>
 					</div>
 					<div class="champ_in">
 						<label>DE</label>
-						<int-input v-model="sheet.animal.qualites.de" style="width: 3em;"></int-input>
+						<input type="text" v-model="sheet.animal.qualites.de" style="width: 3em;"></input>
 						<label>AG</label>
-						<int-input v-model="sheet.animal.qualites.ag" style="width: 3em;"></int-input>
+						<input type="text" v-model="sheet.animal.qualites.ag" style="width: 3em;"></input>
 						<label>CN</label>
-						<int-input v-model="sheet.animal.qualites.cn" style="width: 3em;"></int-input>
+						<input type="text" v-model="sheet.animal.qualites.cn" style="width: 3em;"></input>
 						<label>FO</label>
-						<int-input v-model="sheet.animal.qualites.fo" style="width: 3em;"></int-input>
+						<input type="text" v-model="sheet.animal.qualites.fo" style="width: 3em;"></input>
 					</div>
 					<div class="champ_in">
 						<label>TM</label>
@@ -695,21 +695,21 @@
 
 					<div class="champ_in">
 						<label>Attaque</label>
-						<input type="text" v-model="sheet.animal.attaque" class="field"></int-input>
+						<input type="text" v-model="sheet.animal.attaque" class="field"></input>
 					</div>
 
 					<div class="champ_in">
 						<label>AT/CD</label>
-						<input type="text" v-model="sheet.animal.atcd" style="width: 4em;"></int-input>
+						<input type="text" v-model="sheet.animal.atcd" style="width: 4em;"></input>
 
 						<label>Défense</label>
-						<input type="text" v-model="sheet.animal.defense" style="width: 4em;"></int-input>
+						<input type="text" v-model="sheet.animal.defense" style="width: 4em;"></input>
 
 						<label>PI</label>
-						<input type="text" v-model="sheet.animal.pi" style="width: 5em;"></int-input>
+						<input type="text" v-model="sheet.animal.pi" style="width: 5em;"></input>
 
 						<label>AL/PO</label>
-						<input type="text" v-model="sheet.animal.alpo" style="width: 6em;"></int-input>
+						<input type="text" v-model="sheet.animal.alpo" style="width: 6em;"></input>
 					</div>
 					<div class="champ_in">
 						<label>Actions</label>
@@ -908,7 +908,7 @@
 					<div class="special_actions">
 						<button v-on:click="export_sheet">Exporter la fiche</button>
 						<br>
-						<button v-on:click="import_sheet">Importer une sauvegarde</button>
+						<button v-on:click="import_sheet">Importer sauvegare / Optolith</button>
 					</div>
 				</div>
 			</div>

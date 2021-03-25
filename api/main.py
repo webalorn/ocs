@@ -10,7 +10,8 @@ from starlette.responses import RedirectResponse
 
 from api.db import get_item, set_item
 from api.chat import *
-from api.util import new_id
+from api.util import new_id, config
+from api.sheet import is_optolith_available, load_optolith_data, convert_from_optolith, OptolithConversionError
 
 from pathlib import Path
 import shutil, os
@@ -19,10 +20,29 @@ app = FastAPI()
 app.mount("/web", StaticFiles(directory="static"), name="static")
 Path("upload").mkdir(parents=True, exist_ok=True)
 
+if not Path("optolith-data").is_dir():
+    Path("optolith-data").mkdir(parents=True, exist_ok=True)
+    if config['github_token'] is not None:
+        os.system(
+            f"git clone https://{config['github_token']}@github.com/elyukai/optolith-data"
+        )
+    else:
+        print("[WARNING] No github token, Optolith import is unavailable")
+
+OPTO_AVAILABLE = is_optolith_available()
+if OPTO_AVAILABLE:
+    load_optolith_data()
+
+# Models
+
 
 class Sheet(BaseModel):
     id: str
     content: dict
+
+
+class JsonData(BaseModel):
+    data: dict
 
 
 class Table(BaseModel):
@@ -75,10 +95,21 @@ async def create_sheet():
     return sheet
 
 
+@app.post("/api/sheet/optolith")
+async def create_sheet(import_data: JsonData):
+    if not OPTO_AVAILABLE:
+        raise HTTPException(status_code=501,
+                            detail=f"Missing optolith ressources")
+    try:
+        return convert_from_optolith(import_data.data)
+    except OptolithConversionError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
 @app.put("/api/table/{table_id}/update")
-async def get_table(tableUpdate: NewTable, table_id: str):
+async def get_table(table_update: NewTable, table_id: str):
     table = await get_item(table_id)
-    table['name'] = tableUpdate.name
+    table['name'] = table_update.name
     await set_item(**table)
     return 'OK'
 

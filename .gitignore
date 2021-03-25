@@ -11,9 +11,4 @@
 .env
 env/
 upload/
-
-netsim/toplevel
-netsim/run
-netsim/compile
-netsim/runproc
-netsim/runclock
+optolith-data/
