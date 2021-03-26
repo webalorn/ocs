@@ -45,7 +45,7 @@ body {
 }
 
 
-button {
+button:not(.simpleButton) {
 	display:inline-block;
 	padding:0.3em 1em;
 	border:0.1em solid #141414;
@@ -59,18 +59,19 @@ button {
 	background: white;
 	outline: none;
 }
-button:hover {
+button:not(.simpleButton):hover {
 	color:#ffffff;
 	background-color:#353535;
 }
-button:disabled {
+button:not(.simpleButton):disabled {
 	font-style: italic;
     background: rgb(163, 163, 163);
     color: black;
     cursor: not-allowed;
 }
-button:focus-visible {
+button:not(.simpleButton):focus-visible {
 	box-shadow: 0px 0px 6px #147aab;
+	background-color: #c9eff3
 }
 
 

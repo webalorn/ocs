@@ -2,6 +2,7 @@
 <html>
 
 <head>
+	<meta charset="UTF-8">
 	<title>Fiche de personnage</title>
 	<link rel="stylesheet" href="css/main.css" />
 	<link rel="stylesheet" href="css/sheet.css" />
@@ -18,7 +19,7 @@
 	<div id="app" style="display: none;">
 		<div v-if="!connected && !cantConnect" class="loading">Loading...</div>
 		<div v-if="!connected && cantConnect" class="error">Error, can't load the character "{{ sheetId }}"</div>
-		<sheet-compo v-if="connected" v-bind:socket="socket" v-bind:id="sheetId">
+		<sheet-compo v-if="connected" v-bind:socket="socket" v-bind:id="sheetId" :ismainapp="true">
 		</sheet-compo>
 	</div>
 

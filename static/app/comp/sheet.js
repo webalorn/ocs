@@ -129,7 +129,7 @@ Vue.component('data-saver', {
 	},
 	template: `
 	<div class='save_state'>
-		<button v-on:click="save">Sauvegarder</button>
+		<button v-on:click="save" title="Raccourci : [s]">Sauvegarder</button>
 		<br>
 		<span v-if="manager.saving" class='save_saving'>Sauvegarde....</span>
 		<span v-if="!manager.saving && manager.saveError" class='save_error'>Erreur de sauvegarde</span>
@@ -368,7 +368,37 @@ Vue.component('sheet-table', {
 		},
 		goToCell: function (iLine, iCol) {
 			// console.debug(iLine, iCol);
-			this.$el.querySelector('.cell_' + iLine + '_' + iCol + ' > *').focus();
+			let el = this.$el.querySelector('.cell_' + iLine + '_' + iCol + ' > *');
+			if (el) {
+				el.focus();
+				return el;
+			}
+			return null;
+		},
+		onKeyAction: function (event, iLine, iCol) {
+			let active = event.target;
+			if (event.key == "ArrowDown") {
+				this.goToCell(iLine + 1, iCol);
+			}
+			else if (event.key == "ArrowUp") {
+				this.goToCell(iLine - 1, iCol);
+			}
+			else if (event.key == "ArrowLeft" && active.selectionStart == 0) {
+				let el = this.goToCell(iLine, iCol - 1);
+				if (el) {
+					setTimeout(() => {
+						el.setSelectionRange(el.value.length, el.value.length);
+					}, 0);
+				}
+			}
+			else if (event.key == "ArrowRight" && active.selectionStart == active.value.length) {
+				let el = this.goToCell(iLine, iCol + 1);
+				if (el) {
+					setTimeout(() => {
+						el.setSelectionRange(0, 0);
+					}, 0);
+				}
+			}
 		},
 	},
 	beforeUpdate: function () {
@@ -385,7 +415,8 @@ Vue.component('sheet-table', {
 		<tr v-for="(line, iline) in data"
 			v-on:keydown.enter="insertLine(iline)" v-on:keydown.backspace="delIfEmptySet(iline)"
 			v-on:keyup.backspace="delIfEmptyDo(iline)">
-			<td v-for="(val, ival) in line" v-bind:data-tooltip="[ival in tooltips[iline] ? tooltips[iline][ival] : '']" :class="'cell_' + iline + '_' + ival">
+			<td v-for="(val, ival) in line" v-bind:data-tooltip="[ival in tooltips[iline] ? tooltips[iline][ival] : '']" :class="'cell_' + iline + '_' + ival"
+			v-on:keydown="onKeyAction($event, iline, ival)">
 				<input type="text" v-model.trim="line[ival]" v-if="schema[ival] == 'str'" />
 				<int-input v-model.number="line[ival]" v-if="schema[ival] == 'int'" />
 			</td>
@@ -425,7 +456,7 @@ Vue.component('show-table', {
 */
 function create_sheet_component(sheet_template) {
 	Vue.component('sheet-compo', {
-		props: ['socket', 'id'],
+		props: ['socket', 'id', 'ismainapp'],
 		data: function () {
 			return {
 				loaded: false,
@@ -458,6 +489,14 @@ function create_sheet_component(sheet_template) {
 						});
 					}
 				});
+			if (this.ismainapp) {
+				document.addEventListener("keydown", event => {
+					if (event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLInputElement) {
+						return;
+					}
+					this.onKeydown(event);
+				});
+			}
 		},
 		computed: {
 			avatarStyle: function () {
@@ -614,6 +653,27 @@ function create_sheet_component(sheet_template) {
 			socketListener: function (event, data) {
 				if (data.type == 'notification' && data.on == 'sheet' && data.sheet_id == this.id) {
 					this.saveManager.remoteUpdate(data.new_data.content)
+				}
+			},
+			onKeydown: function (event) {
+				switch (event.key) {
+					case '1': this.active_view = 'character'; break;
+					case '2': this.active_view = 'stats'; break;
+					case '3': this.active_view = 'fight'; break;
+					case '4': this.active_view = 'stuff'; break;
+					case '5':
+						if (this.deriv.stats.ea != 0) this.active_view = 'magic';
+						else if (this.deriv.stats.ek != 0) this.active_view = 'gods';
+						else this.active_view = 'notes';
+						break;
+					case '6':
+						if (this.deriv.stats.ek != 0) {
+							this.active_view = 'gods';
+							break;
+						}
+					case '7': this.active_view = 'notes'; break;
+					case 's': this.saveManager.pushSave(); break;
+					case 'e': this.export_sheet(); break;
 				}
 			},
 			tooltipForSpell: tooltipForSpell,

@@ -12,7 +12,8 @@
 .sheet input[type="text"]:focus, .sheet input[type="number"]:focus {
 	border: none;
 	outline: 1px solid black;
-    background: #f3f3f3;
+    /* background: #f3f3f3; */
+	background: white;
 }
 
 .sheet textarea {
@@ -179,16 +180,22 @@
 	background-color: grey;
 	border-right: 2px solid black;
 }
-.s_sidebar > div {
+.s_sidebar > button {
+	border: none;
+    color: black;
 	width: 90px;
 	height: 90px;
+	background-color: transparent;
 	background-size: 70px;
     background-repeat: no-repeat;
     background-position: 10px;
 	cursor: pointer;
 	outline: 2px solid black;
 }
-.s_sidebar > div:hover {
+.s_sidebar > button:focus-visible {
+	background-color: #b9ddea;
+}
+.s_sidebar > *:hover {
 	background-color: #ada7a7;
 }
 .s_sidebar_character { background-image: url('/web/images/character.png'); }
@@ -275,6 +282,7 @@
 .s_table th {
 	text-align: left;
 	border: 1px solid black;
+	word-break: break-all;
 }
 .s_table td {
 	font-size: small;

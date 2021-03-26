@@ -40,13 +40,15 @@
 	</div>
 	<div class="s_body">
 		<div class="s_sidebar scrollable">
-			<div class="s_sidebar_character" v-on:click="active_view='character';"></div>
-			<div class="s_sidebar_stats" v-on:click="active_view='stats';"></div>
-			<div class="s_sidebar_fight" v-on:click="active_view='fight';"></div>
-			<div class="s_sidebar_stuff" v-on:click="active_view='stuff';"></div>
-			<div class="s_sidebar_magic" v-if="deriv.stats.ea != 0" v-on:click="active_view='magic';"></div>
-			<div class="s_sidebar_gods" v-if="deriv.stats.ek != 0" v-on:click="active_view='gods';"></div>
-			<div class="s_sidebar_notes" v-on:click="active_view='notes';"></div>
+			<button class="s_sidebar_character simpleButton" v-on:click="active_view='character';"></button>
+			<button class="simpleButton s_sidebar_stats" v-on:click="active_view='stats';"></button>
+			<button class="simpleButton s_sidebar_fight" v-on:click="active_view='fight';"></button>
+			<button class="simpleButton s_sidebar_stuff" v-on:click="active_view='stuff';"></button>
+			<button class="simpleButton s_sidebar_magic" v-if="deriv.stats.ea != 0"
+				v-on:click="active_view='magic';"></button>
+			<button class="simpleButton s_sidebar_gods" v-if="deriv.stats.ek != 0"
+				v-on:click="active_view='gods';"></button>
+			<button class="simpleButton s_sidebar_notes" v-on:click="active_view='notes';"></button>
 		</div>
 
 		<div class="s_main_area scrollable" v-if="active_view == 'character'">
@@ -655,10 +657,10 @@
 						<input type="text" v-model="sheet.animal.type" style="width: 12em;" />
 
 						<label>PV</label>
-						<int-input v-model="sheet.animal.pv" style="width: 3em;"></int-input>
+						<input type="text" v-model="sheet.animal.pv" style="width: 3em;"></input>
 
 						<label>PA</label>
-						<int-input v-model="sheet.animal.pa" style="width: 3em;"></int-input>
+						<input type="text" v-model="sheet.animal.pa" style="width: 3em;"></input>
 					</div>
 					<div class="champ_in">
 						<label>CO</label>
@@ -682,15 +684,15 @@
 					</div>
 					<div class="champ_in">
 						<label>TM</label>
-						<int-input v-model="sheet.animal.tm" style="width: 3em;"></int-input>
+						<input type="text" v-model="sheet.animal.tm" style="width: 3em;"></input>
 						<label>TP</label>
-						<int-input v-model="sheet.animal.tp" style="width: 3em;"></int-input>
+						<input type="text" v-model="sheet.animal.tp" style="width: 3em;"></input>
 						<label>PR</label>
-						<int-input v-model="sheet.animal.pr" style="width: 3em;"></int-input>
+						<input type="text" v-model="sheet.animal.pr" style="width: 3em;"></input>
 						<label>INI</label>
-						<int-input v-model="sheet.animal.ini" style="width: 3em;"></int-input>
+						<input type="text" v-model="sheet.animal.ini" style="width: 3em;"></input>
 						<label>VI</label>
-						<int-input v-model="sheet.animal.vi" style="width: 3em;"></int-input>
+						<input type="text" v-model="sheet.animal.vi" style="width: 3em;"></input>
 					</div>
 
 					<div class="champ_in">
@@ -713,7 +715,7 @@
 					</div>
 					<div class="champ_in">
 						<label>Actions</label>
-						<input type="text" v-model="sheet.animal.actions" class="field"></int-input>
+						<input type="text" v-model="sheet.animal.actions" class="field"></input>
 					</div>
 
 					<div class="champ_in">
@@ -906,7 +908,7 @@
 					</div>
 					<textarea class="s_textarea" v-model="sheet.notes.background" style="min-height: 20em;"></textarea>
 					<div class="special_actions">
-						<button v-on:click="export_sheet">Exporter la fiche</button>
+						<button v-on:click="export_sheet" title="Raccourci : [e]">Exporter la fiche</button>
 						<br>
 						<button v-on:click="import_sheet">Importer sauvegarde / Optolith</button>
 					</div>

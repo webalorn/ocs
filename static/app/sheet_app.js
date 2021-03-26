@@ -1,4 +1,4 @@
-var app = null;
+let app = null;
 
 function build_app() {
 	document.getElementById("app").setAttribute("style", "");

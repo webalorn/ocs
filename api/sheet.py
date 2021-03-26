@@ -254,7 +254,7 @@ async def convert_from_optolith_v1(data):
     sexe = OPTO_SEXS.get(data.get("sex", ""), '')
 
     race = opt_get(data['r'])
-    base_ev = race['lp'] - data['attr']['permanentLP']['lost']
+    base_ev = race['lp']
     bonus_ev, bonus_ea, bonus_ek, bonus_tm, bonus_tp, bonus_esq, bonus_ini, bonus_vi = 0, 0, 0, 0, 0, 0, 0, 0
     ea_val, ek_val = 0, 0
     ea_qual, ek_qual = '', ''
@@ -354,6 +354,11 @@ async def convert_from_optolith_v1(data):
                 divin_trad = karmic_sa['name']
         else:
             print("Unknown : ", name)
+
+    if data['attr']['permanentLP']['lost']:
+        perte = data['attr']['permanentLP']['lost']
+        bonus_ev -= perte
+        desavantages.append(f"Perte permanente d'énergie vitale : -{perte}PV")
 
     items = []
     items_melee = []
@@ -456,8 +461,8 @@ async def convert_from_optolith_v1(data):
         animal = { # TODO
             "nom": pet.get('name', ''),
             "type": pet.get('type', ''),
-            "pv": as_int(pet.get('lp', '0')),
-            "pa": as_int(pet.get('ae', '0')),
+            "pv": pet.get('lp', '0'),
+            "pa": pet.get('ae', '0'),
             "qualites": {
                 "co": pet.get('cou', '0'),
                 "in": pet.get('sgc', '0'),
@@ -468,17 +473,17 @@ async def convert_from_optolith_v1(data):
                 "cn": pet.get('con', '0'),
                 "fo": pet.get('str', '0'),
             },
-            "tm": as_int(pet.get('spi', '0')),
-            "tp": as_int(pet.get('tou', '0')),
-            "pr": as_int(pet.get('pro', '0')),
-            "ini": as_int(pet.get('ini', '0')),
-            "vi": as_int(pet.get('vi', '0')),
+            "tm": pet.get('spi', '0'),
+            "tp": pet.get('tou', '0'),
+            "pr": pet.get('pro', '0'),
+            "ini": pet.get('ini', '0'),
+            "vi": pet.get('vi', '0'),
             "attaque": pet.get('attack', ''),
             "atcd": pet.get('at', ''),
             "defense": pet.get('pa', ''),
             "pi": pet.get('dp', ''),
             "alpo": pet.get('reach', ''),
-            "action": pet.get('actions', ''),
+            "actions": pet.get('actions', ''),
             "cs": f"Talents : {pet.get('talents', '')}\nCapacités spéciales : {pet.get('skills', '')}",
             "notes": f"Taille : {pet.get('size', '-')}\nPAV dépensés : {pet.get('spentAp', '0')}/{pet.get('totalAp', '0')}\n\nNotes : {pet.get('notes', '-')}",
             "image": "",
