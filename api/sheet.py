@@ -431,10 +431,10 @@ async def convert_from_optolith_v1(data):
         spell = opt_get(name)
         spells.append([
             spell['name'],
-            qual_format(spell['check1'], spell['check2'], spell['check3']),
-            str(vc), spell['aeCostShort'], spell['durationShort'],
-            spell['rangeShort'], spell['castingTimeShort'], '', spell['ic'],
-            spell['effect'], ''
+            qual_format(spell.get('check1', ''), spell.get('check2', ''), spell.get('check3', '')),
+            str(vc), spell.get('aeCostShort', ''), spell.get('durationShort', ''),
+            spell.get('rangeShort', ''), spell.get('castingTimeShort', ''), '', spell.get('ic', ''),
+            spell.get('effect', ''), ''
         ])
 
     liturgies = []
@@ -442,10 +442,10 @@ async def convert_from_optolith_v1(data):
         lit = opt_get(name)
         liturgies.append([
             lit['name'],
-            qual_format(lit['check1'], lit['check2'], lit['check3']),
-            str(vc), lit['kpCostShort'], lit['durationShort'],
-            lit['rangeShort'], lit['castingTimeShort'], '', lit['ic'],
-            lit['effect'], ''
+            qual_format(lit.get('check1', ''), lit.get('check2', ''), lit.get('check3', '')),
+            str(vc), lit.get('kpCostShort', ''), lit.get('durationShort', ''),
+            lit.get('rangeShort', ''), lit.get('castingTimeShort', ''), '', lit.get('ic', ''),
+            lit.get('effect', ''), ''
         ])
 
     ea_achat = (data['attr'].get('ae', 0) -

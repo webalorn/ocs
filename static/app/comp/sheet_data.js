@@ -548,6 +548,10 @@ function computeRoutine(sheet) {
 
 function updateSheetVersion(sheet) {
 	if (sheet.owner === undefined) {
+		let new_sheet = newDefaultSheet();
+		for (const prop in new_sheet) {
+			sheet[prop] = new_sheet[prop];
+		}
 		return true; // Not created
 	}
 	if (sheet.version === CUR_VERSION) {

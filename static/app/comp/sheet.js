@@ -667,7 +667,7 @@ function create_sheet_component(sheet_template) {
 						else this.active_view = 'notes';
 						break;
 					case '6':
-						if (this.deriv.stats.ek != 0) {
+						if (this.deriv.stats.ea != 0 && this.deriv.stats.ek != 0) {
 							this.active_view = 'gods';
 							break;
 						}

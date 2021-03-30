@@ -47,6 +47,8 @@ var app = new Vue({
 							let id = data['id'];
 							this.tables.push(id);
 							storage_add('tables', id);
+							storage_set_in_dict('idToName', id, table_name);
+							this.idToName[id] = table_name;
 							let url = '/web/table.html?table=' + id + '&gm=' + miniHash(id);
 							window.open(url, '_blank');
 						});
