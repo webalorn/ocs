@@ -429,6 +429,13 @@ th.inrc_qual {
 	background: rgb(231, 206, 243);
 }
 
+input.inrc_roll_name {
+	text-align: left;
+    width: 12em;
+    height: 1.6em;
+    margin-right: 1em;
+}
+
 
 .reroll_comp_view input {
 	background: #c5c5c5;
@@ -468,6 +475,57 @@ th.inrc_qual {
     box-shadow: 0 0px 6px 0px rgb(99, 97, 12);
 	background-color: #8dc573;
 	opacity: 1;
+}
+
+/*
+	Roll options
+*/
+
+.roll_config {
+	margin-bottom: 1em;
+	text-align: center;
+}
+
+.switch_radio input[type="radio"] {
+	display: none;
+}
+.switch_radio {
+	background: #fafafa;
+    display: inline-block;
+    border: 2px solid gray;
+    padding: 3px;
+	/* font-size: 0rem; */
+	border-radius: 5rem;
+}
+.switch_radio label {
+    padding: 0.4em;
+    display: inline-block;
+    border-radius: 2rem;
+    font-size: 1rem;
+    border: 1px solid gray;
+	cursor: pointer;
+	/* font-weight: bold; */
+}
+.switch_radio label:hover {
+    background: black!important;
+	color: white;
+	border-color: white;
+	/* opacity: 0.7; */
+}
+.switch_radio input[type="radio"]:checked+label {
+	background-color: blue;
+	border-color: black;
+}
+#roll_target_self:checked+label {
+	/* background-color: rgb(211, 211, 211); */
+	background: rgb(255 203 203)
+}
+#roll_target_gm:checked+label {
+	background-color: rgb(231, 206, 243);
+}
+#roll_target_all:checked+label {
+	/* background-color: white; */
+	background: #daf8fd;
 }
 
 /*

@@ -29,12 +29,31 @@
 				<button v-on:click="open_sheet" v-if="!identity.gm" class="top_edit_sheet">Voir ma fiche</button>
 				<span class="top_table_name">{{ tableName }}</span>
 			</div>
-			<jet-competence v-if="!reroll_comp.dice" v-bind:socket="socket" v-bind:identity="identity"></jet-competence>
+			<jet-competence v-if="!reroll_comp.dice" v-bind:socket="socket" v-bind:identity="identity"
+				v-bind:config="roll"></jet-competence>
 
 			<reroll-competence v-if="reroll_comp.dice" v-bind:socket="socket" v-bind:identity="identity"
 				v-bind:reroll_comp="reroll_comp"></reroll-competence>
 
-			<jet-fight v-bind:socket="socket" v-bind:identity="identity"></jet-fight>
+			<div class="roll_config">
+				<div class="roll_target switch_radio">
+					<!-- <option value="self">Jet caché</option>
+					<option value="game_master">Jet derrière l'écran</option>
+					<option value="all">Jet public</option> -->
+					<input type="radio" id="roll_target_self" v-model="roll.target" name="roll_target" value="self">
+					<label for="roll_target_self">Jet caché</label>
+
+					<input type="radio" id="roll_target_gm" v-model="roll.target" name="roll_target"
+						value="game_master">
+					<label for="roll_target_gm">Jet derrière l'écran</label>
+
+					<input type="radio" id="roll_target_all" v-model="roll.target" name="roll_target" value="all">
+					<label for="roll_target_all">Jet public</label>
+				</div>
+				<br>
+			</div>
+
+			<jet-fight v-bind:socket="socket" v-bind:identity="identity" v-bind:config="roll"></jet-fight>
 
 			<sheet-short-view v-for="id in characters" v-bind:key="id" v-bind:table="tableId" v-bind:identity="identity"
 				v-bind:id="id" v-bind:socket="socket" v-bind:isgm="identity.gm">

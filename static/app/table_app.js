@@ -17,6 +17,9 @@ var app = new Vue({
 		newPlayerId: "",
 		tableName: "",
 		newTableName: "",
+		roll: {
+			target: "all",
+		},
 	},
 	methods: {
 		open_sheet: function () {

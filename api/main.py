@@ -226,6 +226,7 @@ async def websocket_endpoint(websocket: WebSocket, table_id: str):
                         send_message['target'] = message['target']
                     else:
                         send_message['target'] = 'all'
+                send_message['roll_name'] = message.get('roll_name', '')
                 # if send_message.get('target', None) == 'self':
                 #     await websocket.send_json(send_message)
                 # else:

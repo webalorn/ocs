@@ -170,7 +170,8 @@ Vue.component('chat-compo', {
 							<span v-if="m.bonus > 0">+{{m.bonus}}</span>
 							<span v-if="m.bonus < 0">{{m.bonus}}</span>
 							<span v-if="m.bonus == 0">±0</span>
-							<span class="chat_roll_on_desc">({{m.on}})</span>
+							<span class="chat_roll_on_desc" v-if="m.roll_name.trim()">({{m.roll_name}} [{{m.vc}}])</span>
+							<span class="chat_roll_on_desc" v-else>({{m.on}} [{{m.vc}}])</span>
 						</div>
 						<div>
 							<div v-for="q in [m.q1, m.q2, m.q3]" class="comp_qual_dice" v-bind:class="['rolled_' + q.dice, {comp_dice_can_reroll : m.from == identity.id}, {comp_dice_kept : !q.roll}]" v-on:click="reroll_comp_trigger(m)"><span class="chat_dice_p1">{{ q.dice }}</span></div>

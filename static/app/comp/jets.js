@@ -116,7 +116,7 @@ function probaString(p) {
 }
 
 Vue.component('jet-competence', {
-	props: ['socket', 'identity'],
+	props: ['socket', 'identity', 'config'],
 	data: function () {
 		return {
 			quals: {
@@ -132,6 +132,7 @@ Vue.component('jet-competence', {
 			showTalentSelect: false,
 			talentLists: talentLists,
 			showBonuses: false,
+			rollName: '',
 		};
 	},
 	computed: {
@@ -153,7 +154,7 @@ Vue.component('jet-competence', {
 		},
 	},
 	methods: {
-		send: function (target) {
+		send: function () {
 			let messageDict = {
 				'type': 'competence',
 				'from': this.identity.id,
@@ -164,10 +165,9 @@ Vue.component('jet-competence', {
 				'on': `${this.quals.select1 ? this.quals.select1.toUpperCase() : '-'}/${this.quals.select2 ? this.quals.select2.toUpperCase() : '-'}/${this.quals.select3 ? this.quals.select3.toUpperCase() : '-'}`,
 				'vc': this.vc,
 				'bonus': this.bonus,
+				'target': this.config.target,
+				'roll_name': this.rollName,
 			};
-			if (target) {
-				messageDict.target = target;
-			}
 			this.socket.send_json(messageDict);
 		},
 		send_routine: function () {
@@ -177,6 +177,7 @@ Vue.component('jet-competence', {
 					'from': this.identity.id,
 					'from_name': this.identity.name,
 					'nr': this.nr_routine,
+					'target': this.config.target,
 				};
 				this.socket.send_json(messageDict);
 			}
@@ -187,7 +188,7 @@ Vue.component('jet-competence', {
 		toogleBonusView: function () {
 			this.showBonuses = !this.showBonuses;
 		},
-		selectTalent: function (rollOn, vc) {
+		selectTalent: function (rollOn, vc, name) {
 			let quals = rollOn.toLowerCase().split("/");
 			this.vc = vc;
 			this.quals.qual1 = this.identity.sheet.qualites[quals[0]];
@@ -197,6 +198,7 @@ Vue.component('jet-competence', {
 			this.quals.select2 = quals[1];
 			this.quals.select3 = quals[2];
 			this.showTalentSelect = false;
+			this.rollName = name;
 			// this.bonus = 0;
 		},
 	},
@@ -224,8 +226,7 @@ Vue.component('jet-competence', {
 			<span v-if="nr_routine!=0">NR = {{nr_routine}}</span>
 		</div>
 		<div class="inrc_actions inrc_actions_2">
-			<button class="inrc_send hidden_roll" v-on:click="send('self')">Jet caché</button>
-			<button class="inrc_send screen_roll" v-on:click="send('game_master')">Jet derrière l'écran</button>
+			<input class="inrc_roll_name" v-model.trim="rollName" placeholder="Jet de..." />
 			<button class="inrc_send" v-on:click="send">Effectuer le jet</button>
 		</div>
 
@@ -391,7 +392,7 @@ Vue.component('inrc-selector-talent', {
 	},
 	methods: {
 		select: function () {
-			this.eventFct(this.infos.roll, this.talent.vc);
+			this.eventFct(this.infos.roll, this.talent.vc, this.infos.name);
 		},
 	},
 	template: `
@@ -416,7 +417,7 @@ Vue.component('select-spell-item', {
 	methods: {
 		select: function () {
 			if (this.qualsOk) {
-				this.eventFct(this.roll, this.vc);
+				this.eventFct(this.roll, this.vc, this.name);
 			} else {
 				alert(`Erreur : "${this.roll}" n'a pas le bon format pour l'épreuve de talent (Q1/Q2/Q3)`);
 			}
@@ -508,7 +509,12 @@ Vue.component('reroll-competence', {
 			<div class="dice_reroll_ask" v-bind:class="{dice_for_reroll : reroll3}" v-on:click="reroll3 = !reroll3">{{ dice3 }}</div>
 		</div>
 		<div class="inrc_actions">
-			<button class="inrc_send" v-on:click="send" v-bind:disabled="!(reroll1 || reroll2 || reroll3)">Relancer les dés</button>
+			<button class="inrc_send" v-on:click="send" v-bind:disabled="!(reroll1 || reroll2 || reroll3)">
+				Relancer les dés
+				{{ target == 'self' ? "(jet caché)"
+					: (target == 'game_master' ? "(derrière l'écran)"
+					: "(jet public)")}}
+			</button>
 			<button class="inrc_send" v-on:click="close">Annuler</button>
 		</div>
 	</div>`
@@ -519,7 +525,7 @@ Vue.component('reroll-competence', {
 */
 
 Vue.component('jet-fight', {
-	props: ['socket', 'identity'],
+	props: ['socket', 'identity', 'config'],
 	data: function () {
 		return {
 			ini: 12,
@@ -539,6 +545,7 @@ Vue.component('jet-fight', {
 				'from': this.identity.id,
 				'from_name': this.identity.name,
 				'roll': this.ini + '+1d6',
+				'target': this.config.target,
 			});
 		},
 		sendAttack: function () {
@@ -547,6 +554,7 @@ Vue.component('jet-fight', {
 				'from': this.identity.id,
 				'from_name': this.identity.name,
 				'roll': this.at + this.modif_at,
+				'target': this.config.target,
 			});
 		},
 		sendDmg: function () {
@@ -555,6 +563,7 @@ Vue.component('jet-fight', {
 				'from': this.identity.id,
 				'from_name': this.identity.name,
 				'roll': '' + this.damages,
+				'target': this.config.target,
 			});
 		},
 		sendPrd: function () {
@@ -563,6 +572,7 @@ Vue.component('jet-fight', {
 				'from': this.identity.id,
 				'from_name': this.identity.name,
 				'roll': this.prd,
+				'target': this.config.target,
 			});
 		},
 		sendEsq: function () {
@@ -571,6 +581,7 @@ Vue.component('jet-fight', {
 				'from': this.identity.id,
 				'from_name': this.identity.name,
 				'roll': this.esq,
+				'target': this.config.target,
 			});
 		},
 		toogleAttackView: function () {
