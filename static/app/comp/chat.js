@@ -135,6 +135,7 @@ Vue.component('chat-compo', {
 			<div class="chat_message" v-for='m in messages' v-bind:class="{chat_message_self : m.from == identity.id}">
 				<div class="chat_message_name" v-if="m.type != 'error'">
 					<span class="chat_message_user">{{ m.from_name }}</span>
+					<span class="chat_message_time">[{{ m.time }}]</span>
 					<span v-if="m.target=='game_master'" class="msg_only_gm">(Jet derrière l'écran)</span>
 					<span v-if="m.target=='self'" class="msg_only_self">(Jet secret)</span>
 				</div>

@@ -15,6 +15,7 @@ from api.sheet import is_optolith_available, load_optolith_data, convert_from_op
 
 from pathlib import Path
 import shutil, os
+from datetime import datetime
 
 app = FastAPI()
 app.mount("/web", StaticFiles(directory="static"), name="static")
@@ -227,6 +228,7 @@ async def websocket_endpoint(websocket: WebSocket, table_id: str):
                     else:
                         send_message['target'] = 'all'
                 send_message['roll_name'] = message.get('roll_name', '')
+                send_message['time'] = datetime.now().strftime("%H:%M")
                 # if send_message.get('target', None) == 'self':
                 #     await websocket.send_json(send_message)
                 # else:

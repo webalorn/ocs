@@ -724,30 +724,7 @@ button.rfight_esq:not(:hover) {
 	background: rgb(202 184 169);
     color: #464646;
 }
-.select_win h4 {
-	font-family: fantasy;
-	margin-bottom: 0px;
-	margin-left: 5px;
-	text-align: left;
-}
-.select_win h3 {
-	text-align: left;
-}
-.select_win ul {
-	margin: 0px;
-    padding-left: 20px;
-    list-style: none;
-	text-align: left;
-}
-.select_win li {
-	border-bottom: 1px solid #a99f7e;
-    margin-bottom: 2px;
-}
-.select_win ul li em {
-	float: right;
-    font-weight: bold;
-    font-style: normal;
-}
+
 .bonusesWin {
 	width: 800px;
 }

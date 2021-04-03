@@ -296,6 +296,18 @@
 .s_table input.input_text_int {
 	text-align: center;
 }
+button.s_table_edit {
+	background-image: url("/web/images/edit.png");
+	background-size: 90% 90%;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 1.4em;
+    height: 1.4em;
+    padding: 0px;
+}
+button.s_table_edit:hover {
+	background-color: #97efff;
+}
 
 
 /* Expand table */
@@ -555,28 +567,32 @@
 	width: 5em;
 }
 .magic_table td:nth-child(3), .magic_table th:nth-child(3) {
-	width: 1.5em;
+	width: 2em;
 }
 .magic_table td:nth-child(4), .magic_table th:nth-child(4) {
-	width: 4em;
+	width: 6em;
 }
 .magic_table td:nth-child(5), .magic_table th:nth-child(5) {
-	width: 5em;
+	width: 6em;
 }
 .magic_table td:nth-child(6), .magic_table th:nth-child(6) {
-	width: 5em;
+	width: 6em;
 }
 .magic_table td:nth-child(7), .magic_table th:nth-child(7) {
-	width: 5em;
+	width: 6em;
 }
 .magic_table td:nth-child(8), .magic_table th:nth-child(8) {
-	width: 5em;
+	width: 6em;
 }
 .magic_table td:nth-child(9), .magic_table th:nth-child(9) {
 	width: 1.5em;
 }
-.magic_table td:nth-child(11), .magic_table th:nth-child(11) {
+.magic_table td:nth-child(9) > input {
+	text-align: center;
+}
+.magic_table td:nth-child(10), .magic_table th:nth-child(10) {
 	width: 2em;
+	text-align: center;
 }
 
 .magic_table_display td:nth-child(4), .magic_table_display th:nth-child(4) {
@@ -594,4 +610,10 @@
 .special_actions button {
 	display: inline-block;
 	margin-top: 0.5em;
+}
+
+.spell_edit_win input[type="text"] {
+	width: 95%;
+	text-align: center;
+	background: #ffffff8a;
 }

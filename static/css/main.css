@@ -157,12 +157,37 @@ button:not(.simpleButton):focus-visible {
 	vertical-align:top;
 	text-align: left;
 }
+.select_win h4 {
+	margin: 1em 0em;
+	font-family: fantasy;
+	margin-bottom: 0px;
+	margin-left: 5px;
+	text-align: left;
+}
 .select_win h3 {
 	margin: 0.5em 0em;
 	border-bottom: 1px solid rgb(123, 82, 54);
 	font-family: fantasy;
+	text-align: left;
 }
-.select_win h4 {
-	margin: 1em 0em;
-	/* font-family: fantasy; */
+.select_win ul {
+	margin: 0px;
+    padding-left: 20px;
+    list-style: none;
+	text-align: left;
+}
+.select_win li {
+	border-bottom: 1px solid #a99f7e;
+    margin-bottom: 2px;
+}
+.select_win ul li em {
+	float: right;
+    font-weight: bold;
+    font-style: normal;
+}
+
+button.centerButton:not(.simpleButton) {
+	display: block;
+	margin: auto;
+	text-align: center;
 }

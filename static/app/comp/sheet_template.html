@@ -448,7 +448,7 @@
 						<label>Armes de mêlée</label>
 					</div>
 					<sheet-table v-bind:schema="['str', 'str', 'str', 'str', 'str', 'str', 'int', 'int', 'int']"
-						v-bind:data="sheet.armes.melee"
+						:key="'s_table_armes'" v-bind:data="sheet.armes.melee"
 						v-bind:titles="['Arme', 'Technique', 'Bonus PI', 'PI', 'AT/PRD Mod', 'Allonge', 'AT', 'PRD', 'Masse']"
 						class="weapon_table"></sheet-table>
 
@@ -456,14 +456,14 @@
 						<label>Armes de combat à distance</label>
 					</div>
 					<sheet-table v-bind:schema="['str', 'str', 'str', 'str', 'str', 'str', 'int', 'int']"
-						v-bind:data="sheet.armes.distance"
+						:key="'s_table_distance'" v-bind:data="sheet.armes.distance"
 						v-bind:titles="['Arme', 'Technique', 'Durée de charg.', 'PI', 'Munitions', 'Portée', 'CD', 'Masse']"
 						class="weapon_table dist_weapon"></sheet-table>
 
 					<div class="champ_in">
 						<label>Armures</label>
 					</div>
-					<sheet-table v-bind:schema="['str', 'int', 'int', 'str', 'str', 'int']"
+					<sheet-table v-bind:schema="['str', 'int', 'int', 'str', 'str', 'int']" :key="'s_table_arures'"
 						v-bind:data="sheet.armes.armures"
 						v-bind:titles="['Armure', 'PR', 'ENC', 'Malus supp.', 'Voyage, combat', 'Masse']"
 						class="table_armures"></sheet-table>
@@ -472,6 +472,7 @@
 						<label>Boucliers / Armes de parade</label>
 					</div>
 					<sheet-table v-bind:schema="['str', 'int', 'str', 'int']" v-bind:data="sheet.armes.parade"
+						:key="'s_table_parade'"
 						v-bind:titles="['Bouclier / Arme', 'Pts de struc.', 'AT/PRD mod.', 'Masse']"
 						class="table_boucliers">
 					</sheet-table>
@@ -592,7 +593,8 @@
 					</div>
 
 					<sheet-table v-bind:schema="['str', 'int', 'str']" v-bind:data="sheet.stuff"
-						v-bind:titles="['Article', 'Masse', 'Où est-il rangé ?']" class="stuff_table"></sheet-table>
+						v-bind:titles="['Article', 'Masse', 'Où est-il rangé ?']" class="stuff_table"
+						:key="'s_table_sac'"></sheet-table>
 
 					<br>
 					<div class="champ_in">
@@ -744,20 +746,12 @@
 						<label>Liste des sorts</label>
 					</div>
 					<br>
-					<show-table v-bind:data="sheet.sorts"
-						v-bind:titles="['Sort/Rituel', 'Épreuve', 'VC', 'Coût', 'Durée', 'Portée', 'Durée incantation', 'Domaine', 'am', 'Effets', 'p.']"
-						class="magic_table magic_table_display"></show-table>
-
-					<br>
-					<div class="champ_in">
-						<label>Modifier la liste des sorts (affichage condensé)</label>
-					</div>
-					<br>
-					<sheet-table
+					<sheet-table :key="'s_table_sorts'"
 						v-bind:schema="['str', 'str', 'int', 'str', 'str', 'str', 'str', 'str', 'str', 'str', 'str']"
-						v-bind:data="sheet.sorts"
-						v-bind:titles="['Sort/Rituel', 'Épreuve', 'VC', 'Coût', 'Durée', 'Portée', 'Durée incantation', 'Domaine', 'am', 'Effets', 'p.']"
-						v-bind:tooltipsFct="tooltipForSpell" class="magic_table"></sheet-table>
+						v-bind:show="[0, 1, 2, 3, 4, 5, 6, 7, 8, 'edit']" v-bind:data="sheet.sorts"
+						v-bind:titles="['Sort/Rituel', 'Épreuve', 'VC', 'Coût', 'Durée', 'Portée', 'Durée incantation', 'Domaine', 'am', '']"
+						:edit_compo="'edit-spell'" v-bind:tooltipsFct="tooltipForSpell" class="magic_table">
+					</sheet-table>
 				</div>
 			</div>
 			<div class="col_33">
@@ -812,19 +806,11 @@
 						<label>Liste des liturgies</label>
 					</div>
 					<br>
-					<show-table v-bind:data="sheet.liturgies"
-						v-bind:titles="['Liturgie/Cérémonie', 'Épreuve', 'VC', 'Coût', 'Durée', 'Portée', 'Durée d\'oraison', 'Aspect', 'am', 'Effets', 'p.']"
-						v-bind:tooltipsFct="tooltipForSpell" class="magic_table"></show-table>
-
-					<br>
-					<div class="champ_in">
-						<label>Modifier la liste des liturgies (affichage condensé)</label>
-					</div>
-					<br>
-					<sheet-table
+					<sheet-table :key="'s_table_liturgies'"
 						v-bind:schema="['str', 'str', 'int', 'str', 'str', 'str', 'str', 'str', 'str', 'str', 'str']"
-						v-bind:data="sheet.liturgies"
-						v-bind:titles="['Liturgie/Cérémonie', 'Épreuve', 'VC', 'Coût', 'Durée', 'Portée', 'Durée d\'oraison', 'Aspect', 'am', 'Effets', 'p.']"
+						v-bind:show="[0, 1, 2, 3, 4, 5, 6, 7, 8, 'edit']" v-bind:data="sheet.liturgies"
+						:edit_compo="'edit-liturgie'"
+						v-bind:titles="['Liturgie/Cérémonie', 'Épreuve', 'VC', 'Coût', 'Durée', 'Portée', 'Durée d\'oraison', 'Aspect', 'am', '']"
 						v-bind:tooltipsFct="tooltipForSpell" class="magic_table"></sheet-table>
 				</div>
 			</div>

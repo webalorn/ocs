@@ -301,13 +301,23 @@ Vue.component('sheet-etats-display', {
 	`,
 });
 
+
+
 Vue.component('sheet-table', {
-	props: ["schema", "data", "titles", "tooltipsFct"],
+	props: ["schema", "data", "titles", "tooltipsFct", "show", 'edit_compo'],
 	// schema : ['int', 'str', 'str', ...]
 	// data : [ [1, 'a', 'b', ...], ...]
 	// titles : ["title 1", ....]
 	data: function () {
-		return {};
+		let shown = this.show;
+		if (shown === undefined) {
+			shown = [...Array(this.schema.length).keys()]
+		}
+		return {
+			'cols_shown': shown,
+			'editing': false,
+			'edit_line': 0,
+		};
 	},
 	computed: {
 		tooltips: function () {
@@ -357,17 +367,16 @@ Vue.component('sheet-table', {
 				nextLine.focus();
 			}
 		},
-		delIfEmptySet: function (iLine) { // Hey, problem ! Delete after !!!
+		delIfEmptySet: function (iLine) {
 			this.delLine = this.isLineEmpty(this.data[iLine]);
 		},
-		delIfEmptyDo: function (iLine) { // Hey, problem ! Delete after !!!
+		delIfEmptyDo: function (iLine) {
 			if (this.delLine) {
 				this.data.splice(iLine, 1);
 				this.delLine = false;
 			}
 		},
 		goToCell: function (iLine, iCol) {
-			// console.debug(iLine, iCol);
 			let el = this.$el.querySelector('.cell_' + iLine + '_' + iCol + ' > *');
 			if (el) {
 				el.focus();
@@ -383,22 +392,26 @@ Vue.component('sheet-table', {
 			else if (event.key == "ArrowUp") {
 				this.goToCell(iLine - 1, iCol);
 			}
-			else if (event.key == "ArrowLeft" && active.selectionStart == 0) {
+			else if (event.key == "ArrowLeft" && (!active.setSelectionRange || active.selectionStart == 0)) {
 				let el = this.goToCell(iLine, iCol - 1);
-				if (el) {
+				if (el && el.setSelectionRange) {
 					setTimeout(() => {
 						el.setSelectionRange(el.value.length, el.value.length);
 					}, 0);
 				}
 			}
-			else if (event.key == "ArrowRight" && active.selectionStart == active.value.length) {
+			else if (event.key == "ArrowRight" && (!active.setSelectionRange || active.selectionStart == active.value.length)) {
 				let el = this.goToCell(iLine, iCol + 1);
-				if (el) {
+				if (el && el.setSelectionRange) {
 					setTimeout(() => {
 						el.setSelectionRange(0, 0);
 					}, 0);
 				}
 			}
+		},
+		edit_toogle: function (iline = 0) {
+			this.edit_line = iline;
+			this.editing = !this.editing;
 		},
 	},
 	beforeUpdate: function () {
@@ -408,6 +421,7 @@ Vue.component('sheet-table', {
 		this.refreshData();
 	},
 	template: `
+	<div>
 	<table class="s_table expand_table">
 		<tr>
 			<th v-for="title in titles">{{ title }}</th>
@@ -415,15 +429,98 @@ Vue.component('sheet-table', {
 		<tr v-for="(line, iline) in data"
 			v-on:keydown.enter="insertLine(iline)" v-on:keydown.backspace="delIfEmptySet(iline)"
 			v-on:keyup.backspace="delIfEmptyDo(iline)">
-			<td v-for="(val, ival) in line" v-bind:data-tooltip="[ival in tooltips[iline] ? tooltips[iline][ival] : '']" :class="'cell_' + iline + '_' + ival"
-			v-on:keydown="onKeyAction($event, iline, ival)">
-				<input type="text" v-model.trim="line[ival]" v-if="schema[ival] == 'str'" />
-				<int-input v-model.number="line[ival]" v-if="schema[ival] == 'int'" />
+			<td v-for="(ival, icol) in cols_shown"
+				v-bind:data-tooltip="[ival in tooltips[iline] ? tooltips[iline][ival] : '']" :class="'cell_' + iline + '_' + icol"
+			v-on:keydown="onKeyAction($event, iline, icol)">
+				<button v-if="ival == 'edit'" class='s_table_edit' v-on:click="edit_toogle(iline)"></button>
+				<input type="text" v-model.trim="line[ival]" v-else-if="schema[ival] == 'str'" />
+				<int-input v-model.number="line[ival]" v-else-if="schema[ival] == 'int'" />
 			</td>
 		</tr>
 	</table>
+	<template v-if="editing">
+		<component :is="edit_compo" :data="data[edit_line]" :close="edit_toogle"></component>
+	</template>
+	</div>
 	`,
 });
+
+Vue.component('edit-spell-agnostic', {
+	props: ['data', 'close', 'titles'],
+	data: function () {
+		console.log('cols', this.titles);
+		return {
+		};
+	},
+	template: `
+	<div>
+		<div class="winBack" v-on:click="close"></div>
+		<div class="spell_edit_win select_win scrollable">
+			<h3>Tables</h3>
+			<div class="col_in_win">
+				<label>Nom :</label>
+				<input type="text" v-model.trim="data[0]" />
+				<br>
+				<label>Épreuve :</label>
+				<input type="text" v-model.trim="data[1]" />
+				<br>
+				<label>Valeur de compétence :</label>
+				<int-input type="text" v-model.number="data[2]" style="max-width: 4em; text-align:center;" />
+				<br>
+				<label>{{titles.domain}} :</label>
+				<input type="text" v-model.trim="data[7]" />
+				<br>
+			</div>
+			<div class="col_in_win">
+				<label>Coût :</label>
+				<input type="text" v-model.trim="data[3]" />
+				<br>
+				<label>Durée :</label>
+				<input type="text" v-model.trim="data[4]" />
+				<br>
+				<label>Portée :</label>
+				<input type="text" v-model.trim="data[5]" />
+				<br>
+				<label>{{titles.duree_incant}} :</label>
+				<input type="text" v-model.trim="data[6]" />
+				<br>
+			</div>
+			<h4>Description</h4>
+			<textarea v-model="data[9]"></textarea>
+			<button v-on:click="close" class="centerButton">Fermer</button>
+		</div>
+	</div>
+	`,
+});
+
+Vue.component('edit-spell', {
+	props: ['data', 'close'],
+	data: function () {
+		return {
+			'titles': {
+				'domain': 'Domaine',
+				'duree_incant': "Durée d'incantation",
+			},
+		};
+	},
+	template: `<edit-spell-agnostic :data="data" :close="close" :titles="titles">`,
+});
+
+Vue.component('edit-liturgie', {
+	props: ['data', 'close'],
+	data: function () {
+		return {
+			'titles': {
+				'domain': 'Aspect',
+				'duree_incant': "Durée d'oraison",
+			},
+		};
+	},
+	template: `
+	<edit-spell-agnostic :data="data" :close="close" :titles="titles">
+	`,
+});
+
 
 Vue.component('show-table', {
 	props: ["data", "titles"],
@@ -656,6 +753,9 @@ function create_sheet_component(sheet_template) {
 				}
 			},
 			onKeydown: function (event) {
+				if (event.metaKey || event.ctrlKey || event.shiftKey) {
+					return;
+				}
 				switch (event.key) {
 					case '1': this.active_view = 'character'; break;
 					case '2': this.active_view = 'stats'; break;
