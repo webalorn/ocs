@@ -1,4 +1,4 @@
-<div class="sheet" v-if="loaded">
+<div class="sheet" v-if="loaded" :class="{simplified: simplified}">
 	<div class="s_header scrollable">
 		<div class="avatar" v-on:click="updateAvatar" v-bind:style="avatarStyle"></div>
 		<div class="infos">
@@ -8,10 +8,11 @@
 			<label for="nom">Personnage :</label>
 			<input placeholder="Nom du personnage" type="text" name="nom" v-model.trim="sheet.head.nom" />
 			<br />
-			<label>PAV :</label>
-			<int-input v-model.number="sheet.xp.spent" style="width: 3.5em; text-align: right;" />
-			/ {{sheet.xp.total}} ({{ deriv.xp.degree }})
-			<br />
+			<span class="simple_rm">
+				<label>PAV :</label>
+				<int-input v-model.number="sheet.xp.spent" style="width: 3.5em; text-align: right;" />
+				/ {{sheet.xp.total}} ({{ deriv.xp.degree }})<br />
+			</span>
 			<label>PV :</label>
 			<int-input v-model.number="sheet.cur_stats.ev" style="width: 4em; text-align: right;" />
 			</int-input>
@@ -78,47 +79,47 @@
 						<label>Niveau social</label>
 						<div class='field'><input type="text" v-model.trim="sheet.head.niveau_social" /></div>
 					</div>
-					<div class="champ_in">
+					<div class="champ_in simple_rm">
 						<label>Âge</label>
 						<div class='field'><input type="text" v-model.trim="sheet.head.age" /></div>
 					</div>
-					<div class="champ_in">
+					<div class="champ_in simple_rm">
 						<label>Couleur de cheveux</label>
 						<div class='field'><input type="text" v-model.trim="sheet.head.cheveux" /></div>
 					</div>
-					<div class="champ_in">
+					<div class="champ_in simple_rm">
 						<label>Couleur des yeux</label>
 						<div class='field'><input type="text" v-model.trim="sheet.head.yeux" /></div>
 					</div>
-					<div class="champ_in">
+					<div class="champ_in simple_rm">
 						<label>Taille / Masse</label>
 						<div class='field'><input type="text" v-model.trim="sheet.head.taille_masse" /></div>
 					</div>
-					<div class="champ_in">
+					<div class="champ_in simple_rm">
 						<label>Date de naissance</label>
 						<div class='field'><input type="text" v-model.trim="sheet.head.date_naissance" /></div>
 					</div>
-					<div class="champ_in">
+					<div class="champ_in simple_rm">
 						<label>Lieu de naissance</label>
 						<div class='field'><input type="text" v-model.trim="sheet.head.lieu_naissance" /></div>
 					</div>
-					<div class="champ_in">
+					<div class="champ_in simple_rm">
 						<label>Famille</label>
 					</div>
-					<div class="champ_in">
+					<div class="champ_in simple_rm">
 						<div class='field'><input type="text" v-model.trim="sheet.head.famille" /></div>
 					</div>
-					<div class="champ_in">
+					<div class="champ_in simple_rm">
 						<label>Traits caractéristiques</label>
 					</div>
-					<div class="champ_in">
+					<div class="champ_in simple_rm">
 						<div class='field'><input type="text" v-model.trim="sheet.head.traits" /></div>
 					</div>
 
-					<div class="champ_in">
-						<label>Description physique complète</label>
+					<div class="champ_in simple_rm">
+						<label>Description (physique, caractéristiques...)</label>
 					</div>
-					<textarea class="s_textarea" v-model="sheet.head.description_phy"></textarea>
+					<textarea class="s_textarea simple_rm" v-model="sheet.head.description_phy"></textarea>
 				</div>
 			</div>
 
@@ -263,33 +264,33 @@
 					</div>
 					<table class="table_stats">
 						<tr>
-							<td class="ts_cell_head">Valeur base</td>
-							<td class="ts_cell_head">Bonus / Malus</td>
-							<td class="ts_cell_head">Max</td>
+							<td class="ts_cell_head simple_rm">Valeur base</td>
+							<td class="ts_cell_head simple_rm">Bonus / Malus</td>
+							<td class="ts_cell_head simple_rm">Max</td>
 							<td class="ts_cell_head">Actuels</td>
 						</tr>
 						<tr>
-							<td class="ts_cell">
+							<td class="ts_cell simple_rm">
 								<int-input v-model.number="sheet.des.valeur"></int-input>
 							</td>
-							<td class="ts_cell">
+							<td class="ts_cell simple_rm">
 								<int-input v-model.number="sheet.des.modif"></int-input>
 							</td>
-							<td class="ts_cell">{{ deriv.des.max }}</td>
+							<td class="ts_cell simple_rm">{{ deriv.des.max }}</td>
 							<td class="ts_cell">
 								<int-input v-model.number="sheet.des.actuels"></int-input>
 							</td>
 						</tr>
 					</table>
 
-					<div class="champ_in">
+					<div class="champ_in simple_rm">
 						<label>Degré d'expérience</label>
 						<div class='field'>{{ deriv.xp.degree }}</div>
 					</div>
-					<div class="champ_in">
+					<div class="champ_in simple_rm">
 						<label>Points d'aventure</label>
 					</div>
-					<table class="table_stats table_xp">
+					<table class="table_stats table_xp simple_rm">
 						<tr>
 							<td class="ts_cell_head">Totaux</td>
 							<td class="ts_cell_head">Non dépensés</td>
@@ -373,11 +374,11 @@
 					<div class="champ_in">
 						<label>Langues</label>
 					</div>
-					<textarea class="s_textarea" v-model="sheet.langues"></textarea>
+					<textarea class="s_textarea small_textarea" v-model="sheet.langues"></textarea>
 					<div class="champ_in">
 						<label>Écritures</label>
 					</div>
-					<textarea class="s_textarea" v-model="sheet.ecriture"></textarea>
+					<textarea class="s_textarea small_textarea" v-model="sheet.ecriture"></textarea>
 					<div class="champ_in">
 						<label>Modifications (temporaires) des valeurs</label>
 					</div>
@@ -422,7 +423,7 @@
 
 
 
-		<div class="s_main_area scrollable" v-if="active_view == 'fight'">
+		<div class="s_main_area scrollable fight_pannel" v-if="active_view == 'fight'">
 			<div class="col_666">
 				<div>
 					<br />
@@ -436,7 +437,7 @@
 						<label>TM : </label>{{ deriv.stats.tm }}
 						<label>TP : </label>{{ deriv.stats.tp }}
 					</div>
-					<div class="ev_seuils">
+					<div class="ev_seuils simple_rm">
 						<label>1/4 perdus : </label> {{ Math.floor(deriv.stats.ev * 3 / 4) }}
 						<label>1/2 perdus : </label> {{ Math.floor(deriv.stats.ev * 1 / 2) }}
 						<label>3/4 perdus : </label> {{ Math.floor(deriv.stats.ev * 1 / 4) }}
@@ -477,11 +478,11 @@
 						class="table_boucliers">
 					</sheet-table>
 					<br />
-					<div class="champ_in">
+					<div class="champ_in simple_rm">
 						<label>Masse des armes & armures :</label>
 						{{ deriv.masse.weapons }}
 					</div>
-					<div class="champ_in">
+					<div class="champ_in simple_rm">
 						<label>Masse des armes seules :</label>
 						{{ deriv.masse.weaponsOnly }}
 					</div>
@@ -491,7 +492,7 @@
 			<div class="col_33">
 				<div>
 					<br />
-					<table class="table_techniques s_table">
+					<table class="table_techniques s_table simple_rm">
 						<tr>
 							<th>Techniques de combat</th>
 							<th>Q princ</th>
@@ -585,7 +586,7 @@
 
 
 
-		<div class="s_main_area scrollable" v-if="active_view == 'stuff'">
+		<div class="s_main_area scrollable stuff_pannel" v-if="active_view == 'stuff'">
 			<div class="col_5">
 				<div>
 					<div class="champ_in">
@@ -597,16 +598,16 @@
 						:key="'s_table_sac'"></sheet-table>
 
 					<br>
-					<div class="champ_in">
+					<div class="champ_in simple_rm">
 						<label>Masse dans l'inventaire (hors armes) :</label>
 						{{ deriv.masse.stuff }}
 					</div>
-					<div class="champ_in">
+					<div class="champ_in simple_rm">
 						<label>Masse totale transportée :</label>
 						{{ deriv.masse.total }}
 						<!-- / {{ deriv.masse.max }} -->
 					</div>
-					<div class="champ_in">
+					<div class="champ_in simple_rm">
 						<label>Total pour ENC (sans l'armure) :</label>
 						{{ deriv.masse.total_enc }} / {{ deriv.masse.max }}
 					</div>
@@ -640,106 +641,106 @@
 						</tr>
 					</table>
 
-					<div class="champ_in">
+					<div class="champ_in simple_rm">
 						<label>Autres possessions (hors inventaire)</label>
 					</div>
-					<textarea class="s_textarea" v-model="sheet.other_stuff"></textarea>
+					<textarea class="s_textarea simple_rm" v-model="sheet.other_stuff"></textarea>
 
-
-					<h2>Animal <div class="avatarAnimal" v-on:click="updateAvatarAnimal"
-							v-bind:style="avatarAnimalStyle">
+					<div :class="{simple_rm : sheet.animal.nom == ''}">
+						<h2>Animal <div class="avatarAnimal" v-on:click="updateAvatarAnimal"
+								v-bind:style="avatarAnimalStyle">
+							</div>
+						</h2>
+						<div class="champ_in">
+							<label>Nom</label>
+							<input type="text" v-model="sheet.animal.nom" class="field" />
 						</div>
-					</h2>
-					<div class="champ_in">
-						<label>Nom</label>
-						<input type="text" v-model="sheet.animal.nom" class="field" />
+						<div class="champ_in">
+							<label>Type</label>
+							<input type="text" v-model="sheet.animal.type" style="width: 12em;" />
+
+							<label>PV</label>
+							<input type="text" v-model="sheet.animal.pv" style="width: 3em;"></input>
+
+							<label>PA</label>
+							<input type="text" v-model="sheet.animal.pa" style="width: 3em;"></input>
+						</div>
+						<div class="champ_in">
+							<label>CO</label>
+							<input type="text" v-model="sheet.animal.qualites.co" style="width: 3em;"></input>
+							<label>IN</label>
+							<input type="text" v-model="sheet.animal.qualites.in" style="width: 3em;"></input>
+							<label>IU</label>
+							<input type="text" v-model="sheet.animal.qualites.iu" style="width: 3em;"></input>
+							<label>CH</label>
+							<input type="text" v-model="sheet.animal.qualites.ch" style="width: 3em;"></input>
+						</div>
+						<div class="champ_in">
+							<label>DE</label>
+							<input type="text" v-model="sheet.animal.qualites.de" style="width: 3em;"></input>
+							<label>AG</label>
+							<input type="text" v-model="sheet.animal.qualites.ag" style="width: 3em;"></input>
+							<label>CN</label>
+							<input type="text" v-model="sheet.animal.qualites.cn" style="width: 3em;"></input>
+							<label>FO</label>
+							<input type="text" v-model="sheet.animal.qualites.fo" style="width: 3em;"></input>
+						</div>
+						<div class="champ_in">
+							<label>TM</label>
+							<input type="text" v-model="sheet.animal.tm" style="width: 3em;"></input>
+							<label>TP</label>
+							<input type="text" v-model="sheet.animal.tp" style="width: 3em;"></input>
+							<label>PR</label>
+							<input type="text" v-model="sheet.animal.pr" style="width: 3em;"></input>
+							<label>INI</label>
+							<input type="text" v-model="sheet.animal.ini" style="width: 3em;"></input>
+							<label>VI</label>
+							<input type="text" v-model="sheet.animal.vi" style="width: 3em;"></input>
+						</div>
+
+						<div class="champ_in">
+							<label>Attaque</label>
+							<input type="text" v-model="sheet.animal.attaque" class="field"></input>
+						</div>
+
+						<div class="champ_in">
+							<label>AT/CD</label>
+							<input type="text" v-model="sheet.animal.atcd" style="width: 4em;"></input>
+
+							<label>Défense</label>
+							<input type="text" v-model="sheet.animal.defense" style="width: 4em;"></input>
+
+							<label>PI</label>
+							<input type="text" v-model="sheet.animal.pi" style="width: 5em;"></input>
+
+							<label>AL/PO</label>
+							<input type="text" v-model="sheet.animal.alpo" style="width: 6em;"></input>
+						</div>
+						<div class="champ_in">
+							<label>Actions</label>
+							<input type="text" v-model="sheet.animal.actions" class="field"></input>
+						</div>
+
+						<div class="champ_in">
+							<label>Capacités spéciales, autres attaques, sorts...</label>
+							<!-- <input type="text" v-model="sheet.animal.cs" class="field"></int-input> -->
+						</div>
+						<textarea class="s_textarea" v-model="sheet.animal.cs"></textarea>
+
+
+						<div class="champ_in">
+							<label>Notes</label>
+							<!-- <input type="text" v-model="sheet.animal.notes" class="field"></int-input> -->
+						</div>
+						<textarea class="s_textarea" v-model="sheet.animal.notes"></textarea>
 					</div>
-					<div class="champ_in">
-						<label>Type</label>
-						<input type="text" v-model="sheet.animal.type" style="width: 12em;" />
-
-						<label>PV</label>
-						<input type="text" v-model="sheet.animal.pv" style="width: 3em;"></input>
-
-						<label>PA</label>
-						<input type="text" v-model="sheet.animal.pa" style="width: 3em;"></input>
-					</div>
-					<div class="champ_in">
-						<label>CO</label>
-						<input type="text" v-model="sheet.animal.qualites.co" style="width: 3em;"></input>
-						<label>IN</label>
-						<input type="text" v-model="sheet.animal.qualites.in" style="width: 3em;"></input>
-						<label>IU</label>
-						<input type="text" v-model="sheet.animal.qualites.iu" style="width: 3em;"></input>
-						<label>CH</label>
-						<input type="text" v-model="sheet.animal.qualites.ch" style="width: 3em;"></input>
-					</div>
-					<div class="champ_in">
-						<label>DE</label>
-						<input type="text" v-model="sheet.animal.qualites.de" style="width: 3em;"></input>
-						<label>AG</label>
-						<input type="text" v-model="sheet.animal.qualites.ag" style="width: 3em;"></input>
-						<label>CN</label>
-						<input type="text" v-model="sheet.animal.qualites.cn" style="width: 3em;"></input>
-						<label>FO</label>
-						<input type="text" v-model="sheet.animal.qualites.fo" style="width: 3em;"></input>
-					</div>
-					<div class="champ_in">
-						<label>TM</label>
-						<input type="text" v-model="sheet.animal.tm" style="width: 3em;"></input>
-						<label>TP</label>
-						<input type="text" v-model="sheet.animal.tp" style="width: 3em;"></input>
-						<label>PR</label>
-						<input type="text" v-model="sheet.animal.pr" style="width: 3em;"></input>
-						<label>INI</label>
-						<input type="text" v-model="sheet.animal.ini" style="width: 3em;"></input>
-						<label>VI</label>
-						<input type="text" v-model="sheet.animal.vi" style="width: 3em;"></input>
-					</div>
-
-					<div class="champ_in">
-						<label>Attaque</label>
-						<input type="text" v-model="sheet.animal.attaque" class="field"></input>
-					</div>
-
-					<div class="champ_in">
-						<label>AT/CD</label>
-						<input type="text" v-model="sheet.animal.atcd" style="width: 4em;"></input>
-
-						<label>Défense</label>
-						<input type="text" v-model="sheet.animal.defense" style="width: 4em;"></input>
-
-						<label>PI</label>
-						<input type="text" v-model="sheet.animal.pi" style="width: 5em;"></input>
-
-						<label>AL/PO</label>
-						<input type="text" v-model="sheet.animal.alpo" style="width: 6em;"></input>
-					</div>
-					<div class="champ_in">
-						<label>Actions</label>
-						<input type="text" v-model="sheet.animal.actions" class="field"></input>
-					</div>
-
-					<div class="champ_in">
-						<label>Capacités spéciales, autres attaques, sorts...</label>
-						<!-- <input type="text" v-model="sheet.animal.cs" class="field"></int-input> -->
-					</div>
-					<textarea class="s_textarea" v-model="sheet.animal.cs"></textarea>
-
-
-					<div class="champ_in">
-						<label>Notes</label>
-						<!-- <input type="text" v-model="sheet.animal.notes" class="field"></int-input> -->
-					</div>
-					<textarea class="s_textarea" v-model="sheet.animal.notes"></textarea>
-
 				</div>
 			</div>
 		</div>
 
 
 
-		<div class="s_main_area scrollable" v-if="active_view == 'magic'">
+		<div class="s_main_area scrollable magic_pannel eak_pannel" v-if="active_view == 'magic'">
 			<div class="col_666">
 				<div>
 					<div class="champ_in">
@@ -763,7 +764,8 @@
 						</int-input>
 						/ {{ deriv.stats.ea }}
 					</div>
-					<div class="champ_in" :data-tooltip-bottom="sheet.magic.perma_pa > 0 ? '2 PA / Point' : ''">
+					<div class="champ_in simple_rm"
+						:data-tooltip-bottom="sheet.magic.perma_pa > 0 ? '2 PA / Point' : ''">
 						<label>PA permanents non
 							rachetés</label>
 						<int-input v-model.number="sheet.magic.perma_pa" class="field" />
@@ -773,11 +775,11 @@
 						<label>Tradition</label>
 						<input type="text" v-model="sheet.magic.tradition" class="field" />
 					</div>
-					<div class="champ_in" :data-tooltip-bottom="autoText.magicQual">
+					<div class="champ_in simple_rm" :data-tooltip-bottom="autoText.magicQual">
 						<label>Qualité principale</label>
 						<input type="text" v-model.trim="sheet.magic.qualite_principale" class="field" />
 					</div>
-					<div class="champ_in">
+					<div class="champ_in simple_rm">
 						<label>Domaine</label>
 						<input type="text" v-model="sheet.magic.domaine" class="field" />
 					</div>
@@ -797,7 +799,7 @@
 
 
 
-		<div class="s_main_area scrollable" v-if="active_view == 'gods'">
+		<div class="s_main_area scrollable gods_pannel eak_pannel" v-if="active_view == 'gods'">
 
 			<div class="col_666">
 				<div>
@@ -823,7 +825,8 @@
 						</int-input>
 						/ {{ deriv.stats.ek }}
 					</div>
-					<div class="champ_in" :data-tooltip-bottom="sheet.divin.perma_pk > 0 ? '2 PA / Point' : ''">
+					<div class="champ_in simple_rm"
+						:data-tooltip-bottom="sheet.divin.perma_pk > 0 ? '2 PA / Point' : ''">
 						<label>PK permanents non rachetés</label>
 						<int-input v-model.number="sheet.divin.perma_pk" class="field" />
 					</div>
@@ -832,11 +835,11 @@
 						<label>Tradition</label>
 						<input type="text" v-model="sheet.divin.tradition" class="field" />
 					</div>
-					<div class="champ_in" :data-tooltip-bottom="autoText.divinQual">
+					<div class="champ_in simple_rm" :data-tooltip-bottom="autoText.divinQual">
 						<label>Qualité principale</label>
 						<input type="text" v-model.trim="sheet.divin.qualite_principale" class="field" />
 					</div>
-					<div class="champ_in">
+					<div class="champ_in simple_rm">
 						<label>Aspect</label>
 						<input type="text" v-model="sheet.divin.aspect" class="field" />
 					</div>
@@ -875,7 +878,7 @@
 					<textarea class="s_textarea" v-model="sheet.notes.ideaux_objectifs"></textarea>
 
 					<div class="champ_in">
-						<label>Autres qualités, défauts ou traits spéciaux</label>
+						<label>Qualités, défauts ou traits spéciaux</label>
 					</div>
 					<textarea class="s_textarea" v-model="sheet.notes.qualites_defauts_rp"></textarea>
 				</div>
@@ -893,10 +896,15 @@
 						<label>Background</label>
 					</div>
 					<textarea class="s_textarea" v-model="sheet.notes.background" style="min-height: 20em;"></textarea>
-					<div class="special_actions">
+					<div class="special_actions simple_rm">
 						<button v-on:click="export_sheet" title="Raccourci : [e]">Exporter la fiche</button>
 						<br>
 						<button v-on:click="import_sheet">Importer sauvegarde / Optolith</button>
+						<template v-if="view == 'full'">
+							<br>
+							<input type="checkbox" id="checkbox_simplified" v-model="sheet.simplified">
+							<label for="checkbox_simplified">Vue simplifiée</label>
+						</template>
 					</div>
 				</div>
 			</div>

@@ -18,6 +18,7 @@ function newDefaultSheet() {
 		"image": "",
 		"sheetType": "ocs-tde",
 		"version": CUR_VERSION,
+		"simplified": false,
 		"head": {
 			"nom": "",
 			"sexe": "",
@@ -365,7 +366,7 @@ const fightingList = [
 
 function compute_derived(sheet) {
 	// Etat des PV
-	let total_ev = sheet.stats.ev.reduce(sum2);
+	let total_ev = sheet.stats.ev.reduce(sum2) + sheet.qualites.cn * 2;
 	let cur_ev = sheet.cur_stats.ev;
 	let ev_etats = 0;
 	if (cur_ev <= 3 * total_ev / 4) { ev_etats++; }
@@ -408,7 +409,7 @@ function compute_derived(sheet) {
 			"tpBonus": bonusTP,
 		},
 		"stats": {
-			"ev": sheet.stats.ev.reduce(sum2) + sheet.qualites.cn * 2,
+			"ev": total_ev,
 			"ea": sheet.stats.ea.reduce(sum2) + magicAstralQual,
 			"ek": sheet.stats.ek.reduce(sum2) + diviKarmaQual,
 			"tm": sheet.stats.tm.reduce(sum2) + bonusTM,

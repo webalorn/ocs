@@ -120,7 +120,7 @@ function mergeDatas(cur, add) {
 			}
 		}
 		return cur;
-	} else if (typeCur == "number" || typeCur == "string") {
+	} else if (typeCur == "number" || typeCur == "string" || typeCur == "boolean") {
 		return add;
 	} else {
 		console.warn("Can't merge types", typeCur);
@@ -144,7 +144,7 @@ function cloneData(cur) {
 			newData[prop] = cloneData(cur[prop]);
 		}
 		return newData;
-	} else if (typeCur == "number" || typeCur == "string") {
+	} else if (typeCur == "number" || typeCur == "string" || typeCur == "boolean") {
 		return cur;
 	} else {
 		console.warn("Can't clone type", typeCur);
@@ -225,7 +225,7 @@ function updateSavedData(local, lastSave, remote) {
 				lastSave[prop] = remote[prop];
 			}
 		}
-	} else if (typeLocal == "number" || typeLocal == "string") {
+	} else if (typeLocal == "number" || typeLocal == "string" || typeLocal == "boolean") {
 		if (local === lastSave) {
 			local = remote;
 		}

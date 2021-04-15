@@ -1,0 +1,23 @@
+.simplified .simple_rm {
+	display: none;
+}
+.simplified .table_stats tr:first-child {
+	display: none;
+}
+.simplified .table_stats td {
+	height: 1.6em;
+}
+.simplified .table_stats td:not(:first-child):not(:last-child) {
+	display: none;
+}
+.simplified [data-tooltip]:hover:before { display: none; }
+.simplified [data-tooltip]:hover:after { display: none; }
+.simplified [data-tooltip-bottom]:hover:before { display: none; }
+.simplified [data-tooltip-bottom]:hover:after { display: none; }
+
+.simplified .fight_pannel .line_empty { display: none; }
+.simplified .fight_pannel .empty_table { display: none; }
+.simplified .eak_pannel .line_empty { display: none; }
+.simplified .eak_pannel .empty_table { display: none; }
+
+.simplified .nr_table { display: none; }

@@ -33,6 +33,9 @@
 	outline: 1px solid black;
     background: white;
 }
+.sheet .small_textarea {
+	min-height: 6em;
+}
 
 
 /*
@@ -451,7 +454,7 @@ button.s_table_edit:hover {
 
 /* Etats */
 .table_etats th {
-	font-size: 1rem;
+	font-size: 0.9rem;
 	/* font-weight: normal; */
 	text-align: center;
 }
@@ -463,7 +466,7 @@ button.s_table_edit:hover {
 }
 .table_etats input {
 	text-align: center;
-	width: 3em;
+	width: 4em;
 }
 
 /* Tables */
@@ -505,7 +508,7 @@ button.s_table_edit:hover {
 	width: 2em;
 }
 .table_armures td:nth-child(3), .table_armures th:nth-child(3) {
-	width: 2em;
+	width: 2.5em;
 }
 .table_armures td:nth-child(4), .table_armures th:nth-child(4) {
 	width: 10em;
@@ -616,4 +619,7 @@ button.s_table_edit:hover {
 	width: 95%;
 	text-align: center;
 	background: #ffffff8a;
+}
+.spell_edit_win textarea {
+	height: 25em;
 }

@@ -4,7 +4,7 @@
 const saveIntervalMax = 60 * 1000;
 const saveInactiveDelay = 4 * 1000;
 
-function newSaveManager(dataInit, prepareData, interval = 200) {
+function newSaveManager(dataInit, prepareData, interval = 500) {
 	let data = dataInit;
 	let lastSavedData = cloneData(data);
 	let lastModif = Date.now();
@@ -48,17 +48,17 @@ function newSaveManager(dataInit, prepareData, interval = 200) {
 					body: JSON.stringify(sentData)
 				}).then((answer) => {
 					this.saving = false;
+					lastModif = Date.now();
 					if (!answer.ok) {
 						console.error("Error during saving");
 						console.log(answer);
 						this.saveError = true;
-					} else {
-						this.lastSavedAt = Date.now();
 					}
 				}).catch((error) => {
 					console.error("Error during saving", error);
 					this.saving = false;
 					this.saveError = true;
+					lastModif = Date.now();
 				});
 			}
 		},
@@ -329,6 +329,17 @@ Vue.component('sheet-table', {
 			}
 			return arr;
 		},
+		isEmpty: function () {
+			if (this.data.length > 3) {
+				return false;
+			}
+			for (let line of this.data) {
+				if (!this.isLineEmpty(line)) {
+					return false;
+				}
+			}
+			return true;
+		},
 	},
 	methods: {
 		isLineEmpty: function (line) {
@@ -421,14 +432,15 @@ Vue.component('sheet-table', {
 		this.refreshData();
 	},
 	template: `
-	<div>
+	<div :class="{empty_table: isEmpty}">
 	<table class="s_table expand_table">
 		<tr>
 			<th v-for="title in titles">{{ title }}</th>
 		</tr>
 		<tr v-for="(line, iline) in data"
 			v-on:keydown.enter="insertLine(iline)" v-on:keydown.backspace="delIfEmptySet(iline)"
-			v-on:keyup.backspace="delIfEmptyDo(iline)">
+			v-on:keyup.backspace="delIfEmptyDo(iline)"
+			:class="{line_empty: isLineEmpty(line)}">
 			<td v-for="(ival, icol) in cols_shown"
 				v-bind:data-tooltip="[ival in tooltips[iline] ? tooltips[iline][ival] : '']" :class="'cell_' + iline + '_' + icol"
 			v-on:keydown="onKeyAction($event, iline, icol)">
@@ -448,7 +460,6 @@ Vue.component('sheet-table', {
 Vue.component('edit-spell-agnostic', {
 	props: ['data', 'close', 'titles'],
 	data: function () {
-		console.log('cols', this.titles);
 		return {
 		};
 	},
@@ -553,7 +564,7 @@ Vue.component('show-table', {
 */
 function create_sheet_component(sheet_template) {
 	Vue.component('sheet-compo', {
-		props: ['socket', 'id', 'ismainapp'],
+		props: ['socket', 'id', 'ismainapp', 'view'],
 		data: function () {
 			return {
 				loaded: false,
@@ -642,6 +653,16 @@ function create_sheet_component(sheet_template) {
 						) : '',
 				};
 			},
+			simplified: function () {
+				console.log('view', this.view);
+				if (this.view == 'simple') {
+					return true;
+				}
+				else if (this.view == 'full') {
+					return false;
+				}
+				return this.sheet.simplified;
+			}
 		},
 		watch: {
 			sheet: {
@@ -842,7 +863,7 @@ Vue.component('sheet-short-view', {
 	},
 	methods: {
 		edit: function () {
-			let url = "/web/sheet.html?id=" + this.id;
+			let url = "/web/sheet.html?id=" + this.id + '&view=full';
 			window.open(url, '_blank');
 		},
 		deleteFromTable: function () {
