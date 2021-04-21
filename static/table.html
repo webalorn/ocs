@@ -6,6 +6,7 @@
 	<title>Table</title>
 	<link rel="stylesheet" href="css/main.css" />
 	<link rel="stylesheet" href="css/table.css" />
+	<link rel="stylesheet" href="css/sheet.css" />
 	<link rel="stylesheet" href="css/sheet_short.css" />
 	<link rel="icon" type="image/png" href="/web/images/icon.png" />
 
@@ -17,59 +18,95 @@
 </head>
 
 <body>
-	<div id="app" style="display: none;" v-on:drop="dropHandler" v-on:dragover="dragHandler">
+	<div id="app" style="display: none;" v-on:drop="dropHandler" v-on:dragover="dragHandler" class="app_table">
 		<div v-if="!connected && !cantConnect && !errorMessage" class="loading">Loading...</div>
 		<div v-if="!connected && cantConnect" class="error">Error, can't connect to the table "{{ tableId }}"</div>
 		<div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 		<div v-if="connected" class="mainTable">
 			<div class="top_bar">
 				<span class="label">Connecté : </span>
-				<span class="top_username">{{ identity.player_name }}</span>
-				<span class="top_name">({{ identity.name }})</span>
+				<template v-if="identity.player_name">
+					<span class="top_username">{{ identity.player_name }}</span>
+					<span class="top_name">({{ identity.name }})</span>
+				</template>
+				<span class="top_name" v-else>{{ identity.name }}</span>
+
 				<button v-on:click="open_sheet" v-if="!identity.gm" class="top_edit_sheet">Voir ma fiche</button>
 				<span class="top_table_name">{{ tableName }}</span>
 			</div>
-			<jet-competence v-if="!reroll_comp.dice" v-bind:socket="socket" v-bind:identity="identity"
-				v-bind:config="roll"></jet-competence>
 
-			<reroll-competence v-if="reroll_comp.dice" v-bind:socket="socket" v-bind:identity="identity"
-				v-bind:reroll_comp="reroll_comp"></reroll-competence>
+			<div class="col_container">
+				<div class="t_sidebar" v-if="!identity.gm">
+					<button class="t_sidebar_roll simpleButton" v-on:click="fireEvent('openRoll')"></button>
+					<button class="t_sidebar_fight simpleButton" v-on:click="fireEvent('openWeapons')"></button>
+					<button class="t_sidebar_magic simpleButton" v-on:click="fireEvent('openSpells')"
+						v-if="identity.deriv.stats.ea || identity.deriv.stats.ek"></button>
+					<button class="t_sidebar_bag simpleButton" v-on:click="fireEvent('openBag')"></button>
+				</div>
+				<div class="column">
+					<jet-competence v-if="!reroll_comp.dice" v-bind:socket="socket" v-bind:identity="identity"
+						v-bind:config="roll"></jet-competence>
 
-			<div class="roll_config">
-				<div class="roll_target switch_radio">
-					<!-- <option value="self">Jet caché</option>
+					<reroll-competence v-if="reroll_comp.dice" v-bind:socket="socket" v-bind:identity="identity"
+						v-bind:reroll_comp="reroll_comp"></reroll-competence>
+
+					<div class="roll_config">
+						<div class="roll_target switch_radio">
+							<!-- <option value="self">Jet caché</option>
 					<option value="game_master">Jet derrière l'écran</option>
 					<option value="all">Jet public</option> -->
-					<input type="radio" id="roll_target_self" v-model="roll.target" name="roll_target" value="self">
-					<label for="roll_target_self">Jet caché</label>
+							<input type="radio" id="roll_target_self" v-model="roll.target" name="roll_target"
+								value="self">
+							<label for="roll_target_self">Jet caché</label>
 
-					<input type="radio" id="roll_target_gm" v-model="roll.target" name="roll_target"
-						value="game_master">
-					<label for="roll_target_gm">Jet derrière l'écran</label>
+							<input type="radio" id="roll_target_gm" v-model="roll.target" name="roll_target"
+								value="game_master">
+							<label for="roll_target_gm">Jet derrière l'écran</label>
 
-					<input type="radio" id="roll_target_all" v-model="roll.target" name="roll_target" value="all">
-					<label for="roll_target_all">Jet public</label>
+							<input type="radio" id="roll_target_all" v-model="roll.target" name="roll_target"
+								value="all">
+							<label for="roll_target_all">Jet public</label>
+						</div>
+						<br>
+					</div>
+
+					<jet-fight v-if="identity.initOk" v-bind:socket="socket" v-bind:identity="identity"
+						v-bind:config="roll">
+					</jet-fight>
+
+					<show-bag :identity="identity"></show-bag>
 				</div>
-				<br>
 			</div>
-
-			<jet-fight v-bind:socket="socket" v-bind:identity="identity" v-bind:config="roll"></jet-fight>
 
 			<sheet-short-view v-for="id in characters" v-bind:key="id" v-bind:table="tableId" v-bind:identity="identity"
 				v-bind:id="id" v-bind:socket="socket" v-bind:isgm="identity.gm">
 			</sheet-short-view>
 
-			<div v-if="identity.gm" class="add_player">
-				<label>Ajouter des joueurs</label>
-				<input v-model.trim="newPlayerId" placeholder="Id de la fiche"> <br />
-				<button v-on:click="addPlayer" v-bind:disabled="!newPlayerId">Ajouter un joueur</button>
+			<div v-if="identity.gm" class="table_gm_only col_container">
+				<div class="column">
+					<div class="gm_action">
+						<label>Ajouter des joueurs</label><br>
+						<input v-model.trim="newPlayerId" placeholder="Id de la fiche"> <br />
+						<button v-on:click="addPlayer" v-bind:disabled="!newPlayerId">Ajouter un joueur</button>
+					</div>
+					<div class="gm_action">
+						<label>Changer le nom de la table</label><br>
+						<input v-model.trim="newTableName" placeholder="Id de la fiche"> <br />
+						<button v-on:click="updateTableName"
+							v-bind:disabled="!newTableName || newTableName == tableName">Modifier</button>
+					</div>
+				</div>
+				<div class="column">
+					<div class="gm_action">
+						<strong>Lien d'invitation générique</strong><br>
+						<a :href="'/web/invitation.html?table=' + tableId" target="_blank">{{ window.location.protocol
+							}}//{{ window.location.host}}/web/invitation.html?table={{
+							tableId }}</a>
+					</div>
+				</div>
 			</div>
 
 			<div v-if="identity.gm" class="change_table_name">
-				<label>Changer le nom de la table</label>
-				<input v-model.trim="newTableName" placeholder="Id de la fiche"> <br />
-				<button v-on:click="updateTableName"
-					v-bind:disabled="!newTableName || newTableName == tableName">Modifier</button>
 			</div>
 
 		</div>
@@ -86,6 +123,7 @@
 	<script src="app/comp/jets.js"></script>
 	<script src="app/comp/sheet_data.js"></script>
 	<script src="app/comp/sheet.js"></script>
+	<script src="app/comp/sheet_short.js"></script>
 	<script src="app/table_app.js"></script>
 </body>
 

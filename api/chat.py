@@ -12,7 +12,7 @@ class RollError(Exception):
     pass
 
 
-SIMPLE_MESSAGES = ['message', 'routine']
+SIMPLE_MESSAGES = ['message', 'routine', 'join', 'quit']
 ROLL_D20 = ['attack', 'parade', 'esquive']
 ROLL_STR = ['initiative', 'damages']
 

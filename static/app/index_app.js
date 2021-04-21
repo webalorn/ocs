@@ -21,7 +21,7 @@ var app = new Vue({
 							let id = data['id'];
 							this.characters.push(id);
 							storage_add('characters', id);
-							let url = '/web/sheet.html?id=' + id;
+							let url = '/web/sheet.html?view=full&id=' + id;
 							window.open(url, '_blank');
 						});
 					} else {

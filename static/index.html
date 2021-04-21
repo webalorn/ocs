@@ -15,9 +15,9 @@
 	<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
 </head>
 
-<body>
+<body class="app_body">
 	<div id="app">
-		<div id="app_column">
+		<div class="app_column">
 			<h1>Système de fiches et tables pour l'Oeil Noir</h1>
 			<p style="font-style: italic;">
 				Veuillez sauvegarder toutes les url des fiches et des tables que vous créez de votre côté. Les url ne
@@ -52,8 +52,8 @@
 						@drop="onDrop($event, 'characters', id, characters)" @dragover.prevent
 						@dragenter="onDragEnter($event, 'characters', id)"
 						@dragleave="onDragLeave($event, 'characters', id)">
-						<a :href="'/web/sheet.html?id=' + id" target="_blank">{{ idToName[id] || id }}</a> <span
-							class="del_item" v-on:click="delCharacter(id)">(✗)</span>
+						<a :href="'/web/sheet.html?view=full&id=' + id" target="_blank">{{ idToName[id] || id }}</a>
+						<span class="del_item" v-on:click="delCharacter(id)">(✗)</span>
 					</li>
 				</ol>
 			</template>

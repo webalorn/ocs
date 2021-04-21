@@ -1,17 +1,3 @@
-body {
-	background-color: rgb(230, 230, 230);
-}
-
-#app_column {
-	border: 6px double #b38503;
-    max-width: 40em;
-    background: white;
-    margin: auto;
-    margin-top: 1.5em;
-    margin-bottom: 1.5em;
-    padding: 1em;
-}
-
 #create_block {
 	background-color: gray;
 	text-align: center;
@@ -26,25 +12,6 @@ body {
 	cursor: pointer;
 }
 
-
-footer {
-	border: 2px solid gray;
-    max-width: 40em;
-	background: white;
-	color: gray;
-    margin: auto;
-    margin-top: 1.5em;
-    margin-bottom: 1.5em;
-	padding: 1em;
-	font-style: italic;
-	text-align: center;
-}
-footer a {
-	color: gray;
-}
-footer a:hover {
-	color: rgb(138, 138, 202);
-}
 
 .importExportButton {
 	margin: auto;

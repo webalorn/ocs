@@ -3,8 +3,9 @@
 */
 const saveIntervalMax = 60 * 1000;
 const saveInactiveDelay = 4 * 1000;
+const autoCheckInterval = 500;
 
-function newSaveManager(dataInit, prepareData, interval = 500) {
+function newSaveManager(dataInit, prepareData, saveInactive = saveInactiveDelay) {
 	let data = dataInit;
 	let lastSavedData = cloneData(data);
 	let lastModif = Date.now();
@@ -64,7 +65,7 @@ function newSaveManager(dataInit, prepareData, interval = 500) {
 		},
 		autoSave: function () {
 			if (!this.saving && this.unsaved && (Date.now() - this.lastSavedAt > saveIntervalMax) ||
-				(Date.now() - lastModif > saveInactiveDelay)) {
+				(Date.now() - lastModif > saveInactive)) {
 				this.pushSave();
 			}
 		},
@@ -76,7 +77,7 @@ function newSaveManager(dataInit, prepareData, interval = 500) {
 			}
 		},
 	};
-	setInterval(() => manager.autoSave(), interval);
+	setInterval(() => manager.autoSave(), autoCheckInterval);
 
 	return manager;
 };
@@ -467,7 +468,7 @@ Vue.component('edit-spell-agnostic', {
 	<div>
 		<div class="winBack" v-on:click="close"></div>
 		<div class="spell_edit_win select_win scrollable">
-			<h3>Tables</h3>
+			<h3>Modifier {{ data[0] }}</h3>
 			<div class="col_in_win">
 				<label>Nom :</label>
 				<input type="text" v-model.trim="data[0]" />
@@ -475,7 +476,7 @@ Vue.component('edit-spell-agnostic', {
 				<label>Épreuve :</label>
 				<input type="text" v-model.trim="data[1]" />
 				<br>
-				<label>Valeur de compétence :</label>
+				<label>Valeur de compétence (VC) :</label>
 				<int-input type="text" v-model.number="data[2]" style="max-width: 4em; text-align:center;" />
 				<br>
 				<label>{{titles.domain}} :</label>
@@ -510,7 +511,7 @@ Vue.component('edit-spell', {
 		return {
 			'titles': {
 				'domain': 'Domaine',
-				'duree_incant': "Durée d'incantation",
+				'duree_incant': 'Durée d\'incantation',
 			},
 		};
 	},
@@ -654,7 +655,6 @@ function create_sheet_component(sheet_template) {
 				};
 			},
 			simplified: function () {
-				console.log('view', this.view);
 				if (this.view == 'simple') {
 					return true;
 				}
@@ -770,7 +770,7 @@ function create_sheet_component(sheet_template) {
 			},
 			socketListener: function (event, data) {
 				if (data.type == 'notification' && data.on == 'sheet' && data.sheet_id == this.id) {
-					this.saveManager.remoteUpdate(data.new_data.content)
+					this.saveManager.remoteUpdate(data.new_data.content);
 				}
 			},
 			onKeydown: function (event) {
@@ -811,203 +811,74 @@ if (event_sheet_loaded !== null) {
 		.then(sheet_template => create_sheet_component(sheet_template));
 }
 
-
-/*
-	Sheet short view
-*/
-Vue.component('sheet-short-view', {
-	props: ['identity', 'table', 'id', 'socket', 'isgm'],
-	data: function () {
-		return {
-			detailOpen: false,
-			sheet: null,
-		}
-	},
-	mounted: function () {
-		let url = "/api/sheet/" + this.id;
-		fetch(url)
-			.then(answer => answer.json())
-			.then(data => {
-				let sheet = data.content;
-				updateSheetVersion(sheet);
-				this.setSheet(sheet);
-			});
-		this.socket.register((event, data) => {
-			if (data.type == 'notification' && data.on == 'sheet' && data.sheet_id == this.id) {
-				this.setSheet(data.new_data.content);
-			}
-		});
-	},
-	computed: {
-		avatarStyle: function () {
-			if (this.sheet.image) {
-				return "background-image: url('" + this.sheet.image + "'); background-size: cover;"
-			}
-			return "";
-		},
-		avatarAnimalStyle: function () {
-			if (this.sheet.animal.image) {
-				return "background-image: url('" + this.sheet.animal.image + "'); background-size: cover;"
-			}
-			return "";
-		},
-		deriv: function () {
-			return compute_derived(this.sheet);
-		},
-		invite_url: function () {
-			if (this.isgm) {
-				return window.location.protocol + '//' + window.location.host + '/web/table.html?table=' + this.table + '&id=' + this.id;
-			}
-			return null;
-		},
-	},
+Vue.component('etats-table', {
+	props: ["sheet"],
 	methods: {
-		edit: function () {
-			let url = "/web/sheet.html?id=" + this.id + '&view=full';
-			window.open(url, '_blank');
-		},
-		deleteFromTable: function () {
-			if (confirm("Supprimer de la campagne ?")) {
-				let url = "/api/table/" + this.table + "/player/" + this.id;
-				fetch(url, {
-					method: 'DELETE',
-					cache: 'no-cache',
-				}).then(ans => {
-					if (ans.ok) { location.reload(); }
-				});
+		isLineEmpty: function (line) {
+			for (let i in line) {
+				if (line[i]) {
+					return false;
+				}
 			}
-		},
-		toggleDetails: function () {
-			this.detailOpen = !this.detailOpen;
-		},
-		setSheet: function (sheet) {
-			this.sheet = sheet;
-			if (this.id === this.identity.id) {
-				this.identity.sheet = sheet;
-				this.identity.deriv = compute_derived(sheet);
-			}
+			return true;
 		},
 	},
 	template: `
-	<div class="sheet_short_view">
-	<template v-if="sheet">
-		<div class="ssv_head">
-			<div class="ssv_avatar" v-bind:style="avatarStyle" v-on:click="toggleDetails"></div>
-			<div class="header_infos">
-				<label>Nom :</label>
-				<span>{{sheet.head.nom}}</span>
-				<br>
-				<label>Joueur :</label>
-				<span>{{sheet.owner}}</span>
-				<br>
-				<label>Âge :</label>
-				<span>{{sheet.head.age}}</span>
-			</div>
-			<div class="header_infos">
-				<label>Peuple :</label>
-				<span>{{sheet.head.peuple}}</span>
-				<br>
-				<label>Culture :</label>
-				<span>{{sheet.head.culture}}</span>
-				<br>
-				<label>Profession :</label>
-				<span>{{sheet.head.profession}}</span>
-			</div>
-			<div class="header_infos">
-				<label>PV :</label>
-				<span>{{sheet.cur_stats.ev}} / {{ deriv.stats.ev }}</span>
-				<span v-if="deriv.ev_etats == 1" class="ev_niv_1">Touché (1)</span>
-				<span v-if="deriv.ev_etats == 2" class="ev_niv_2">Touché (2)</span>
-				<span v-if="deriv.ev_etats == 3" class="ev_niv_3">Touché (3)</span>
-				<span v-if="deriv.ev_etats == 4" class="ev_niv_4">Touché (4)</span>
-				<span v-if="deriv.ev_etats == 5" class="ev_niv_5">Mourant</span>
-				<br>
-				<template v-if="deriv.stats.ea != 0">
-					<label>PA :</label>
-					<span>{{sheet.cur_stats.ea}} / {{ deriv.stats.ea }}</span>
-					<br>
-				</template>
-				<template v-if="deriv.stats.ek != 0">
-					<label>PK :</label>
-					<span>{{sheet.cur_stats.ek}} / {{ deriv.stats.ek }}</span>
-					<br>
-				</template>
-				<label>PAV :</label>
-				<span>{{sheet.xp.total}} ({{ deriv.xp.degree }})</span>
-			</div>
-
-			<div class="header_infos" v-if="identity.gm">
-				<button v-on:click="edit">Modifier</button>
-				<br>
-				<br>
-				<button v-on:click="deleteFromTable">Retirer</button>
-				<br>
-			</div>
-		</div>
-		<div class='ssv_body'>
-			<div class="champ_in">
-				<label>Status & États</label>
-			</div>
-			<div class="ssv_status">{{ sheet.status }}</div>
-			<sheet-etats-display v-bind:etats="sheet.etats"></sheet-etats-display>
-			<div class="ssv_status">{{ sheet.modifs_qualites }}</div>
-		</div>
-		<template v-if="detailOpen">
-			<div class="winBack" v-on:click="toggleDetails"></div>
-			<div class="ssv_details scrollable">
-				<div class="champ_in">
-					<label>Nom</label>
-					<span>{{sheet.head.nom}}</span>
-				</div>
-				<div class="champ_in">
-					<label>Âge</label>
-					<span>{{ sheet.head.age}}</span>
-				</div>
-				<div class="champ_in">
-					<label>Sexe</label>
-					<span>{{ sheet.head.sexe}}</span>
-				</div>
-				<div class="champ_in">
-					<label>Peuple</label>
-					<span>{{ sheet.head.peuple}}</span>
-				</div>
-				<div class="champ_in">
-					<label>Culture</label>
-					<span>{{ sheet.head.culture}}</span>
-				</div>
-				<div class="champ_in">
-					<label>Couleur de cheveux</label>
-					<span>{{ sheet.head.cheveux}}</span>
-				</div>
-				<div class="champ_in">
-					<label>Couleur des yeux</label>
-					<span>{{ sheet.head.yeux}}</span>
-				</div>
-				<div class="champ_in">
-					<label>Taille / Masse</label>
-					<span>{{ sheet.head.taille_masse}}</span>
-				</div>
-
-				<div class="champ_in">
-					<label>Traits caractéristiques</label>
-				</div>
-				<p>{{ sheet.head.traits }}</p>
-
-				<div class="champ_in">
-					<label>Description physique complète</label>
-				</div>
-				<p>{{ sheet.head.description_phy }}</p>
-
-				<div class="ssv_invit" v-if="isgm">
-					<span>Lien d'invitation :</span><br />
-					<a v-bind:href="invite_url" target="_blank">{{ invite_url }}</a>
-				</div>
-
-				<div class="ssv_details_close">
-					<button v-on:click="toggleDetails">Fermer</button>
-				</div>
-			</div>
-		</template>
-	</template>
-	</div>`,
+	<table class="s_table table_etats">
+		<tr>
+			<th>Etat</th>
+			<th>Niveau</th>
+			<th>Etat</th>
+			<th>Niveau</th>
+		</tr>
+		<tr>
+			<td>Confusion</td>
+			<td>
+				<intnum-input v-model.number="sheet.etats.confusion" v-bind:min="0" v-bind:max="4">
+				</intnum-input>
+			</td>
+			<td>Douleur</td>
+			<td>
+				<intnum-input v-model.number="sheet.etats.douleur" v-bind:min="0" v-bind:max="4">
+				</intnum-input>
+			</td>
+		</tr>
+		<tr>
+			<td>Encombrement</td>
+			<td>
+				<intnum-input v-model.number="sheet.etats.encombrement" v-bind:min="0" v-bind:max="4">
+				</intnum-input>
+			</td>
+			<td>Étourdissement</td>
+			<td>
+				<intnum-input v-model.number="sheet.etats.etourdissement" v-bind:min="0" v-bind:max="4">
+				</intnum-input>
+			</td>
+		</tr>
+		<tr>
+			<td>Extase</td>
+			<td>
+				<intnum-input v-model.number="sheet.etats.extase" v-bind:min="0" v-bind:max="4">
+				</intnum-input>
+			</td>
+			<td>Paralysie</td>
+			<td>
+				<intnum-input v-model.number="sheet.etats.paralysie" v-bind:min="0" v-bind:max="4">
+				</intnum-input>
+			</td>
+		</tr>
+		<tr>
+			<td>Terreur</td>
+			<td>
+				<intnum-input v-model.number="sheet.etats.terreur" v-bind:min="0" v-bind:max="4">
+				</intnum-input>
+			</td>
+			<td>Ébriété</td>
+			<td>
+				<intnum-input v-model.number="sheet.etats.ebriete" v-bind:min="0" v-bind:max="4">
+				</intnum-input>
+			</td>
+		</tr>
+	</table>
+	`,
 });

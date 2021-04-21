@@ -35,6 +35,12 @@ Vue.component('chat-compo', {
 				this.messages.push(data);
 			}
 		});
+
+		this.socket.send_json({
+			'type': 'join',
+			'from': this.identity.id,
+			'from_name': this.identity.name,
+		});
 	},
 	updated: function () {
 		let elMsgList = this.$el.querySelector('.chat_message_list');
@@ -133,7 +139,7 @@ Vue.component('chat-compo', {
 				<em>Vous pouvez utiliser le modificateur <code>h</code> pour cacher un jet (<code>/rh d20</code>), le modificateur <code>j</code> pour envoyer uniquement au MJ (<code>/rj d20</code>).</em>
 			</div>
 			<div class="chat_message" v-for='m in messages' v-bind:class="{chat_message_self : m.from == identity.id}">
-				<div class="chat_message_name" v-if="m.type != 'error'">
+				<div class="chat_message_name" v-if="m.type != 'error' && m.type != 'join' && m.type != 'quit'">
 					<span class="chat_message_user">{{ m.from_name }}</span>
 					<span class="chat_message_time">[{{ m.time }}]</span>
 					<span v-if="m.target=='game_master'" class="msg_only_gm">(Jet derrière l'écran)</span>
@@ -183,7 +189,11 @@ Vue.component('chat-compo', {
 					</div>
 					<div v-else-if="m.type == 'simple_roll'" class="simple_roll" v-bind:class="'simple_' + m.roll_type">
 						<span v-if="m.roll_type == 'initiative'" class="chat_simpleroll_type">Initiative :</span>
-						<span v-else-if="m.roll_type == 'damages'" class="chat_simpleroll_type">Dégâts :</span>
+						<span v-else-if="m.roll_type == 'damages'" class="chat_simpleroll_type">
+							<template v-if="m.using">{{m.using}} :</template>
+							<template v-else>Dégâts :</template>
+						</span>
+
 						<span v-else class="chat_simpleroll_type">{{ m.roll_type }} :</span>
 
 						<span class="chat_roll_total">{{ m.dice }}</span>
@@ -202,11 +212,22 @@ Vue.component('chat-compo', {
 						</div>
 						<div class="chat_d20_jet">
 							<span v-if="m.roll_type == 'attack'" class="chat_d20_type">Attaque :</span>
+							<span v-else-if="m.roll_type == 'parade'" class="chat_d20_type">Parade :</span>
 							<span v-else class="chat_d20_type">{{ m.roll_type }} :</span>
 
 							<span class="chat_d20_jet_val">{{ m.dice }}</span>
 							<span>(Jet sur {{ m.difficulty }})</span>
+							<div v-if="m.using" class="chat_d20_using">
+								({{m.using}})
+							</div>
 						</div>
+					</div>
+
+					<div v-else-if="m.type == 'join'" class="join_quit_msg">
+						</span>{{ m.from_name }} a rejoint</span>
+					</div>
+					<div v-else-if="m.type == 'quit'" class="join_quit_msg">
+						</span>{{ m.from_name }} a quitté</span>
 					</div>
 					<p v-else>
 					{{ m }}

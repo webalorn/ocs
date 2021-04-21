@@ -1,3 +1,7 @@
+.app_body {
+	background-color: rgb(230, 230, 230);
+}
+
 #app {
 	width: 100%;
 	height: 100%;
@@ -74,6 +78,49 @@ button:not(.simpleButton):focus-visible {
 	background-color: #c9eff3
 }
 
+.niceInputs textarea {
+	width: calc(100% - 4px);
+	padding: 2px;
+	border: none;
+	resize: none;
+	min-height: 10em;
+	background: rgb(243, 239, 235);
+	font-family: serif;
+}
+.niceInputs textarea:hover {
+	background: #c6c6f9;
+}
+.niceInputs textarea:focus {
+	border: none;
+	outline: 1px solid black;
+    background: white;
+}
+.small_textarea {
+	min-height: 6em;
+}
+
+.niceInputs label {
+	font-weight: bold;
+}
+.niceInputs input[type="text"], .niceInputs input[type="number"] {
+	background: transparent;
+	border: none;
+}
+
+.niceInputs input[type="text"]:hover, .niceInputs input[type="number"]:hover {
+	background: #c6c6f9;
+}
+.niceInputs input[type="text"]:focus, .niceInputs input[type="number"]:focus {
+	border: none;
+	outline: 1px solid black;
+    /* background: #f3f3f3; */
+	background: white;
+}
+
+
+/*
+	Tooltips
+*/
 
 [data-tooltip]:not([data-tooltip=""]),
 [data-tooltip-bottom]:not([data-tooltip-bottom=""]) {
@@ -190,4 +237,58 @@ button.centerButton:not(.simpleButton) {
 	display: block;
 	margin: auto;
 	text-align: center;
+}
+
+.win_bottom {
+	margin: 2em 0px;
+	text-align: center;
+}
+
+/*
+	Columns
+*/
+.col_container {
+	display: flex;
+}
+.column {
+	flex: 1;
+}
+.full_column {
+	flex: 1;
+	margin-left: 5px;
+	margin-right: 5px;
+	height: 100%;
+	overflow: scroll;
+}
+
+/*
+	Page Blocks
+*/
+footer {
+	border: 2px solid gray;
+    max-width: 40em;
+	background: white;
+	color: gray;
+    margin: auto;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+	padding: 1em;
+	font-style: italic;
+	text-align: center;
+}
+footer a {
+	color: gray;
+}
+footer a:hover {
+	color: rgb(138, 138, 202);
+}
+
+.app_column {
+	border: 6px double #b38503;
+    max-width: 40em;
+    background: white;
+    margin: auto;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+    padding: 1em;
 }

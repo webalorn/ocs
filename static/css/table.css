@@ -97,6 +97,11 @@ code {
 	color: rgb(0, 59, 25);
 }
 
+.join_quit_msg {
+	font-style: italic;
+    color: #5d5d5d;
+}
+
 /* rolls */
 .chat_roll_line * {
 	vertical-align: middle;
@@ -293,6 +298,48 @@ code {
 }
 
 /*
+	Sidebar
+*/
+.t_sidebar {
+	width: 60px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	border-right: 2px solid black;
+}
+.t_sidebar > button {
+    border: none;
+    color: black;
+    width: 60px;
+    height: 60px;
+    background-color: #eaeaea;
+    background-size: 50px;
+    background-repeat: no-repeat;
+    background-position: 5px;
+    cursor: pointer;
+    outline: 2px solid black;
+}
+.t_sidebar > button:focus-visible {
+	background-color: #b9ddea;
+}
+.t_sidebar > *:hover {
+	background-color: #ada7a7;
+}
+.t_sidebar_roll {
+    background-image: url(/web/images/d20.png);
+}
+.t_sidebar_fight {
+    background-image: url(/web/images/fight.png);
+}
+.t_sidebar_magic {
+    background-image: url(/web/images/magic.png);
+}
+.t_sidebar_bag {
+    background-image: url(/web/images/stuff.png);
+}
+
+/*
 	Main area
 */
 
@@ -315,7 +362,7 @@ code {
 	padding: 5px;
 	box-shadow: 0px 0px 5px black;
 	z-index: 10;
-	margin-bottom: 1em;
+	margin-bottom: 7px;
 	line-height: 1.5em;
 }
 .top_edit_sheet {
@@ -337,8 +384,9 @@ code {
 /* jet de dés */
 .inrc_view {
 	padding: 10px;
+	padding-top: 0px;
     background: #eaeaea;
-	margin-bottom: 1em;
+	margin-bottom: 0.5em;
 	text-align: center;
 }
 .inrc_view input {
@@ -353,6 +401,9 @@ code {
 .inrc_view > table {
 	display: inline-block;
 }
+.inrc_view td, .inrc_view th {
+	border: 1px solid transparent;
+}
 .inrc_view > div {
 }
 .inrc_view > table th {
@@ -362,10 +413,10 @@ code {
 .inrc_view_clickable {
 	cursor: pointer;
 	position: relative;
-	border-radius: 5px;
-	border: 1px solid transparent;
-	/* border: 1px dotted #8080808a; */
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
 	background: #80808024;
+	border: 1px solid transparent;
 }
 .inrc_view_clickable:hover {
 	background: white;
@@ -482,7 +533,7 @@ input.inrc_roll_name {
 */
 
 .roll_config {
-	margin-bottom: 1em;
+	margin-bottom: 0.5em;
 	text-align: center;
 }
 
@@ -532,12 +583,17 @@ input.inrc_roll_name {
 	Roll for talents
 */
 .inrc_talent {
-	padding: 0.3em;
-    cursor: pointer;
 	background: #e0e0e0;
 	font-size: small;
+	display: flex;
 }
-.inrc_talent:hover {
+.inrc_talent_select {
+    cursor: pointer;
+	padding: 0.3em;
+	display: block;
+	flex: 1;
+}
+.inrc_talent_select:hover {
 	background: rgb(202 184 169);
     color: #464646;
 }
@@ -553,6 +609,20 @@ input.inrc_roll_name {
 	font-weight: bold;
 	padding: 0em 1em;
 }
+.inrc_tal_show {
+	border: none;
+    width: 3em;
+    height: 1.8em;
+    background-color: transparent;
+    background-size: 1.4em;
+	background-position: 0.6em 0.2em;
+    background-repeat: no-repeat;
+	background-image: url(/web/images/info.png);
+    cursor: pointer;
+}
+.inrc_tal_show:hover {
+	background-color: rgb(202 184 169);
+}
 
 .inrc_spell_error {
 	color: #ff4b4b;
@@ -564,8 +634,9 @@ input.inrc_roll_name {
 
 .rfight_view {
 	padding: 10px;
+	padding-top: 0px;
     background: #e6d3d3;
-	margin-bottom: 1em;
+	/* margin-bottom: 1em; */
 	text-align: center;
 }
 .rfight_view table {
@@ -583,6 +654,16 @@ input.inrc_roll_name {
     width: 4em;
     text-align: center;
 }
+.rfight_weapon_name {
+	border-top: 1px solid black;
+    padding-top: 4px;
+}
+.rfight_weapon_name > input {
+	text-align: left;
+    width: 15em;
+    height: 1.6em;
+    margin-right: 1em;
+}
 
 button.rfight_ini:not(:hover) {
 	background:rgb(193, 213, 219);
@@ -599,6 +680,14 @@ button.rfight_prd:not(:hover) {
 button.rfight_esq:not(:hover) {
 	background:rgb(192, 218, 186);
 }
+
+.weapon_name {
+	font-weight: bold;
+}
+.weapon_infos {
+	font-style: italic;
+}
+
 /*
 	Roll details
 */
@@ -669,6 +758,10 @@ button.rfight_esq:not(:hover) {
 	font-weight: bold;
 	padding: 0px 5px;
 }
+.chat_d20_using {
+	font-style: italic;
+    color: #3c3c3c;
+}
 
 .d20_reussite .chat_d20_title {
 	background: #a9d2b2;
@@ -727,4 +820,10 @@ button.rfight_esq:not(:hover) {
 
 .bonusesWin {
 	width: 800px;
+}
+
+.app_table .niceInputs input {
+	background-color: #ffffff8a;
+	height: 1.5em;
+    margin: 3px;
 }

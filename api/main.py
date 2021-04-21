@@ -97,7 +97,7 @@ async def create_sheet():
 
 
 @app.post("/api/sheet/optolith")
-async def create_sheet(import_data: JsonData):
+async def load_from_optolith(import_data: JsonData):
     if not OPTO_AVAILABLE:
         raise HTTPException(status_code=501,
                             detail=f"Missing optolith ressources")
@@ -108,7 +108,7 @@ async def create_sheet(import_data: JsonData):
 
 
 @app.put("/api/table/{table_id}/update")
-async def get_table(table_update: NewTable, table_id: str):
+async def put_table(table_update: NewTable, table_id: str):
     table = await get_item(table_id)
     table['name'] = table_update.name
     await set_item(**table)
@@ -116,7 +116,7 @@ async def get_table(table_update: NewTable, table_id: str):
 
 
 @app.post("/api/table/{table_id}/player/{player_id}")
-async def get_table(table_id: str, player_id: str):
+async def post_table(table_id: str, player_id: str):
     table = await get_item(table_id)
     if player_id in table['characters']:
         raise HTTPException(status_code=400,
@@ -128,7 +128,7 @@ async def get_table(table_id: str, player_id: str):
 
 
 @app.delete("/api/table/{table_id}/player/{player_id}")
-async def get_table(table_id: str, player_id: str):
+async def delete_table(table_id: str, player_id: str):
     table = await get_item(table_id)
     if player_id in table['characters']:
         table['characters'].remove(player_id)
@@ -171,7 +171,7 @@ async def create_upload_file(file: UploadFile = File(...)):
 
 
 @app.get("/api/upload/{image_name}")
-async def create_upload_file(image_name: str):
+async def get_upload_file(image_name: str):
     path = "upload/" + image_name
     if '/' in image_name or not os.path.isfile(path):
         raise HTTPException(status_code=404,
@@ -205,9 +205,11 @@ class WebsocketGroup:
 table_groups = defaultdict(lambda: WebsocketGroup())
 sheet_groups = defaultdict(lambda: WebsocketGroup())
 
+KEEP_MSG_ARGS = ['from', 'from_name', 'using']
+
 
 @app.websocket("/ws/table/{table_id}")  # Chat
-async def websocket_endpoint(websocket: WebSocket, table_id: str):
+async def websocket_endpoint_table(websocket: WebSocket, table_id: str):
     table = await get_item(table_id)
     group = table_groups[table_id]
 
@@ -215,13 +217,16 @@ async def websocket_endpoint(websocket: WebSocket, table_id: str):
     await group.connect(websocket)
     for user_id in table['characters']:
         await sheet_groups[user_id].connect(websocket)
+    from_name = None
     try:
         while True:
             message = await websocket.receive_json()
             try:
                 send_message = process_message(message)
-                send_message['from'] = message['from']
-                send_message['from_name'] = message['from_name']
+                for key in KEEP_MSG_ARGS:
+                    if key in message:
+                        send_message[key] = message[key]
+                from_name = message['from_name']
                 if 'target' not in send_message:
                     if 'target' in message:
                         send_message['target'] = message['target']
@@ -249,10 +254,17 @@ async def websocket_endpoint(websocket: WebSocket, table_id: str):
         group.disconnect(websocket)
         for user_id in table['characters']:
             sheet_groups[user_id].disconnect(websocket)
+    if from_name is not None:
+        await group.broadcast({
+            'from': None,
+            'from_name': from_name,
+            'target': 'all',
+            'type': 'quit',
+        })
 
 
 @app.websocket("/ws/sheet/{sheet_id}")  # Sheet
-async def websocket_endpoint(websocket: WebSocket, sheet_id: str):
+async def websocket_endpoint_sheet(websocket: WebSocket, sheet_id: str):
     group = sheet_groups[sheet_id]
 
     await websocket.accept()

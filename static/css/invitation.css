@@ -1,0 +1,36 @@
+h1 {
+	margin-bottom: 0.2rem;
+}
+h2 {
+	margin-top: 0.2rem;
+    font-size: 1.1rem;
+    font-style: italic;
+    color: #6b6b6b;
+}
+
+.select_char > div {
+	display: inline-block;
+    vertical-align: middle;
+    margin-right: 20px;
+}
+.char_avatar {
+    width: 90px;
+    height: 90px;
+    background-color: gray;
+}
+.select_char {
+	cursor: pointer;
+	padding: 0.5em;
+    margin-top: 0.2em;
+    border: 2px solid black;
+    background: #e8e8e8;
+}
+.select_char:hover {
+	background: #ebffeb;
+    border-color: green;
+	border-radius: 5px;
+}
+.char_name {
+	margin-bottom: 1em;
+    font-family: fantasy;
+}

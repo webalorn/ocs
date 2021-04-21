@@ -1,4 +1,4 @@
-<div class="sheet" v-if="loaded" :class="{simplified: simplified}">
+<div class="sheet niceInputs" v-if="loaded" :class="{simplified: simplified}">
 	<div class="s_header scrollable">
 		<div class="avatar" v-on:click="updateAvatar" v-bind:style="avatarStyle"></div>
 		<div class="infos">
@@ -511,62 +511,7 @@
 					</div>
 					<textarea class="s_textarea" v-model="sheet.cs.combat"></textarea>
 
-					<table class="s_table table_etats">
-						<tr>
-							<th>Etat</th>
-							<th>Niveau</th>
-							<th>Etat</th>
-							<th>Niveau</th>
-						</tr>
-						<tr>
-							<td>Confusion</td>
-							<td>
-								<intnum-input v-model.number="sheet.etats.confusion" v-bind:min="0" v-bind:max="4">
-								</intnum-input>
-							</td>
-							<td>Douleur</td>
-							<td>
-								<intnum-input v-model.number="sheet.etats.douleur" v-bind:min="0" v-bind:max="4">
-								</intnum-input>
-							</td>
-						</tr>
-						<tr>
-							<td>Encombrement</td>
-							<td>
-								<intnum-input v-model.number="sheet.etats.encombrement" v-bind:min="0" v-bind:max="4">
-								</intnum-input>
-							</td>
-							<td>Étourdissement</td>
-							<td>
-								<intnum-input v-model.number="sheet.etats.etourdissement" v-bind:min="0" v-bind:max="4">
-								</intnum-input>
-							</td>
-						</tr>
-						<tr>
-							<td>Extase</td>
-							<td>
-								<intnum-input v-model.number="sheet.etats.extase" v-bind:min="0" v-bind:max="4">
-								</intnum-input>
-							</td>
-							<td>Paralysie</td>
-							<td>
-								<intnum-input v-model.number="sheet.etats.paralysie" v-bind:min="0" v-bind:max="4">
-								</intnum-input>
-							</td>
-						</tr>
-						<tr>
-							<td>Terreur</td>
-							<td>
-								<intnum-input v-model.number="sheet.etats.terreur" v-bind:min="0" v-bind:max="4">
-								</intnum-input>
-							</td>
-							<td>Ébriété</td>
-							<td>
-								<intnum-input v-model.number="sheet.etats.ebriete" v-bind:min="0" v-bind:max="4">
-								</intnum-input>
-							</td>
-						</tr>
-					</table>
+					<etats-table :sheet="sheet"></etats-table>
 
 					<sheet-etats-display v-bind:etats="sheet.etats"></sheet-etats-display>
 					<br />
@@ -897,14 +842,23 @@
 					</div>
 					<textarea class="s_textarea" v-model="sheet.notes.background" style="min-height: 20em;"></textarea>
 					<div class="special_actions simple_rm">
-						<button v-on:click="export_sheet" title="Raccourci : [e]">Exporter la fiche</button>
-						<br>
-						<button v-on:click="import_sheet">Importer sauvegarde / Optolith</button>
-						<template v-if="view == 'full'">
-							<br>
-							<input type="checkbox" id="checkbox_simplified" v-model="sheet.simplified">
-							<label for="checkbox_simplified">Vue simplifiée</label>
-						</template>
+						<div class="col_5">
+							<div>
+								<label>Id du personnage : </label><span>{{ id }}</span>
+								<template v-if="view == 'full'">
+									<br>
+									<input type="checkbox" id="checkbox_simplified" v-model="sheet.simplified">
+									<label for="checkbox_simplified">Vue simplifiée pour le joueur</label>
+								</template>
+							</div>
+						</div>
+						<div class="col_5">
+							<div>
+								<button v-on:click="export_sheet" title="Raccourci : [e]">Exporter la fiche</button>
+								<br>
+								<button v-on:click="import_sheet">Importer sauvegarde / Optolith</button>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

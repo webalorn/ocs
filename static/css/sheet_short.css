@@ -55,27 +55,6 @@
 	white-space: pre-wrap;
 }
 
-.ev_niv_1 .ev_niv_2 .ev_niv_3 .ev_niv_4 .ev_niv_5 {
-	font-style: italic;
-}
-.ev_niv_1 {
-	color: rgb(6, 17, 82);
-}
-.ev_niv_2 {
-	color: rgb(83, 45, 2);
-}
-.ev_niv_3 {
-	color: rgb(66, 0, 0);
-}
-.ev_niv_4 {
-	color: rgb(216, 0, 0);
-	background: rgb(87, 1, 1);
-}
-.ev_niv_5 {
-	color: rgb(230, 0, 0);
-	background: black;
-}
-
 
 .ssv_details {
 	z-index: 100;
@@ -91,11 +70,6 @@
 	padding: 2em;
 }
 
-.ssv_details_close {
-	margin: 2em 0px;
-	text-align: center;
-}
-
 .ssv_invit span {
 	font-weight: bold;
     text-decoration: underline;
@@ -103,24 +77,58 @@
 .ssv_invit a {
 	color: #3e3e3e;
 }
+.champ_ste { 
+	height: 1.5em;
+    padding-bottom: 4px;
+    line-height: 1.5em;
+}
 
-.add_player {
-	padding: 2em;
-	padding-bottom: 0em;
+.char_name {
+	margin-bottom: 1em;
+    font-family: fantasy;
 }
-.change_table_name {
-	padding: 2em;
-}
-.change_table_name, .add_player {
-	width: fit-content;
-	margin: auto;
-}
-.add_player input, .change_table_name input {
+
+.table_gm_only input {
 	margin-bottom: 0.7em;
 	width: 20em;
 }
-.add_player label, .change_table_name label {
+.table_gm_only label {
 	font-weight: bold;
 	display: block;
 	margin-bottom: 0.2em;
+}
+.gm_action {
+	width: fit-content;
+	margin: auto;
+	text-align: left;
+}
+
+/*
+	Edit status & state
+*/
+.winSte {
+	width: 90%;
+	max-width: 60em;
+	height: 20em;
+	padding: 0px;
+}
+.winSte .column {
+	padding: 0.4em;
+}
+
+/*
+	Bag
+*/
+.bag_item_list {
+	display: flex;
+	flex-wrap: wrap;
+}
+.bag_item {
+	flex: 1 0 40%;
+	border-bottom: 1px solid grey;
+}
+.bag_sep {
+	flex: 2 0 80%;
+	height: 1.5em;
+	/* border-bottom: 1px solid grey; */
 }

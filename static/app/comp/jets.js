@@ -120,20 +120,41 @@ Vue.component('jet-competence', {
 	data: function () {
 		return {
 			quals: {
-				qual1: 12,
-				qual2: 12,
-				qual3: 12,
+				qual1: 0,
+				qual2: 0,
+				qual3: 0,
 				select1: null,
 				select2: null,
 				select3: null,
 			},
 			vc: 0,
 			bonus: 0,
-			showTalentSelect: false,
 			talentLists: talentLists,
+			showTalentSelect: false,
+			showSpellSelect: false,
 			showBonuses: false,
 			rollName: '',
+
+			magic_titles: {
+				'domain': 'Domaine',
+				'duree_incant': 'Durée d\'incantation',
+			},
+			divin_titles: {
+				'domain': 'Aspect',
+				'duree_incant': "Durée d'oraison",
+			},
+			showSpellDetails: false,
+			spell: null,
+			titles: null,
 		};
+	},
+	mounted: function () {
+		document.addEventListener('openRoll', e => {
+			this.toogleTalentView();
+		}, false);
+		document.addEventListener('openSpells', e => {
+			this.toogleSpellView();
+		}, false);
 	},
 	computed: {
 		nr_routine: function () {
@@ -188,6 +209,9 @@ Vue.component('jet-competence', {
 		toogleBonusView: function () {
 			this.showBonuses = !this.showBonuses;
 		},
+		toogleSpellView: function () {
+			this.showSpellSelect = !this.showSpellSelect;
+		},
 		selectTalent: function (rollOn, vc, name) {
 			let quals = rollOn.toLowerCase().split("/");
 			this.vc = vc;
@@ -198,8 +222,14 @@ Vue.component('jet-competence', {
 			this.quals.select2 = quals[1];
 			this.quals.select3 = quals[2];
 			this.showTalentSelect = false;
+			this.showSpellSelect = false;
 			this.rollName = name;
 			// this.bonus = 0;
+		},
+		displaySpell: function (titles, spell) {
+			this.spell = spell;
+			this.titles = titles;
+			this.showSpellDetails = true;
 		},
 	},
 	template: `
@@ -226,12 +256,12 @@ Vue.component('jet-competence', {
 			<span v-if="nr_routine!=0">NR = {{nr_routine}}</span>
 		</div>
 		<div class="inrc_actions inrc_actions_2">
-			<input class="inrc_roll_name" v-model.trim="rollName" placeholder="Jet de..." />
+			<input class="inrc_roll_name" v-model.trim="rollName" placeholder="Nom de la compétence..." />
 			<button class="inrc_send" v-on:click="send">Effectuer le jet</button>
 		</div>
 
 		<template v-if="showTalentSelect">
-			<div class="winBack" v-on:click="toogleTalentView"></div>
+			<div class="winBack" v-on:click.self="toogleTalentView"></div>
 			<div class="talent_select select_win scrollable">
 				<div class="col_in_win">
 					<h3>Talents physiques</h3>
@@ -265,21 +295,48 @@ Vue.component('jet-competence', {
 						v-bind:talents="identity.sheet.talents" v-bind:cat="'savoir'" 
 						v-bind:stat="tal" v-bind:key="'stal_savoir_' + tal"></inrc-selector-talent>
 				</div>
+			</div>
+		</template>
 
+		<template v-if="showSpellSelect">
+			<div class="winBack" v-on:click.self="toogleSpellView"></div>
+			<div class="talent_select select_win scrollable">
 				<template v-if="identity.deriv.stats.ea">
 					<h3>Sortilièges</h3>
-					<select-spell-item v-for="(w, iw) in identity.sheet.sorts" :key="'spell_' + iw" :eventFct="selectTalent" :name="w[0]" :vc="w[2]" :roll="w[1]"></select-spell-item>
+					<select-spell-item v-for="(w, iw) in identity.sheet.sorts" :key="'spell_' + iw" :eventFct="selectTalent" :spell="w" :titles="divin_titles" :showFct="displaySpell"></select-spell-item>
 				</template>
 
 				<template v-if="identity.deriv.stats.ek">
 					<h3>Liturgies</h3>
-					<select-spell-item v-for="(w, iw) in identity.sheet.liturgies" :key="'liturgie_' + iw" :eventFct="selectTalent" :name="w[0]" :vc="w[2]" :roll="w[1]"></select-spell-item>
+					<select-spell-item v-for="(w, iw) in identity.sheet.liturgies" :key="'liturgie_' + iw" :eventFct="selectTalent" :spell="w" :titles="magic_titles" :showFct="displaySpell"></select-spell-item>
 				</template>
 			</div>
 		</template>
 
+		<template v-if="showSpellDetails">
+			<div class="winBack" v-on:click.stop="showSpellDetails = false;"></div>
+			<div class="select_win scrollable">
+				<h3>{{ spell[0] }}</h3>
+				<div class="col_in_win">
+					<strong>Nom :</strong> {{ spell[0] }} <br>
+					<strong>Épreuve :</strong> {{ spell[1] }} <br>
+					<strong>Valeur de compétence (VC) :</strong> {{ spell[2] }} <br>
+					<strong>{{titles.domain}} :</strong> {{ spell[7] }} <br>
+				</div>
+				<div class="col_in_win">
+					<strong>Coût :</strong> {{ spell[3] }} <br>
+					<strong>Durée :</strong> {{ spell[4] }} <br>
+					<strong>Portée :</strong> {{ spell[5] }} <br>
+					<strong>{{titles.duree_incant}} :</strong> {{ spell[6] }} <br>
+				</div>
+				<h4>Description</h4>
+				<p style="text-align:left;">{{ spell[9] }}</p>
+				<button v-on:click="showSpellDetails = false;" class="centerButton">Fermer</button>
+			</div>
+		</template>
+
 		<template v-if="showBonuses">
-			<div class="winBack" v-on:click="toogleBonusView"></div>
+			<div class="winBack" v-on:click.self="toogleBonusView"></div>
 			<div class="bonusesWin select_win scrollable" v-on:click="toogleBonusView">
 				<div class="col_in_win">
 					<h3>Compétence</h3>
@@ -396,7 +453,7 @@ Vue.component('inrc-selector-talent', {
 		},
 	},
 	template: `
-	<div class="inrc_talent" v-on:click="select">
+	<div class="inrc_talent inrc_talent_select" v-on:click="select">
 		<span class="inrc_tal_name">{{ infos.name }}</span>
 		<span class="inrc_tal_roll">({{ infos.roll }})</span>
 		<span class="inrc_tal_enc" v-if="infos.enc!='NON'">[ENC : {{infos.enc}}]</span>
@@ -406,12 +463,16 @@ Vue.component('inrc-selector-talent', {
 });
 
 Vue.component('select-spell-item', {
-	props: ['eventFct', 'name', 'vc', 'roll'],
+	props: ['eventFct', 'titles', 'spell', 'showFct'],
 	data: function () {
-		let qs = this.roll.toLowerCase().split('/');
+		let qs = this.spell[1].toLowerCase().split('/');
 		return {
 			qualsOk: qs.length == 3 && qualNames.includes(qs[0])
 				&& qualNames.includes(qs[1]) && qualNames.includes(qs[2]),
+			showDetails: false,
+			vc: this.spell[2],
+			roll: this.spell[1],
+			name: this.spell[0],
 		};
 	},
 	methods: {
@@ -425,10 +486,13 @@ Vue.component('select-spell-item', {
 	},
 	template: `
 	<div>
-		<div class="inrc_talent" v-on:click="select" v-if="name.trim()" v-bind:class="{inrc_spell_error : !qualsOk}">
-			<span class="inrc_tal_name">{{ name }}</span>
-			<span class="inrc_tal_roll">({{ roll }})</span>
-			<span class="inrc_tal_val">{{ vc }}</span>
+		<div class="inrc_talent" v-if="name.trim()">
+			<div class="inrc_tal_show simpleButton" v-on:click="showFct(titles, spell)"></div>
+			<div class="inrc_talent_select" v-on:click="select" v-bind:class="{inrc_spell_error : !qualsOk}">
+				<span class="inrc_tal_name">{{ name }}</span>
+				<span class="inrc_tal_roll">({{ roll }})</span>
+				<span class="inrc_tal_val">{{ vc }}</span>
+			</div>
 		</div>
 	</div>
 	`,
@@ -528,17 +592,42 @@ Vue.component('jet-fight', {
 	props: ['socket', 'identity', 'config'],
 	data: function () {
 		return {
-			ini: 12,
-			at: 12,
+			ini: this.identity.deriv.stats.ini,
+			at: 0,
 			modif_at: 0,
-			damages: '1D6+1',
-			prd: 6,
-			esq: 6,
+			damages: '1D1-1',
+			prd: 0,
+			esq: this.identity.deriv.stats.esq,
 			showAttackSelect: false,
 			showBonuses: false,
+			weaponName: '',
 		};
 	},
+	mounted: function () {
+		document.addEventListener('openWeapons', e => {
+			this.toogleAttackView();
+		}, false);
+	},
+	computed: {
+		hasRanged: function () {
+			return this.doesTablExists(this.identity.sheet.armes.distance);
+		},
+		hasArmor: function () {
+			return this.doesTablExists(this.identity.sheet.armes.armures);
+		},
+		hasShield: function () {
+			return this.doesTablExists(this.identity.sheet.armes.parade);
+		},
+	},
 	methods: {
+		doesTablExists: function (table) {
+			for (let el of table) {
+				if (el[0].length > 0) {
+					return true;
+				}
+			}
+			return false;
+		},
 		sendIni: function () {
 			this.socket.send_json({
 				'type': 'initiative',
@@ -555,6 +644,7 @@ Vue.component('jet-fight', {
 				'from_name': this.identity.name,
 				'roll': this.at + this.modif_at,
 				'target': this.config.target,
+				'using': this.weaponName,
 			});
 		},
 		sendDmg: function () {
@@ -564,6 +654,7 @@ Vue.component('jet-fight', {
 				'from_name': this.identity.name,
 				'roll': '' + this.damages,
 				'target': this.config.target,
+				'using': this.weaponName,
 			});
 		},
 		sendPrd: function () {
@@ -573,6 +664,7 @@ Vue.component('jet-fight', {
 				'from_name': this.identity.name,
 				'roll': this.prd,
 				'target': this.config.target,
+				'using': this.weaponName,
 			});
 		},
 		sendEsq: function () {
@@ -590,7 +682,8 @@ Vue.component('jet-fight', {
 		toogleBonusView: function () {
 			this.showBonuses = !this.showBonuses;
 		},
-		selectWeapon: function (at, prd, pi) {
+		selectWeapon: function (name, at, prd, pi) {
+			this.weaponName = name;
 			this.showAttackSelect = false;
 			this.at = at === null ? this.at : at;
 			this.prd = prd === null ? this.prd : prd;
@@ -601,12 +694,12 @@ Vue.component('jet-fight', {
 	<div class="rfight_view">
 		<table>
 			<tr>
-				<th>INI ({{ identity.deriv.stats.ini }})</th>
+				<th data-tooltip="Initiative">Initiative ({{ identity.deriv.stats.ini }})</th>
 				<th class="inrc_view_clickable" v-on:click="toogleAttackView">Attaque</th>
 				<th class="inrc_view_clickable" v-on:click="toogleBonusView">Bonus / Malus</th>
 				<th>Dégâts</th>
-				<th>PRD</th>
-				<th>ESQ ({{ identity.deriv.stats.esq }})</th>
+				<th>Parade</th>
+				<th data-tooltip="Esquive">Esquive (1{{ identity.deriv.stats.esq }})</th>
 			</tr>
 			<tr>
 				<td><input type="number" v-model.number="ini"></td>
@@ -623,22 +716,55 @@ Vue.component('jet-fight', {
 				<td><button class="rfight_prd" v-on:click="sendPrd">Parer</button></td>
 				<td><button class="rfight_esq" v-on:click="sendEsq">Esquiver</button></td>
 			</tr>
+			<tr>
+				<td></td>
+				<td colspan="4" class="rfight_weapon_name">
+					<input v-model.trim="weaponName" placeholder="Nom de l'arme..." />
+				</td>
+				<td></td>
+			</tr>
 		</table>
 
 
 		<template v-if="showAttackSelect">
-			<div class="winBack" v-on:click="toogleAttackView"></div>
-			<div class="attack_select select_win scrollable">
+			<div class="winBack" v-on:click.self="toogleAttackView"></div>
+			<div class="attack_select select_win scrollable niceInputs">
 				<h3>Armes de contact</h3>
-				<select-weapon-item v-for="(w, iw) in identity.sheet.armes.melee" :key="'melee_' + iw" :eventFct="selectWeapon" :name="w[0]" :pi="w[3]" :at="w[6]" :prd="w[7]"></select-weapon-item>
+				<select-weapon-item v-for="(w, iw) in identity.sheet.armes.melee" :key="'melee_' + iw" :eventFct="selectWeapon" :name="w[0]" :pi="w[3]" :at="w[6]" :prd="w[7]" :al="w[5]"></select-weapon-item>
 
-				<h3>Armes à distance</h3>
-				<select-weapon-item v-for="(w, iw) in identity.sheet.armes.distance" :key="'dist_' + iw" :eventFct="selectWeapon" :name="w[0]" :pi="w[3]" :at="w[6]" :prd="0"></select-weapon-item>
+				<template v-if="hasRanged">
+					<h3>Armes à distance</h3>
+					<select-weapon-item v-for="(w, iw) in identity.sheet.armes.distance" :key="'dist_' + iw" :eventFct="selectWeapon" :name="w[0]" :pi="w[3]" :at="w[6]" :prd="0" :po="w[5]" :dc="w[2]"></select-weapon-item>
+
+					<h4>Munitions</h4>
+					<div v-for="(w, iw) in identity.sheet.armes.distance" :key="'munitons_' + iw" v-if="w[0].length > 0" class="minutions_row">
+						<span>{{ w[0] }} :</span>
+						<input type="text" style="width: 10em; text-align: left;" v-model="w[4]" class="field" />
+					</div>
+				</template>
+
+				<template v-if="hasArmor">
+					<h3>Armure</h3>
+
+					<div v-for="(w, iw) in identity.sheet.armes.armures" :key="'armor_' + iw" v-if="w[0].length > 0" class="pr_row">
+						<span class="weapon_name">{{ w[0] }} </span>
+						<span class="weapon_infos">(Protection {{ w[1] }})</span>
+					</div>
+				</template>
+
+				<template v-if="hasShield">
+					<h3>Boucliers(s)</h3>
+
+					<div v-for="(w, iw) in identity.sheet.armes.parade" :key="'shield_' + iw" v-if="w[0].length > 0" class="pr_row">
+						<span class="weapon_name">{{ w[0] }} </span>
+						<span class="weapon_infos">(Protection {{ w[2] }})</span>
+					</div>
+				</template>
 			</div>
 		</template>
 
 		<template v-if="showBonuses">
-			<div class="winBack" v-on:click="toogleBonusView"></div>
+			<div class="winBack" v-on:click.self="toogleBonusView"></div>
 			<div class="bonusesWin select_win scrollable" v-on:click="toogleBonusView">
 				Prendre en compte les états, status, et l'encombrement si applicable.
 				<div class="col_in_win">
@@ -733,21 +859,26 @@ Vue.component('jet-fight', {
 });
 
 Vue.component('select-weapon-item', {
-	props: ['eventFct', 'name', 'pi', 'at', 'prd'],
+	props: ['eventFct', 'name', 'pi', 'at', 'prd', 'po', 'al', 'dc'],
 	data: function () {
 		return {
 		};
 	},
 	methods: {
 		select: function () {
-			this.eventFct(this.at, this.prd, this.pi);
+			this.eventFct(this.name, this.at, this.prd, this.pi);
 		},
 	},
 	template: `
 	<div>
 		<div class="select_weapon_item" v-on:click="select" v-if="name.trim()">
 			<span class="weapon_name">{{ name }}</span>
-			<span class="weapon_dmg">({{ pi }} PI)</span>
+			<span class="weapon_infos">(<!--
+				--><template v-if="!dc && !po">{{ pi }} PI</template><!--
+				--><template v-if="po">Portée {{po}}</template><!--
+				--><template v-if="al">, allonge {{al}}</template><!--
+				--><template v-if="dc">, charger : {{dc}}</template><!--
+			-->)</span>
 		</div>
 	</div>
 	`,

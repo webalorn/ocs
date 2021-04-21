@@ -20,6 +20,12 @@ var app = new Vue({
 		roll: {
 			target: "all",
 		},
+		events: {
+			openRoll: new Event('openRoll'),
+			openWeapons: new Event('openWeapons'),
+			openSpells: new Event('openSpells'),
+			openBag: new Event('openBag'),
+		},
 	},
 	methods: {
 		open_sheet: function () {
@@ -150,7 +156,10 @@ var app = new Vue({
 		},
 		dragHandler: function (ev) {
 			ev.preventDefault();
-		}
+		},
+		fireEvent: function (name) {
+			document.dispatchEvent(this.events[name]);
+		},
 	},
 	mounted: function () {
 		this.tableId = this.urlParams.get("table");
@@ -162,6 +171,9 @@ var app = new Vue({
 			} else {
 				answer.json().then(data => {
 					this.setTitle(data['name']);
+					let defSheet = newDefaultSheet();
+					let defDeriv = compute_derived(defSheet);
+
 					if (this.urlParams.get("gm")) {
 						if (this.urlParams.get('gm') != miniHash(this.urlParams.get('table'))) {
 							this.errorMessage = "Vous n'êtes pas le MJ";
@@ -171,9 +183,11 @@ var app = new Vue({
 							'id': '0',
 							'name': 'MJ',
 							'gm': true,
-							'sheet': newDefaultSheet(),
-							'deriv': compute_derived(newDefaultSheet()),
+							'sheet': defSheet,
+							'deriv': defDeriv,
+							'initOk': true,
 						};
+						this.connected = true;
 					} else {
 						if (this.urlParams.get("id") === null) {
 							this.errorMessage = "Il faut un personnage pour rejoindre";
@@ -184,8 +198,9 @@ var app = new Vue({
 							'name': '',
 							'player_name': '',
 							'gm': false,
-							'sheet': newDefaultSheet(),
-							'deriv': compute_derived(newDefaultSheet()),
+							'sheet': defSheet,
+							'deriv': defDeriv,
+							'initOk': false,
 						};
 						if (!data['characters'].includes(this.identity.id)) {
 							this.errorMessage = "Le personnage " + this.identity.id + " n'appartient pas à cette table de jeu";
@@ -198,9 +213,9 @@ var app = new Vue({
 								this.identity.name = data.content.head.nom;
 								this.identity.player_name = data.content.owner;
 								storage_set_in_dict('idToName', this.identity.id, this.identity.name);
+								this.connected = true;
 							});
 					}
-					this.connected = true;
 					this.characters = data['characters'];
 					this.characters.sort(this.compCharacters);
 					this.markAsRecentTable();
