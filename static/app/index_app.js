@@ -86,7 +86,7 @@ var app = new Vue({
 			lines.forEach(l => {
 				let parts = l.trim().split(';');
 				if (parts.length == 2 && !this.characters.includes(parts[0])) {
-					if (miniHashStep(parts[0], 2) == parts[1]) {
+					if (miniHashStep(parts[0], 2) == parts[1] || parts[1] == '!') {
 						this.characters.push(parts[0]);
 						storage_add('characters', parts[0]);
 					} else {

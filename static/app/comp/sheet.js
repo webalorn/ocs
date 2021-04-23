@@ -6,6 +6,7 @@ const saveInactiveDelay = 4 * 1000;
 const autoCheckInterval = 500;
 
 function newSaveManager(dataInit, prepareData, saveInactive = saveInactiveDelay) {
+	console.log('saveInactive', saveInactive);
 	let data = dataInit;
 	let lastSavedData = cloneData(data);
 	let lastModif = Date.now();
@@ -754,7 +755,7 @@ function create_sheet_component(sheet_template) {
 						ans.json().then(data => {
 							data = mergeDatas(newDefaultSheet(), data);
 							this.sheet = data;
-							alert("Import Optolith réussi : il faut compléter les champs manquants (Nom du joueur, PAV dépensés)");
+							alert("Import Optolith réussi : il faut compléter les champs manquants (Nom du joueur, PAV dépensés, munitions)");
 						});
 					} else {
 						ans.json().then(data => {

@@ -15,11 +15,14 @@ from api.sheet import is_optolith_available, load_optolith_data, convert_from_op
 
 from pathlib import Path
 import shutil, os
-from datetime import datetime
+from datetime import datetime, timezone
+from dateutil import tz
+
+Path("upload").mkdir(parents=True, exist_ok=True)
 
 app = FastAPI()
 app.mount("/web", StaticFiles(directory="static"), name="static")
-Path("upload").mkdir(parents=True, exist_ok=True)
+app.mount("/upload", StaticFiles(directory="upload"), name="static")
 
 if not Path("optolith-data").is_dir():
     Path("optolith-data").mkdir(parents=True, exist_ok=True)
@@ -167,17 +170,16 @@ async def create_upload_file(file: UploadFile = File(...)):
     path = "upload/" + new_id() + '.' + file.filename.split('.')[-1]
     with open(path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-    return {"url": '/api/' + path}
+    return {"url": '/' + path}
 
 
-@app.get("/api/upload/{image_name}")
-async def get_upload_file(image_name: str):
-    path = "upload/" + image_name
-    if '/' in image_name or not os.path.isfile(path):
-        raise HTTPException(status_code=404,
-                            detail=f"Image {image_name} doesn't exists")
-    return FileResponse(path)
-
+# @app.get("/api/upload/{image_name}")
+# async def get_upload_file(image_name: str):
+#     path = "upload/" + image_name
+#     if '/' in image_name or not os.path.isfile(path):
+#         raise HTTPException(status_code=404,
+#                             detail=f"Image {image_name} doesn't exists")
+#     return FileResponse(path)
 
 # ========== Sockets ==========
 
@@ -233,7 +235,11 @@ async def websocket_endpoint_table(websocket: WebSocket, table_id: str):
                     else:
                         send_message['target'] = 'all'
                 send_message['roll_name'] = message.get('roll_name', '')
-                send_message['time'] = datetime.now().strftime("%H:%M")
+
+                utc_time = datetime.now(timezone.utc)
+                to_zone = tz.gettz('France/Paris')
+                now = utc_time.astimezone(to_zone)
+                send_message['time'] = now.strftime("%H:%M")
                 # if send_message.get('target', None) == 'self':
                 #     await websocket.send_json(send_message)
                 # else:

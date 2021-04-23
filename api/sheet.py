@@ -31,6 +31,42 @@ def as_float(n):
 OPTO_SEXS = {'m': 'Masculin', 'f': 'Féminin'}
 OPTO_AL = ['AL?', 'Courte', 'Moyenne', 'Longue', 'Très longue']
 OPTO_DATA_V1 = None
+ITEM_PAQUETAGES = {
+    'paquetage de voyage':
+    [["Amadou, 25 portions", 0.025, ""],
+     ["Amulettes, figurines de dieux et autres objets personnels", 2.175, ""],
+     ["Bandages (x10)", 0.05, ""],
+     ["Boîte à amadou, place pour 25 portions", 0.2, ""],
+     ["Bol en bois", 0.2, ""], ["Bourse", 0.05, ""],
+     ["Briquet à amadou", 0.25, ""], ["Corde d'escalade, 10 pas", 5, ""],
+     ["Couteau", 0.25, ""], ["Couverts", 0.1, ""],
+     ["Couverture en laine", 1.5, ""], ["Gobelet", 0.1, ""],
+     ["Grappin", 1, ""], ["Hachette", 0.75, ""],
+     ["Matériel d'entretien des armes (pierre d'affûtage, tissu)", 1, ""],
+     ["Outre", 0.25, ""], ["Provisions pour 3 jours", 4.5, ""],
+     ["Sac à dos en cuir", 2, ""], ["Set de fils et aiguilles", 0.1, ""],
+     ["Torche", 0.5, ""]],
+    'paquetage de survie':
+    [["Amadou, 25 portions", 0.025, ""], ["Bandages (x10)", 0.05, ""],
+     ["Boîte à amadou, place pour 25 portions", 0.2, ""],
+     ["Bol en bois", 0.2, ""], ["Briquet à amadou", 0.25, ""],
+     ["Couverture en laine", 1.5, ""], ["Corde d'escalade, 10 pas", 5, ""],
+     ["Couteau", 0.25, ""], ["Grappin", 1, ""], ["Hachette", 0.75, ""],
+     ["Matériel d'entretien d'armes (pierre d'affûtage, tissu)", 1, ""],
+     ["Outre (x2)", 0.5, ""], ["Provisions pour 5 jours", 7.5, ""],
+     ["Sac à dos en cuir", 2, ""], ["Set de fils et aiguilles", 0.1, ""],
+     ["Tente, 1 personne", 3, ""], ["Torche", 0.5, ""]],
+    'paquetage citadin': [["Amadou, 25 portions", 0.025, ""],
+                          ["Aumônière (bourse)", 0.1, ""],
+                          ["Bandages (x10)", 0.05, ""],
+                          ["Boîte à amadou (place pour 25 portions)", 0.2, ""],
+                          ["Couteau", 0.25, ""],
+                          ["Crayon de charbon", 0.05, ""],
+                          ["Huile pour lampe, 8h de combustion", 0.25, ""],
+                          ["Lampe à huile", 0.25, ""],
+                          ["Papier, 1 feuille", 0.05, ""],
+                          ["Set de fils et aiguilles", 0.1, ""]],
+}
 
 
 def list_ids_to_dicts(data):
@@ -171,6 +207,12 @@ def to_roman(n):
     return 'I' * n
 
 
+def to_roman_maitrise(n):
+    if n == 4:
+        return 'III (natif)'
+    return to_roman(n)
+
+
 S_FORMAT = ['SA_27', 'SA_29']
 
 
@@ -207,7 +249,7 @@ def format_activables(name, data, source):
             parts = [desc['name']]
             if name in source:
                 if 'tier' in conf:
-                    parts.append(to_roman(conf['tier']))
+                    parts.append(to_roman_maitrise(conf['tier']))
                 if 'sid' in conf:
                     option = None
                     if type(conf['sid']) == int:
@@ -249,8 +291,8 @@ async def convert_from_optolith_v1(data):
     for q in data['attr']['values']:
         quals[q['id']] = q['value']
 
-    taille_masse = personal.get("", "?") + "pieds / " + personal.get(
-        "", "?") + " pierres"
+    taille_masse = personal.get("size", "?") + "pieds / " + personal.get(
+        "weight", "?") + " pierres"
     sexe = OPTO_SEXS.get(data.get("sex", ""), '')
 
     race = opt_get(data['r'])
@@ -303,6 +345,9 @@ async def convert_from_optolith_v1(data):
             bonus_tp += conf[0].get('tier', 1)
         if name == 'ADV_9':
             bonus_vi += 1
+
+        if name == 'SA_51':
+            bonus_ini += conf[0].get('tier', 1)
 
         if name == 'DISADV_31':
             des_delta -= conf[0].get('tier', 1)
@@ -361,6 +406,7 @@ async def convert_from_optolith_v1(data):
         desavantages.append(f"Perte permanente d'énergie vitale : -{perte}PV")
 
     items = []
+    paquetages = []
     items_melee = []
     items_distance = []
     items_armures = []
@@ -410,8 +456,16 @@ async def convert_from_optolith_v1(data):
                 name, item['pro'], item['enc'],
                 '-1 VI, -1 INI' if item['pro'] % 2 == 1 else '', '', weight
             ])
+        elif name.lower() in ITEM_PAQUETAGES:
+            paquetages.append((name, ITEM_PAQUETAGES[name.lower()]))
         else:
             items.append([name, weight, item.get('where', '')])
+
+    for p in paquetages:
+        items.append(['', 0, ''])  # Séparation
+        items.append([p[0] + ' :', 0, ''])
+        for it in p[1]:
+            items.append(['-> ' + it[0], it[1], it[2]])
 
     worn = [None, 0, 0, '', '', 0]
     if items_armures:
@@ -431,9 +485,14 @@ async def convert_from_optolith_v1(data):
         spell = opt_get(name)
         spells.append([
             spell['name'],
-            qual_format(spell.get('check1', ''), spell.get('check2', ''), spell.get('check3', '')),
-            str(vc), spell.get('aeCostShort', ''), spell.get('durationShort', ''),
-            spell.get('rangeShort', ''), spell.get('castingTimeShort', ''), '', spell.get('ic', ''),
+            qual_format(spell.get('check1', ''), spell.get('check2', ''),
+                        spell.get('check3', '')),
+            str(vc),
+            spell.get('aeCostShort', ''),
+            spell.get('durationShort', ''),
+            spell.get('rangeShort', ''),
+            spell.get('castingTimeShort', ''), '',
+            spell.get('ic', ''),
             spell.get('effect', ''), ''
         ])
 
@@ -442,9 +501,14 @@ async def convert_from_optolith_v1(data):
         lit = opt_get(name)
         liturgies.append([
             lit['name'],
-            qual_format(lit.get('check1', ''), lit.get('check2', ''), lit.get('check3', '')),
-            str(vc), lit.get('kpCostShort', ''), lit.get('durationShort', ''),
-            lit.get('rangeShort', ''), lit.get('castingTimeShort', ''), '', lit.get('ic', ''),
+            qual_format(lit.get('check1', ''), lit.get('check2', ''),
+                        lit.get('check3', '')),
+            str(vc),
+            lit.get('kpCostShort', ''),
+            lit.get('durationShort', ''),
+            lit.get('rangeShort', ''),
+            lit.get('castingTimeShort', ''), '',
+            lit.get('ic', ''),
             lit.get('effect', ''), ''
         ])
 
@@ -510,19 +574,34 @@ async def convert_from_optolith_v1(data):
         "version":
         CONVERT_TARGET,
         "head": {
-            "nom": data.get("name", "") + titre,
-            "sexe": sexe,
-            "peuple": opto['Races'][data['r']]['name'] + peuple_from,
-            "date_naissance": personal.get("dateofbirth", ""),
-            "age": age,
-            "cheveux": haircolor,
-            "yeux": eyecolor,
-            "taille_masse": taille_masse,
-            "profession": opto['Professions'][data['p']]['name'],
-            "culture": opto['Cultures'][data['c']]['name'],
-            "niveau_social": socialstatus,
-            "lieu_naissance": personal.get("placeofbirth", ""),
-            "famille": personal.get("family", ""),
+            "nom":
+            data.get("name", "") + titre,
+            "sexe":
+            sexe,
+            "peuple":
+            opto['Races'][data['r']]['name'] + peuple_from,
+            "date_naissance":
+            personal.get("dateofbirth", ""),
+            "age":
+            age,
+            "cheveux":
+            haircolor,
+            "yeux":
+            eyecolor,
+            "taille_masse":
+            taille_masse,
+            "profession":
+            opto['Professions'].get(
+                data['p'],
+                {'name': 'Profession créée par l\'utilisateur'})['name'],
+            "culture":
+            opto['Cultures'][data['c']]['name'],
+            "niveau_social":
+            socialstatus,
+            "lieu_naissance":
+            personal.get("placeofbirth", ""),
+            "famille":
+            personal.get("family", ""),
         },
         "qualites": {
             "co": quals['ATTR_1'],
@@ -807,10 +886,10 @@ async def convert_from_optolith_v1(data):
             },
         },
         "argent": [
-            as_int(data['belongings']['purse']['d']),
-            as_int(data['belongings']['purse']['s']),
-            as_int(data['belongings']['purse']['h']),
             as_int(data['belongings']['purse']['k']),
+            as_int(data['belongings']['purse']['h']),
+            as_int(data['belongings']['purse']['s']),
+            as_int(data['belongings']['purse']['d']),
         ],
         "etats": {
             "encombrement": worn[2],
