@@ -17,12 +17,14 @@ Vue.component('chat-compo', {
 			if (data.type == 'notification') {
 				return;
 			}
+			let d = new Date();
 			let elMsgList = this.$el.querySelector('.chat_message_list');
 			this.scrollMsg = (elMsgList.clientHeight + elMsgList.scrollTop + 50 >= elMsgList.scrollHeight);
 			data.target_ok = true;
 			if (data.target == 'game_master' && !this.identity.gm) {
 				data.target_ok = false;
 			}
+			data['time'] = `${d.getHours()}:${d.getMinutes()}`;
 			if (data.type == 'message' && data.display == 'text') {
 				if (isLink(data.message)) {
 					data.display = 'link';
@@ -138,7 +140,7 @@ Vue.component('chat-compo', {
 				Liens et images supportés (peut nécessiter <code>/img url</code>).<br>
 				<em>Vous pouvez utiliser le modificateur <code>h</code> pour cacher un jet (<code>/rh d20</code>), le modificateur <code>j</code> pour envoyer uniquement au MJ (<code>/rj d20</code>).</em>
 			</div>
-			<div class="chat_message" v-for='m in messages' v-bind:class="{chat_message_self : m.from == identity.id}">
+			<div class="chat_message" v-for='(m, i_msg) in messages' v-bind:class="{chat_message_self : m.from == identity.id}" :key="'message_'+i_msg">
 				<div class="chat_message_name" v-if="m.type != 'error' && m.type != 'join' && m.type != 'quit'">
 					<span class="chat_message_user">{{ m.from_name }}</span>
 					<span class="chat_message_time">[{{ m.time }}]</span>

@@ -31,7 +31,8 @@
 				</template>
 				<span class="top_name" v-else>{{ identity.name }}</span>
 
-				<button v-on:click="open_sheet" v-if="!identity.gm" class="top_edit_sheet">Voir ma fiche</button>
+				<button v-on:click="open_sheet" v-if="!identity.gm && options.sheetView != 'no'"
+					class="top_edit_sheet">Voir ma fiche</button>
 				<span class="top_table_name">{{ tableName }}</span>
 			</div>
 
@@ -45,12 +46,12 @@
 				</div>
 				<div class="column">
 					<jet-competence v-if="!reroll_comp.dice" v-bind:socket="socket" v-bind:identity="identity"
-						v-bind:config="roll"></jet-competence>
+						v-bind:config="roll" :simple_rules="useSimpleRules"></jet-competence>
 
 					<reroll-competence v-if="reroll_comp.dice" v-bind:socket="socket" v-bind:identity="identity"
 						v-bind:reroll_comp="reroll_comp"></reroll-competence>
 
-					<div class="roll_config">
+					<div class="roll_config" v-if="options.choose_roll_target || identity.gm">
 						<div class="roll_target switch_radio">
 							<!-- <option value="self">Jet caché</option>
 					<option value="game_master">Jet derrière l'écran</option>
@@ -85,18 +86,33 @@
 			<div v-if="identity.gm" class="table_gm_only col_container">
 				<div class="column">
 					<div class="gm_action">
-						<label>Ajouter des joueurs</label><br>
-						<input v-model.trim="newPlayerId" placeholder="Id de la fiche"> <br />
-						<button v-on:click="addPlayer" v-bind:disabled="!newPlayerId">Ajouter un joueur</button>
-					</div>
-					<div class="gm_action">
-						<label>Changer le nom de la table</label><br>
-						<input v-model.trim="newTableName" placeholder="Id de la fiche"> <br />
-						<button v-on:click="updateTableName"
-							v-bind:disabled="!newTableName || newTableName == tableName">Modifier</button>
+						<h3>Configuration</h3>
+						<label>Nom de la table</label><br>
+						<input type="text" v-model.trim="newTableName" placeholder="Id de la fiche"> <br />
+
+						<label>Fiches de personages</label><br>
+						<select v-model="options.sheetView">
+							<option value="default">Par défaut</option>
+							<option value="full">Fiche complète</option>
+							<option value="simple">Fiche simplifiée</option>
+							<option value="no">Non-visible</option>
+						</select>
+						<br>
+						<label for="choose_roll_target">Choisir la cible du jet</label>
+						<input type="checkbox" v-model="options.choose_roll_target" id="choose_roll_target">
+						<br>
+						<label for="simple_rules">Version simplifiée</label>
+						<input type="checkbox" v-model="options.simple_rules" id="simple_rules">
+						<br><br>
+						<button v-on:click="updateTableOptions">Mettre à jour</button>
 					</div>
 				</div>
 				<div class="column">
+					<div class="gm_action">
+						<label>Ajouter des joueurs</label><br>
+						<input type="text" v-model.trim="newPlayerId" placeholder="Id de la fiche"> <br />
+						<button v-on:click="addPlayer" v-bind:disabled="!newPlayerId">Ajouter un joueur</button>
+					</div>
 					<div class="gm_action">
 						<strong>Lien d'invitation générique</strong><br>
 						<a :href="'/web/invitation.html?table=' + tableId" target="_blank">{{ window.location.protocol
@@ -125,6 +141,9 @@
 	<script src="app/comp/sheet.js"></script>
 	<script src="app/comp/sheet_short.js"></script>
 	<script src="app/table_app.js"></script>
+	<script>
+		keepalive_server();
+	</script>
 </body>
 
 </html>

@@ -857,6 +857,10 @@
 								<button v-on:click="export_sheet" title="Raccourci : [e]">Exporter la fiche</button>
 								<br>
 								<button v-on:click="import_sheet">Importer sauvegarde / Optolith</button>
+								<template v-if="view == 'full'">
+									<br>
+									<button v-on:click="clone_sheet">Cloner la fiche</button>
+								</template>
 							</div>
 						</div>
 					</div>

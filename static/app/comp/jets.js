@@ -116,7 +116,7 @@ function probaString(p) {
 }
 
 Vue.component('jet-competence', {
-	props: ['socket', 'identity', 'config'],
+	props: ['socket', 'identity', 'config', 'simple_rules'],
 	data: function () {
 		return {
 			quals: {
@@ -239,7 +239,8 @@ Vue.component('jet-competence', {
 				<qual-selector v-bind:quals="quals" v-bind:num="1" v-bind:qualities="identity.sheet.qualites"></qual-selector>
 				<qual-selector v-bind:quals="quals" v-bind:num="2" v-bind:qualities="identity.sheet.qualites"></qual-selector>
 				<qual-selector v-bind:quals="quals" v-bind:num="3" v-bind:qualities="identity.sheet.qualites"></qual-selector>
-				<th class="inrc_view_clickable" v-on:click="toogleTalentView">VC</th>
+				<th class="inrc_view_clickable" v-on:click="toogleTalentView" v-if="identity.gm">VC</th>
+				<th v-else>VC</th>
 				<th :data-tooltip="success_proba" class="inrc_view_clickable" v-on:click="toogleBonusView">Bonus / Malus</th>
 			</tr>
 			<tr>
@@ -250,13 +251,13 @@ Vue.component('jet-competence', {
 				<td><input type="number" v-model.number="bonus"></td>
 			</tr>
 		</table>
-		<div class="inrc_routine" v-on:click="send_routine" v-bind:class="{inrc_routine_allowed: nr_routine!=0}">
+		<div class="inrc_routine" v-on:click="send_routine" v-bind:class="{inrc_routine_allowed: nr_routine!=0}" v-if="!simple_rules">
 			<span>Épreuve de routine:</span>
 			<span v-if="nr_routine==0">impossible</span>
 			<span v-if="nr_routine!=0">NR = {{nr_routine}}</span>
 		</div>
 		<div class="inrc_actions inrc_actions_2">
-			<input class="inrc_roll_name" v-model.trim="rollName" placeholder="Nom de la compétence..." />
+			<input class="inrc_roll_name" v-model.trim="rollName" placeholder="Nom de la compétence..." :readonly="simple_rules" />
 			<button class="inrc_send" v-on:click="send">Effectuer le jet</button>
 		</div>
 
@@ -695,11 +696,11 @@ Vue.component('jet-fight', {
 		<table>
 			<tr>
 				<th data-tooltip="Initiative">Initiative ({{ identity.deriv.stats.ini }})</th>
-				<th class="inrc_view_clickable" v-on:click="toogleAttackView">Attaque</th>
+				<th>Attaque</th>
 				<th class="inrc_view_clickable" v-on:click="toogleBonusView">Bonus / Malus</th>
 				<th>Dégâts</th>
 				<th>Parade</th>
-				<th data-tooltip="Esquive">Esquive (1{{ identity.deriv.stats.esq }})</th>
+				<th data-tooltip="Esquive">Esquive ({{ identity.deriv.stats.esq }})</th>
 			</tr>
 			<tr>
 				<td><input type="number" v-model.number="ini"></td>

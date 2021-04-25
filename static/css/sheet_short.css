@@ -88,19 +88,21 @@
     font-family: fantasy;
 }
 
-.table_gm_only input {
+.table_gm_only input[type="text"] {
 	margin-bottom: 0.7em;
 	width: 20em;
 }
 .table_gm_only label {
 	font-weight: bold;
-	display: block;
-	margin-bottom: 0.2em;
+	/* display: block;
+	margin-bottom: 0.2em; */
 }
 .gm_action {
 	width: fit-content;
 	margin: auto;
 	text-align: left;
+	margin-top: 1em;
+	margin-bottom: 1em;
 }
 
 /*
@@ -126,6 +128,7 @@
 .bag_item {
 	flex: 1 0 40%;
 	border-bottom: 1px solid grey;
+	margin-right: 0.7em;
 }
 .bag_sep {
 	flex: 2 0 80%;

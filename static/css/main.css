@@ -116,6 +116,14 @@ button:not(.simpleButton):focus-visible {
     /* background: #f3f3f3; */
 	background: white;
 }
+input[readonly] {
+	border-radius: 0px;
+    outline: none;
+    cursor: default;
+    background: white;
+    border: none;
+    text-align: center;
+}
 
 
 /*

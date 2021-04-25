@@ -2,6 +2,8 @@ from pathlib import Path
 import yaml
 import copy
 import aiohttp
+import threading
+import os
 
 from api.util import config
 
@@ -28,9 +30,10 @@ def as_float(n):
 
 # ========== Optolith datas ==========
 
+OPTO_DATA_V1 = None
+OPTO_LOADED = False
 OPTO_SEXS = {'m': 'Masculin', 'f': 'Féminin'}
 OPTO_AL = ['AL?', 'Courte', 'Moyenne', 'Longue', 'Très longue']
-OPTO_DATA_V1 = None
 ITEM_PAQUETAGES = {
     'paquetage de voyage':
     [["Amadou, 25 portions", 0.025, ""],
@@ -165,17 +168,6 @@ def prepare_data(data):
     data['_'] = union
     return data
 
-
-def load_optolith_data():
-    global OPTO_DATA_V1
-    if is_optolith_available():
-        data_univ = load_opto_from("optolith-data/Data/univ")
-        data_en = load_opto_from("optolith-data/Data/en-US")
-        data_en = merge_data(data_univ, data_en, True)
-        data_fr = load_opto_from("optolith-data/Data/fr-FR")
-        OPTO_DATA_V1 = prepare_data(merge_data(data_en, data_fr, True))
-
-
 async def upload_b64_image(img):
     if config['imgbb_token'] is None:
         return None
@@ -195,6 +187,36 @@ async def upload_b64_image(img):
             else:
                 print('Upload error:', answer)
 
+
+# ========== Load optolith data ==========
+
+def _do_load_opto_data():
+    global OPTO_DATA_V1, OPTO_LOADED
+    if not Path("optolith-data").is_dir():
+        Path("optolith-data").mkdir(parents=True, exist_ok=True)
+        if config['github_token'] is not None:
+            print("Cloning optolith-data repo")
+            os.system(
+                f"git clone https://{config['github_token']}@github.com/elyukai/optolith-data"
+            )
+        else:
+            print("[WARNING] No github token, Optolith import is unavailable")
+            return
+
+    if is_optolith_available():
+        print("Started loading Optolith data")
+        data_univ = load_opto_from("optolith-data/Data/univ")
+        data_en = load_opto_from("optolith-data/Data/en-US")
+        data_en = merge_data(data_univ, data_en, True)
+        data_fr = load_opto_from("optolith-data/Data/fr-FR")
+        OPTO_DATA_V1 = prepare_data(merge_data(data_en, data_fr, True))
+        OPTO_LOADED = True
+        print("Finished loading Optolith data")
+
+
+def load_optolith_data():
+    th = threading.Thread(target=_do_load_opto_data)
+    th.start()
 
 # ========== Conversion ==========
 
@@ -291,7 +313,7 @@ async def convert_from_optolith_v1(data):
     for q in data['attr']['values']:
         quals[q['id']] = q['value']
 
-    taille_masse = personal.get("size", "?") + "pieds / " + personal.get(
+    taille_masse = personal.get("size", "?") + " pieds / " + personal.get(
         "weight", "?") + " pierres"
     sexe = OPTO_SEXS.get(data.get("sex", ""), '')
 
@@ -951,6 +973,8 @@ def is_optolith_available():
 async def convert_from_optolith(data):
     if not is_optolith_available():
         raise OptolithConversionError("Optolith data not found")
+    if not OPTO_LOADED:
+        raise OptolithConversionError("Optolith data still not loaded")
     if not 'clientVersion' in data:
         raise OptolithConversionError("Wrong format")
 

@@ -44,7 +44,7 @@ Vue.component('sheet-short-view', {
 							"content": sheet
 						};
 						return [url, data];
-					}, 2000);
+					}, 1000);
 				}
 			});
 		this.socket.register((event, data) => {

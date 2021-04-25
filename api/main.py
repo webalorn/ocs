@@ -11,31 +11,18 @@ from starlette.responses import RedirectResponse
 from api.db import get_item, set_item
 from api.chat import *
 from api.util import new_id, config
-from api.sheet import is_optolith_available, load_optolith_data, convert_from_optolith, OptolithConversionError
+from api.sheet import load_optolith_data, convert_from_optolith, OptolithConversionError
 
 from pathlib import Path
-import shutil, os
-from datetime import datetime, timezone
-from dateutil import tz
+import shutil
+import time
 
 Path("upload").mkdir(parents=True, exist_ok=True)
+load_optolith_data()
 
 app = FastAPI()
 app.mount("/web", StaticFiles(directory="static"), name="static")
 app.mount("/upload", StaticFiles(directory="upload"), name="static")
-
-if not Path("optolith-data").is_dir():
-    Path("optolith-data").mkdir(parents=True, exist_ok=True)
-    if config['github_token'] is not None:
-        os.system(
-            f"git clone https://{config['github_token']}@github.com/elyukai/optolith-data"
-        )
-    else:
-        print("[WARNING] No github token, Optolith import is unavailable")
-
-OPTO_AVAILABLE = is_optolith_available()
-if OPTO_AVAILABLE:
-    load_optolith_data()
 
 # Models
 
@@ -53,10 +40,20 @@ class Table(BaseModel):
     id: str
     characters: List[str]
     name: str = "Unnamed"
+    sheet_view: str = "default"
+    choose_roll_target: bool = True
+    simple_rules: bool = False
 
 
 class NewTable(BaseModel):
     name: str = "Unnamed"
+
+
+class TableUpdateData(BaseModel):
+    name: str
+    sheet_view: str
+    choose_roll_target: bool
+    simple_rules: bool
 
 
 # @app.get("/")
@@ -65,12 +62,17 @@ class NewTable(BaseModel):
 
 
 @app.get("/")
-async def redirect():
+async def redirect_root():
     return RedirectResponse(url='/web/index.html')
 
 
+@app.get("/keepalive")
+async def keepalive():
+    return f'OK - {int(time.time())}'
+
+
 @app.get("/web")
-async def redirect():
+async def redirect_web():
     return RedirectResponse(url='/web/index.html')
 
 
@@ -101,9 +103,9 @@ async def create_sheet():
 
 @app.post("/api/sheet/optolith")
 async def load_from_optolith(import_data: JsonData):
-    if not OPTO_AVAILABLE:
-        raise HTTPException(status_code=501,
-                            detail=f"Missing optolith ressources")
+    # if not OPTO_AVAILABLE:
+    #     raise HTTPException(status_code=501,
+    #                         detail=f"Missing optolith ressources")
     try:
         return await convert_from_optolith(import_data.data)
     except OptolithConversionError as e:
@@ -111,9 +113,12 @@ async def load_from_optolith(import_data: JsonData):
 
 
 @app.put("/api/table/{table_id}/update")
-async def put_table(table_update: NewTable, table_id: str):
+async def put_table(table_update: TableUpdateData, table_id: str):
     table = await get_item(table_id)
-    table['name'] = table_update.name
+
+    for key, val in table_update.dict().items():
+        table[key] = val
+
     await set_item(**table)
     return 'OK'
 
@@ -236,10 +241,6 @@ async def websocket_endpoint_table(websocket: WebSocket, table_id: str):
                         send_message['target'] = 'all'
                 send_message['roll_name'] = message.get('roll_name', '')
 
-                utc_time = datetime.now(timezone.utc)
-                to_zone = tz.gettz('France/Paris')
-                now = utc_time.astimezone(to_zone)
-                send_message['time'] = now.strftime("%H:%M")
                 # if send_message.get('target', None) == 'self':
                 #     await websocket.send_json(send_message)
                 # else:

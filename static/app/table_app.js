@@ -26,10 +26,25 @@ var app = new Vue({
 			openSpells: new Event('openSpells'),
 			openBag: new Event('openBag'),
 		},
+		options: {
+			sheetView: "no",
+			choose_roll_target: false,
+			simple_rules: true,
+		}
+	},
+	computed: {
+		useSimpleRules: function () {
+			return this.options.simple_rules && !this.identity.gm;
+		},
 	},
 	methods: {
 		open_sheet: function () {
 			let url = "/web/sheet.html?id=" + this.identity.id;
+			if (this.options.sheetView == 'full') {
+				url += '&view=full';
+			} else if (this.options.sheetView == 'simple') {
+				url += '&view=simple';
+			}
 			window.open(url, '_blank');
 		},
 		addPlayer: function () {
@@ -63,10 +78,13 @@ var app = new Vue({
 			document.title = this.tableName + ' | Table de jeu';
 			storage_set_in_dict('idToName', this.tableId, title);
 		},
-		updateTableName: function () {
+		updateTableOptions: function () {
 			let urlPost = "/api/table/" + this.tableId + "/update";
 			let data = {
 				'name': this.newTableName,
+				'sheet_view': this.options.sheetView,
+				'choose_roll_target': this.options.choose_roll_target,
+				'simple_rules': this.options.simple_rules,
 			};
 			fetch(urlPost, {
 				method: 'PUT',
@@ -171,6 +189,11 @@ var app = new Vue({
 			} else {
 				answer.json().then(data => {
 					this.setTitle(data['name']);
+					this.options.sheetView = data['sheet_view'];
+					this.options.choose_roll_target = data['choose_roll_target'];
+					this.options.simple_rules = data['simple_rules']
+					console.log(data);
+
 					let defSheet = newDefaultSheet();
 					let defDeriv = compute_derived(defSheet);
 

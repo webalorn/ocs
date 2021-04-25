@@ -6,7 +6,6 @@ const saveInactiveDelay = 4 * 1000;
 const autoCheckInterval = 500;
 
 function newSaveManager(dataInit, prepareData, saveInactive = saveInactiveDelay) {
-	console.log('saveInactive', saveInactive);
 	let data = dataInit;
 	let lastSavedData = cloneData(data);
 	let lastModif = Date.now();
@@ -65,8 +64,8 @@ function newSaveManager(dataInit, prepareData, saveInactive = saveInactiveDelay)
 			}
 		},
 		autoSave: function () {
-			if (!this.saving && this.unsaved && (Date.now() - this.lastSavedAt > saveIntervalMax) ||
-				(Date.now() - lastModif > saveInactive)) {
+			if (!this.saving && this.unsaved && (Date.now() - this.lastSavedAt > saveIntervalMax ||
+				Date.now() - lastModif > saveInactive)) {
 				this.pushSave();
 			}
 		},
@@ -768,6 +767,39 @@ function create_sheet_component(sheet_template) {
 						});
 					}
 				})
+			},
+			clone_sheet: function () {
+				let clone_message = confirm("Créer une nouvelle fiche identique ?");
+				if (clone_message) {
+					fetch("/api/sheet/", {
+						method: 'POST',
+						cache: 'no-cache',
+					}).then(ans => {
+						if (ans.ok) {
+							ans.json().then(data => {
+								let id = data['id'];
+								storage_add('characters', id);
+
+								fetch("/api/sheet/" + id, {
+									method: 'PUT',
+									cache: 'no-cache',
+									headers: {
+										'Content-Type': 'application/json',
+									},
+									body: JSON.stringify({
+										"id": this.id,
+										"content": this.sheet,
+									}),
+								}).then(ans => {
+									let url = '/web/sheet.html?view=full&id=' + id;
+									window.open(url, '_blank');
+								});
+							});
+						} else {
+							alert("Erreur lors de la copie du personnage");
+						}
+					});
+				}
 			},
 			socketListener: function (event, data) {
 				if (data.type == 'notification' && data.on == 'sheet' && data.sheet_id == this.id) {

@@ -42,7 +42,11 @@ function newReSocket(url_path, connnectCallback) {
 			);
 		},
 		send: function (data) {
-			return this.socket.send(data);
+			if (this.socket.readyState === 1) {
+				return this.socket.send(data);
+			} else {
+				setTimeout(() => this.send(data), 200);
+			}
 		},
 		send_json: function (data) {
 			return this.send(JSON.stringify(data));
@@ -50,6 +54,12 @@ function newReSocket(url_path, connnectCallback) {
 	};
 	s.initSocket();
 	return s;
+}
+
+function keepalive_server() {
+	setInterval(() => {
+		fetch("/keepalive");
+	}, 5 * 60 * 1000);
 }
 
 String.prototype.hashCode = function () {
