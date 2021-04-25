@@ -627,6 +627,12 @@ input.inrc_roll_name {
 .inrc_spell_error {
 	color: #ff4b4b;
 }
+.inrc_view_th_button {
+    padding: 0.3em;
+}
+.inrc_view_th_button > button {
+	background: #dbdbdb;
+}
 
 /*
 	Roll for fight
@@ -647,7 +653,10 @@ input.inrc_roll_name {
 }
 .rfight_view table td {
 	text-align: center;
-    width: 6.5em;
+    /* width: 6.5em; */
+}
+.rfight_view table .col_sep {
+	width: 3em;
 }
 .rfight_view input {
 	height: 2em;
@@ -657,12 +666,37 @@ input.inrc_roll_name {
 .rfight_weapon_name {
 	border-top: 1px solid black;
     padding-top: 4px;
+	text-align: center;
 }
 .rfight_weapon_name > input {
 	text-align: left;
     width: 15em;
     height: 1.6em;
     margin-right: 1em;
+    margin: auto;
+}
+.rfight_weapon_name > span {
+	min-height: 1em;
+	font-style: italic;
+}
+.rfight_val {
+	background-color: white;
+    padding: 0.15em 0.6em;
+    font-weight: bold;
+    border-radius: 5px;
+	border: 1px solid grey;
+}
+.rfight_val_esq {
+	background-color:rgb(192, 218, 186);
+}
+.rfight_val_ini {
+	background-color:rgb(193, 213, 219);
+}
+.rfight_val_dmg {
+	background-color:rgb(241, 149, 149);
+}
+.rfight_val_prd {
+	background-color:#d4b097;
 }
 
 button.rfight_ini:not(:hover) {

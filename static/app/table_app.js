@@ -192,7 +192,6 @@ var app = new Vue({
 					this.options.sheetView = data['sheet_view'];
 					this.options.choose_roll_target = data['choose_roll_target'];
 					this.options.simple_rules = data['simple_rules']
-					console.log(data);
 
 					let defSheet = newDefaultSheet();
 					let defDeriv = compute_derived(defSheet);

@@ -27,7 +27,11 @@
 	background-image: url("/web/images/eye.png")!important;
 	background-size: cover;
 }
-
+.ssv_avatar_simple {
+	width : 90px;
+	height: 90px;
+	background-color: gray;
+}
 
 
 .champ_in {

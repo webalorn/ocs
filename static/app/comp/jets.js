@@ -590,15 +590,18 @@ Vue.component('reroll-competence', {
 */
 
 Vue.component('jet-fight', {
-	props: ['socket', 'identity', 'config'],
+	props: ['socket', 'identity', 'config', 'simple_rules'],
 	data: function () {
 		return {
 			ini: this.identity.deriv.stats.ini,
+			modif_ini: 0,
 			at: 0,
 			modif_at: 0,
-			damages: '1D1-1',
+			damages: '0',
 			prd: 0,
+			modif_prd: 0,
 			esq: this.identity.deriv.stats.esq,
+			modif_esq: 0,
 			showAttackSelect: false,
 			showBonuses: false,
 			weaponName: '',
@@ -643,7 +646,8 @@ Vue.component('jet-fight', {
 				'type': 'attack',
 				'from': this.identity.id,
 				'from_name': this.identity.name,
-				'roll': this.at + this.modif_at,
+				'roll': this.at,
+				'roll_modif': this.modif_at,
 				'target': this.config.target,
 				'using': this.weaponName,
 			});
@@ -664,6 +668,7 @@ Vue.component('jet-fight', {
 				'from': this.identity.id,
 				'from_name': this.identity.name,
 				'roll': this.prd,
+				'roll_modif': this.modif_prd,
 				'target': this.config.target,
 				'using': this.weaponName,
 			});
@@ -674,6 +679,7 @@ Vue.component('jet-fight', {
 				'from': this.identity.id,
 				'from_name': this.identity.name,
 				'roll': this.esq,
+				'roll_modif': this.modif_esq,
 				'target': this.config.target,
 			});
 		},
@@ -694,36 +700,69 @@ Vue.component('jet-fight', {
 	template: `
 	<div class="rfight_view">
 		<table>
-			<tr>
+			<!--<tr>
 				<th data-tooltip="Initiative">Initiative ({{ identity.deriv.stats.ini }})</th>
 				<th>Attaque</th>
 				<th class="inrc_view_clickable" v-on:click="toogleBonusView">Bonus / Malus</th>
 				<th>Dégâts</th>
 				<th>Parade</th>
 				<th data-tooltip="Esquive">Esquive ({{ identity.deriv.stats.esq }})</th>
-			</tr>
+			</tr>-->
 			<tr>
-				<td><input type="number" v-model.number="ini"></td>
-				<td><input type="number" v-model.number="at"></td>
+				<td><span class="rfight_val rfight_val_ini">{{ini}}</span></td>
+				<td>±</td>
+				<td><input type="number" v-model.number="modif_ini"></td>
+				<td><button class="rfight_ini" v-on:click="sendIni">Initiative</button></td>
+				<td class="col_sep"></td>
+
+				<td v-if="!simple_rules"><input type="number" v-model.number="at"></td>
+				<td v-else><span class="rfight_val rfight_val_at">{{at}}</span></td>
+				<td>±</td>
 				<td><input type="number" v-model.number="modif_at"></td>
-				<td><input type="text" v-model.trim="damages" style="width: 5em;"></td>
-				<td><input type="number" v-model.number="prd"></td>
-				<td><input type="number" v-model.number="esq"></td>
+				<td><button class="rfight_at" v-on:click="sendAttack">Attaquer</button></td>
 			</tr>
 			<tr>
-				<td><button class="rfight_ini" v-on:click="sendIni">Jet d'INI</button></td>
-				<td colspan="2"><button class="rfight_at" v-on:click="sendAttack">Attaquer</button></td>
-				<td><button class="rfight_dmg" v-on:click="sendDmg">Jet dégâts</button></td>
-				<td><button class="rfight_prd" v-on:click="sendPrd">Parer</button></td>
+				<td><span class="rfight_val rfight_val_esq">{{esq}}</span></td>
+				<td>±</td>
+				<td><input type="number" v-model.number="modif_esq"></td>
 				<td><button class="rfight_esq" v-on:click="sendEsq">Esquiver</button></td>
+				<td class="col_sep"></td>
+
+				<td v-if="!simple_rules"><input type="number" v-model.number="prd"></td>
+				<td v-else><span class="rfight_val rfight_val_prd">{{prd}}</span></td>
+				<td>±</td>
+				<td><input type="number" v-model.number="modif_prd"></td>
+				<td><button class="rfight_prd" v-on:click="sendPrd">Parer</button></td>
 			</tr>
 			<tr>
+				<td colspan="4"></td>
+				<td class="col_sep"></td>
+
+				<td colspan="3" style="text-align:right;">
+					<input type="text" v-model.trim="damages" style="width: 7em;"  v-if="!simple_rules">
+					<span class="rfight_val rfight_val_at" v-else>{{damages}}</span>
+				</td>
+				<td><button class="rfight_dmg" v-on:click="sendDmg">Dégâts</button></td>
+			</tr>
+			<tr>
+				<td></td>
+				<th colspan="3" class="inrc_view_th_button">
+					<button v-on:click="toogleBonusView" v-if="!simple_rules">Liste des bonus / malus</button>
+				</th>
+				<td class="col_sep"></td>
+				<td colspan="4" class="rfight_weapon_name">
+					<input v-model.trim="weaponName" placeholder="Nom de l'arme..." v-if="!simple_rules" />
+					<span v-else-if="weaponName.length>0">{{weaponName}}</span>
+					<span v-else>Aucune arme sélectionnée</span>
+				</td>
+			</tr>
+			<!--<tr>
 				<td></td>
 				<td colspan="4" class="rfight_weapon_name">
 					<input v-model.trim="weaponName" placeholder="Nom de l'arme..." />
 				</td>
 				<td></td>
-			</tr>
+			</tr>-->
 		</table>
 
 

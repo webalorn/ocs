@@ -31,7 +31,7 @@
 				</template>
 				<span class="top_name" v-else>{{ identity.name }}</span>
 
-				<button v-on:click="open_sheet" v-if="!identity.gm && options.sheetView != 'no'"
+				<button v-on:click="open_sheet" v-if="!useSimpleRules && !identity.gm && options.sheetView != 'no'"
 					class="top_edit_sheet">Voir ma fiche</button>
 				<span class="top_table_name">{{ tableName }}</span>
 			</div>
@@ -51,7 +51,7 @@
 					<reroll-competence v-if="reroll_comp.dice" v-bind:socket="socket" v-bind:identity="identity"
 						v-bind:reroll_comp="reroll_comp"></reroll-competence>
 
-					<div class="roll_config" v-if="options.choose_roll_target || identity.gm">
+					<div class="roll_config" v-if="!useSimpleRules && (options.choose_roll_target || identity.gm)">
 						<div class="roll_target switch_radio">
 							<!-- <option value="self">Jet caché</option>
 					<option value="game_master">Jet derrière l'écran</option>
@@ -72,7 +72,7 @@
 					</div>
 
 					<jet-fight v-if="identity.initOk" v-bind:socket="socket" v-bind:identity="identity"
-						v-bind:config="roll">
+						:simple_rules="useSimpleRules" v-bind:config="roll">
 					</jet-fight>
 
 					<show-bag :identity="identity"></show-bag>
@@ -80,7 +80,7 @@
 			</div>
 
 			<sheet-short-view v-for="id in characters" v-bind:key="id" v-bind:table="tableId" v-bind:identity="identity"
-				v-bind:id="id" v-bind:socket="socket" v-bind:isgm="identity.gm">
+				:simple_rules="useSimpleRules" v-bind:id="id" v-bind:socket="socket" v-bind:isgm="identity.gm">
 			</sheet-short-view>
 
 			<div v-if="identity.gm" class="table_gm_only col_container">
@@ -89,9 +89,12 @@
 						<h3>Configuration</h3>
 						<label>Nom de la table</label><br>
 						<input type="text" v-model.trim="newTableName" placeholder="Id de la fiche"> <br />
+						<label for="simple_rules">Version simplifiée</label>
+						<input type="checkbox" v-model="options.simple_rules" id="simple_rules">
+						<br><br>
 
 						<label>Fiches de personages</label><br>
-						<select v-model="options.sheetView">
+						<select v-model="options.sheetView" :disabled="options.simple_rules">
 							<option value="default">Par défaut</option>
 							<option value="full">Fiche complète</option>
 							<option value="simple">Fiche simplifiée</option>
@@ -99,10 +102,8 @@
 						</select>
 						<br>
 						<label for="choose_roll_target">Choisir la cible du jet</label>
-						<input type="checkbox" v-model="options.choose_roll_target" id="choose_roll_target">
-						<br>
-						<label for="simple_rules">Version simplifiée</label>
-						<input type="checkbox" v-model="options.simple_rules" id="simple_rules">
+						<input type="checkbox" v-model="options.choose_roll_target" id="choose_roll_target"
+							:disabled="options.simple_rules">
 						<br><br>
 						<button v-on:click="updateTableOptions">Mettre à jour</button>
 					</div>

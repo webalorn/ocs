@@ -23,7 +23,8 @@ def process_message(message_obj):
                               message_obj['q3'], message_obj['vc'],
                               message_obj['bonus'], message_obj['on'])
     if message_obj['type'] in ROLL_D20:
-        return jet_d20(message_obj['roll'], message_obj['type'])
+        return jet_d20(message_obj['roll'], message_obj['type'],
+                       message_obj.get('roll_modif', 0))
     if message_obj['type'] in ROLL_STR:
         return jet_simple(message_obj['roll'], message_obj['type'])
 
@@ -204,7 +205,8 @@ def jet_competence(rq1, rq2, rq3, vc, bonus, on):
     }
 
 
-def jet_d20(difficulty, type):
+def jet_d20(base_val, type, modif=0):
+    difficulty = base_val + modif
     dice = random.randint(1, 20)
     dice_conf = random.randint(1, 20)
     results = {
@@ -214,7 +216,8 @@ def jet_d20(difficulty, type):
         'success': bool(dice <= difficulty and dice != 20),
         'critique': bool(dice == 1 and difficulty > 0),
         'maladresse': bool(dice == 20),
-        'difficulty': difficulty,
+        'base_val': base_val,
+        'modif': modif,
         'confirmation': False,
         'dice_conf': dice_conf,
     }

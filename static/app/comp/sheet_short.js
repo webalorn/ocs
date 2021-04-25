@@ -2,7 +2,7 @@
 	Sheet short view
 */
 Vue.component('sheet-short-view', {
-	props: ['identity', 'table', 'id', 'socket', 'isgm'],
+	props: ['identity', 'table', 'id', 'socket', 'isgm', 'simple_rules'],
 	data: function () {
 		return {
 			sheet: null,
@@ -101,7 +101,8 @@ Vue.component('sheet-short-view', {
 	<div class="sheet_short_view">
 	<template v-if="sheet">
 		<div class="ssv_head">
-			<div class="ssv_avatar" v-bind:style="avatarStyle" v-on:click="openDetails"></div>
+			<div class="ssv_avatar" v-bind:style="avatarStyle" v-on:click="openDetails" v-if="!simple_rules"></div>
+			<div class="ssv_avatar_simple" v-bind:style="avatarStyle" v-else></div>
 			<div class="header_infos">
 				<span class="char_name">{{sheet.head.nom}}</span>
 				<br>

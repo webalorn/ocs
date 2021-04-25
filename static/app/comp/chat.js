@@ -218,7 +218,12 @@ Vue.component('chat-compo', {
 							<span v-else class="chat_d20_type">{{ m.roll_type }} :</span>
 
 							<span class="chat_d20_jet_val">{{ m.dice }}</span>
-							<span>(Jet sur {{ m.difficulty }})</span>
+							<span>(Jet sur {{ m.base_val }}<!--
+							--><template v-if="m.modif>0">+{{m.modif}}</template><!--
+							--><template v-if="m.modif<0">-{{-m.modif}}</template><!--
+							--><template v-if="m.modif!=0"> = {{m.base_val+m.modif}}</template><!--
+							-->)
+							</span>
 							<div v-if="m.using" class="chat_d20_using">
 								({{m.using}})
 							</div>
