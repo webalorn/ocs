@@ -54,6 +54,8 @@ function newSaveManager(dataInit, prepareData, saveInactive = saveInactiveDelay)
 						console.error("Error during saving");
 						console.log(answer);
 						this.saveError = true;
+					} else {
+						this.lastSavedAt = Date.now();
 					}
 				}).catch((error) => {
 					console.error("Error during saving", error);

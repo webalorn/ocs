@@ -49,8 +49,8 @@ var app = new Vue({
 		},
 		addPlayer: function () {
 			if (this.newPlayerId) {
-				for (let i in this.players) {
-					if (this.players[i].id == this.newPlayerId) {
+				for (let p of this.characters) {
+					if (p == this.newPlayerId) {
 						alert("Déjà à cette table !");
 						return;
 					}
@@ -69,7 +69,8 @@ var app = new Vue({
 								if (ans.ok) { location.reload(); }
 							});
 						}
-					})
+						return answer;
+					});
 			}
 		},
 		setTitle: function (title) {

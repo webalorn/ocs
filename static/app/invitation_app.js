@@ -37,7 +37,7 @@ Vue.component('select-character', {
 		return {
 			sheet: {
 				head: {
-					nom: "Loading...",
+					nom: "Chargement...",
 					peuple: "",
 					culture: "",
 					profession: "",
