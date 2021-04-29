@@ -338,6 +338,9 @@ code {
 .t_sidebar_bag {
     background-image: url(/web/images/stuff.png);
 }
+.t_sidebar_notes {
+    background-image: url(/web/images/notes.png);
+}
 
 /*
 	Main area

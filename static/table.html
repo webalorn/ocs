@@ -6,6 +6,7 @@
 	<title>Table</title>
 	<link rel="stylesheet" href="css/main.css" />
 	<link rel="stylesheet" href="css/table.css" />
+	<link rel="stylesheet" href="css/firepad.css" />
 	<link rel="stylesheet" href="css/sheet.css" />
 	<link rel="stylesheet" href="css/sheet_short.css" />
 	<link rel="icon" type="image/png" href="/web/images/icon.png" />
@@ -15,6 +16,16 @@
 
 	<!-- production version, optimized for size and speed -->
 	<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+
+	<!-- Firebase -->
+	<script src="https://www.gstatic.com/firebasejs/8.4.2/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.4.2/firebase-database.js"></script>
+	<!-- CodeMirror -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/codemirror.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/codemirror.css" />
+	<!-- Firepad -->
+	<link rel="stylesheet" href="https://firepad.io/releases/v1.5.10/firepad.css" />
+	<script src="https://firepad.io/releases/v1.5.10/firepad.min.js"></script>
 </head>
 
 <body>
@@ -37,12 +48,14 @@
 			</div>
 
 			<div class="col_container">
-				<div class="t_sidebar" v-if="!identity.gm">
+				<!--<div class="t_sidebar" v-if="!identity.gm">-->
+				<div class="t_sidebar">
 					<button class="t_sidebar_roll simpleButton" v-on:click="fireEvent('openRoll')"></button>
 					<button class="t_sidebar_fight simpleButton" v-on:click="fireEvent('openWeapons')"></button>
 					<button class="t_sidebar_magic simpleButton" v-on:click="fireEvent('openSpells')"
 						v-if="identity.deriv.stats.ea || identity.deriv.stats.ek"></button>
 					<button class="t_sidebar_bag simpleButton" v-on:click="fireEvent('openBag')"></button>
+					<button class="t_sidebar_notes simpleButton" v-on:click="openNotes()"></button>
 				</div>
 				<div class="column">
 					<jet-competence v-if="!reroll_comp.dice" v-bind:socket="socket" v-bind:identity="identity"
@@ -116,7 +129,8 @@
 					</div>
 					<div class="gm_action">
 						<strong>Lien d'invitation générique</strong><br>
-						<a :href="'/web/invitation.html?table=' + tableId" target="_blank">{{ window.location.protocol
+						<a :href="'/web/invitation.html?table=' + tableId" target="_blank">{{
+							window.location.protocol
 							}}//{{ window.location.host}}/web/invitation.html?table={{
 							tableId }}</a>
 					</div>
@@ -131,11 +145,22 @@
 		</chat-compo>
 	</div>
 
+	<div class="winBack" id="firepad-back" style="display: none;" onclick="hideFirepad();"></div>
+	<div id="firepad-window" class="select_win">
+		<div class="firepad-titlebar">
+			<h5>Notes de jeu</h5>
+			<button onclick="hideFirepad();">Fermer</button>
+		</div>
+		<div id="firepad-container">
+		</div>
+	</div>
+
 	<script>
 		const event_sheet_loaded = null;
 	</script>
 
 	<script src="app/util.js"></script>
+	<script src="app/ressources/firepad.js"></script>
 	<script src="app/comp/chat.js"></script>
 	<script src="app/comp/jets.js"></script>
 	<script src="app/comp/sheet_data.js"></script>

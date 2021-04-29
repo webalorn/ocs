@@ -1,0 +1,37 @@
+.display-block {
+	display: block !important;
+}
+
+#firepad-container {
+	width: 100%;
+	height: calc(100% - 2.3rem - 1px);
+}
+
+#firepad-window {
+	width: 90%;
+	height: 90%;
+	padding: 0px;
+	overflow: hidden;
+	display: none;
+}
+
+.firepad-titlebar {
+	padding: 0.5rem;
+	border-bottom: 1px solid rgb(123, 82, 54);
+	height: 1.3rem;
+}
+
+.firepad-titlebar h5 {
+	font-size: 1.2rem;
+	margin: 0px;
+	display: inline-block;
+}
+
+.firepad-titlebar button {
+	float: right;
+}
+
+
+.powered-by-firepad {
+	display: none!important;
+}

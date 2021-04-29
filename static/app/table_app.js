@@ -179,6 +179,9 @@ var app = new Vue({
 		fireEvent: function (name) {
 			document.dispatchEvent(this.events[name]);
 		},
+		openNotes: function () {
+			showFirepad();
+		},
 	},
 	mounted: function () {
 		this.tableId = this.urlParams.get("table");
@@ -267,6 +270,7 @@ var app = new Vue({
 			}
 		});
 
+		initFirepad(this.tableId);
 		document.getElementById("app").setAttribute("style", "");
 	},
 });

@@ -553,8 +553,11 @@
 						<!-- / {{ deriv.masse.max }} -->
 					</div>
 					<div class="champ_in simple_rm">
-						<label>Total pour ENC (sans l'armure) :</label>
+						<label>Total encombrement (sans l'armure) :</label>
 						{{ deriv.masse.total_enc }} / {{ deriv.masse.max }}
+						<span v-if="deriv.masse.total_enc > deriv.masse.max" class="enc_subit">
+							(+{{ Math.floor((deriv.masse.total_enc-deriv.masse.max)/4) }} Encombrement)
+						</span>
 					</div>
 				</div>
 			</div>

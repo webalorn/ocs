@@ -518,6 +518,11 @@ button.s_table_edit:hover {
 .stuff_table td:nth-child(3), .stuff_table th:nth-child(3) {
 	width: 12em;
 }
+.enc_subit {
+	margin-left: 1em;
+    font-style: italic;
+	color: #690000;
+}
 
 /*
 	Magic
