@@ -129,7 +129,7 @@ Vue.component('sheet-short-view', {
 				<int-input v-model.number="sheet.cur_stats.ev" style="width: 4em; text-align: right;" v-if="editSheet" />
 				<span v-else>{{sheet.cur_stats.ev}}</span>
 				<span> / {{ deriv.stats.ev }}</span>
-				<br v-if="editSheet">
+				<br v-if="editSheet || isgm">
 				<span v-if="deriv.ev_etats == 1" class="ev_niv_1" data-tooltip="+1 Douleur">Touché (1)</span>
 				<span v-if="deriv.ev_etats == 2" class="ev_niv_2" data-tooltip="+2 Douleur">Touché (2)</span>
 				<span v-if="deriv.ev_etats == 3" class="ev_niv_3" data-tooltip="+3 Douleur">Touché (3)</span>
@@ -155,6 +155,10 @@ Vue.component('sheet-short-view', {
 					<int-input v-model.number="sheet.des.actuels" style="width: 2em; text-align: center;" v-if="editSheet" />
 					<span> / {{ deriv.des.max }}</span>
 				</template>
+				<template v-else-if="isgm">
+					<label data-tooltip="Points de destin">DES :</label>
+					<span>{{ sheet.des.actuels }} / {{ deriv.des.max }}</span>
+				</template>
 			</div>
 			<div class="header_infos" v-if="editSheet">
 				<label>Vitesse :</label>
@@ -164,6 +168,19 @@ Vue.component('sheet-short-view', {
 				<span>{{ deriv.stats.tm }}</span>
 				<br>
 				<label data-tooltip="Ténacité physique">TP :</label>
+				<span>{{ deriv.stats.tp }}</span>
+			</div>
+			<div class="header_infos" v-else-if="isgm">
+				<label>INI :</label>
+				<span>{{ deriv.stats.ini }}</span>
+				<br>
+				<label>VI :</label>
+				<span>{{ deriv.stats.vi }}</span>
+				<br>
+				<label>TM :</label>
+				<span>{{ deriv.stats.tm }}</span>
+				<br>
+				<label>TP :</label>
 				<span>{{ deriv.stats.tp }}</span>
 			</div>
 
