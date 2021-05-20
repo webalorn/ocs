@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Aide à la traduction pour l'Œil Noir</title>
+	<link rel="stylesheet" href="/web/css/main.css" />
+	<link rel="icon" type="image/png" href="/web/images/icon.png" />
+
+	<!-- development version, includes helpful console warnings -->
+	<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+	<!-- production version, optimized for size and speed -->
+	<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2"></script> -->
+</head>
+
+<body class="app_body">
+	<div id="app" class="niceInputs">
+		<div class="app_column">
+			<h1>Aide pour la traduction</h1>
+			<textarea placeholder="Texte d'origine..." v-model="text">
+			</textarea>
+			<button class="centerButton" v-on:click="openDeepl">Traduction dans Deepl</button>
+			<h2>Mise en forme uniquement</h2>
+			<p class="displayText">{{ formatedText }}</p>
+			<label for="cut_pars">Séparer les paragraphes :</label>
+			<input type="checkbox" v-model="cut_pars" id="cut_pars">
+		</div>
+	</div>
+
+	<style>
+		.displayText {
+			white-space: pre-line;
+			background: #e1ffd5;
+			padding: 0.5em;
+		}
+	</style>
+
+	<script>
+		const regexCesures = /(?<=[a-z])-\s+(?=[a-z])/ig;
+		const newParagraph = /(?<=\S)\n+(?=\S)/ig;
+
+		var app = new Vue({
+			el: '#app',
+			data: {
+				text: "",
+				cut_pars: false,
+			},
+			methods: {
+				openDeepl: function () {
+					window.open(this.deeplUrl, "_blank");
+				},
+			},
+			mounted: function () {
+			},
+			computed: {
+				formatedText: function () {
+					let txt = this.text.replaceAll(regexCesures, "");
+					if (this.cut_pars) {
+						console.log("CUT PARS");
+						txt = txt.replaceAll(newParagraph, "\n\n");
+					}
+					// navigator.clipboard.writeText(txt);
+					return txt;
+				},
+				deeplUrl: function () {
+					return "https://www.deepl.com/translator#de/fr/" + encodeURI(this.formatedText);
+				},
+			}
+		});
+
+	</script>
+</body>
+
+</html>

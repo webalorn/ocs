@@ -1,6 +1,6 @@
 # OCS
 
-Système pour gérer les fiches de personnages et les jets de dés pour [le jeu de rôle l'Oeil Noir](https://fr.wikipedia.org/wiki/L%27%C5%92il_noir) (version 5). Une instance est disponible sur [dark-eye.herokuapp.com](dark-eye.herokuapp.com).
+Système pour gérer les fiches de personnages et les jets de dés pour [le jeu de rôle l'Œil noir](https://fr.wikipedia.org/wiki/L%27%C5%92il_noir) (version 5). Une instance est disponible sur [dark-eye.herokuapp.com](dark-eye.herokuapp.com).
 
 Le serveur à besoin de plusieurs variables d'environement qui peuvent être définies globalement, ou dans un fichier `.env` à la racine du projet :
 - `AWS_ACCESS_KEY_ID` : Clé d'accès pour la base de données DynamoDB
